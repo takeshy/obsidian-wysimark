@@ -1,0 +1,272 @@
+/* Wysimark Editor for Obsidian */
+
+/* Container styling */
+.wysimark-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding: 0;
+    background-color: var(--background-primary);
+}
+
+/* React root container */
+.wysimark-react-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+/* Empty state styling */
+.wysimark-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-faint);
+}
+
+.wysimark-empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.wysimark-empty-state-text {
+    font-size: var(--font-ui-medium);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+}
+
+.wysimark-empty-state-hint {
+    font-size: var(--font-ui-small);
+    color: var(--text-faint);
+}
+
+/* Header styling */
+.wysimark-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background-color: var(--background-secondary);
+    border-bottom: 1px solid var(--background-modifier-border);
+    flex-shrink: 0;
+}
+
+.wysimark-header-filename {
+    font-size: var(--font-ui-medium);
+    font-weight: 500;
+    color: var(--text-normal);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wysimark-header-save {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.wysimark-header-save:hover {
+    opacity: 1;
+}
+
+/* Editor wrapper */
+.wysimark-editor-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Editor container */
+.wysimark-editor-container {
+    flex: 1;
+    overflow: auto;
+    padding: 0;
+}
+
+/* Editor styling */
+.wysimark-editor {
+    min-height: 100%;
+    padding: 1rem;
+    font-family: var(--font-text);
+    font-size: var(--font-text-size);
+    line-height: var(--line-height-normal);
+    color: var(--text-normal);
+    background-color: var(--background-primary);
+}
+
+/* Focus styling */
+.wysimark-editor:focus {
+    outline: none;
+}
+
+/* Headings */
+.wysimark-editor h1,
+.wysimark-editor h2,
+.wysimark-editor h3,
+.wysimark-editor h4,
+.wysimark-editor h5,
+.wysimark-editor h6 {
+    color: var(--text-normal);
+    font-weight: var(--font-bold);
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+.wysimark-editor h1 {
+    font-size: var(--h1-size);
+}
+
+.wysimark-editor h2 {
+    font-size: var(--h2-size);
+}
+
+.wysimark-editor h3 {
+    font-size: var(--h3-size);
+}
+
+.wysimark-editor h4 {
+    font-size: var(--h4-size);
+}
+
+.wysimark-editor h5 {
+    font-size: var(--h5-size);
+}
+
+.wysimark-editor h6 {
+    font-size: var(--h6-size);
+}
+
+/* Links */
+.wysimark-editor a {
+    color: var(--text-accent);
+    text-decoration: underline;
+}
+
+.wysimark-editor a:hover {
+    color: var(--text-accent-hover);
+}
+
+/* Code blocks */
+.wysimark-editor pre {
+    background-color: var(--code-background);
+    border-radius: var(--radius-s);
+    padding: 1em;
+    overflow-x: auto;
+    font-family: var(--font-monospace);
+    font-size: var(--font-smaller);
+}
+
+.wysimark-editor code {
+    background-color: var(--code-background);
+    border-radius: var(--radius-s);
+    padding: 0.2em 0.4em;
+    font-family: var(--font-monospace);
+    font-size: 0.9em;
+}
+
+/* Blockquotes */
+.wysimark-editor blockquote {
+    border-left: 3px solid var(--text-accent);
+    margin: 1em 0;
+    padding-left: 1em;
+    color: var(--text-muted);
+}
+
+/* Lists */
+.wysimark-editor ul,
+.wysimark-editor ol {
+    padding-left: 2em;
+    margin: 0.5em 0;
+}
+
+.wysimark-editor li {
+    margin: 0.25em 0;
+}
+
+/* Tables */
+.wysimark-editor table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+.wysimark-editor th,
+.wysimark-editor td {
+    border: 1px solid var(--background-modifier-border);
+    padding: 0.5em;
+}
+
+.wysimark-editor th {
+    background-color: var(--background-secondary);
+    font-weight: var(--font-bold);
+}
+
+/* Images */
+.wysimark-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-s);
+}
+
+/* Horizontal rule */
+.wysimark-editor hr {
+    border: none;
+    border-top: 1px solid var(--background-modifier-border);
+    margin: 2em 0;
+}
+
+/* Task lists */
+.wysimark-editor input[type="checkbox"] {
+    margin-right: 0.5em;
+}
+
+/* Selection */
+.wysimark-editor ::selection {
+    background-color: var(--text-selection);
+}
+
+/* Placeholder */
+.wysimark-editor [data-placeholder]::before {
+    color: var(--text-faint);
+    font-style: italic;
+}
+
+/* Toolbar overrides for Obsidian theme compatibility */
+.wysimark-editor [class*="toolbar"] {
+    background-color: var(--background-secondary);
+    border-color: var(--background-modifier-border);
+}
+
+.wysimark-editor [class*="toolbar"] button {
+    color: var(--text-muted);
+}
+
+.wysimark-editor [class*="toolbar"] button:hover {
+    color: var(--text-normal);
+    background-color: var(--background-modifier-hover);
+}
+
+/* Slate editor specific fixes */
+.wysimark-editor [data-slate-editor="true"] {
+    min-height: 100%;
+    outline: none;
+}
+
+/* Fix for editable area */
+.wysimark-editor [contenteditable="true"] {
+    outline: none;
+    min-height: 200px;
+}
