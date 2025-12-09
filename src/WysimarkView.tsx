@@ -53,12 +53,12 @@ function EmptyState() {
 }
 
 // Header component showing current file
-function FileHeader({ fileName, onSave }: { fileName: string; onSave: () => void }) {
+function FileHeader({ fileName, onReload }: { fileName: string; onReload: () => void }) {
   return (
     <div className="wysimark-header">
       <span className="wysimark-header-filename">{fileName}</span>
-      <button className="wysimark-header-save" onClick={onSave} title="Save">
-        💾
+      <button className="wysimark-header-reload" onClick={onReload} title="Reload from Obsidian">
+        📥
       </button>
     </div>
   );
@@ -69,13 +69,13 @@ function WysimarkEditorComponent({
   initialValue,
   onChange,
   fileName,
-  onSave,
+  onReload,
   onImageSave,
 }: {
   initialValue: string;
   onChange: (markdown: string) => void;
   fileName: string;
-  onSave: () => void;
+  onReload: () => void;
   onImageSave?: OnImageSaveHandler;
 }) {
   const editor = useEditor({
@@ -93,7 +93,7 @@ function WysimarkEditorComponent({
 
   return (
     <div className="wysimark-editor-wrapper">
-      <FileHeader fileName={fileName} onSave={onSave} />
+      <FileHeader fileName={fileName} onReload={onReload} />
       <div className="wysimark-editor-container">
         <Editable
           editor={editor}
@@ -114,14 +114,16 @@ function WysimarkContainer({
   file,
   content,
   onChange,
-  onSave,
+  onReload,
   onImageSave,
+  reloadKey,
 }: {
   file: TFile | null;
   content: string;
   onChange: (markdown: string) => void;
-  onSave: () => void;
+  onReload: () => void;
   onImageSave?: OnImageSaveHandler;
+  reloadKey: number;
 }) {
   if (!file) {
     return <EmptyState />;
@@ -129,11 +131,11 @@ function WysimarkContainer({
 
   return (
     <WysimarkEditorComponent
-      key={file.path}
+      key={`${file.path}-${reloadKey}`}
       initialValue={content}
       onChange={onChange}
       fileName={file.basename}
-      onSave={onSave}
+      onReload={onReload}
       onImageSave={onImageSave}
     />
   );
@@ -149,6 +151,7 @@ export class WysimarkView extends ItemView {
   private saveTimeout: ReturnType<typeof setTimeout> | null = null;
   private isDirty: boolean = false;
   private reactContainer: HTMLElement | null = null;
+  private reloadKey: number = 0;  // Used to force React component remount on reload
 
   constructor(leaf: WorkspaceLeaf, plugin: WysimarkPlugin) {
     super(leaf);
@@ -240,6 +243,34 @@ export class WysimarkView extends ItemView {
     this.renderEditor();
   }
 
+  // Reload the current file from Obsidian (discard any unsaved changes)
+  async reloadFile() {
+    if (!this.currentFile) {
+      return;
+    }
+
+    // Clear any pending save timeout
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+      this.saveTimeout = null;
+    }
+
+    // Read fresh content from disk
+    const rawContent = await this.app.vault.read(this.currentFile);
+
+    // Extract frontmatter and body
+    const { frontmatter, body } = extractFrontmatter(rawContent);
+    this.frontmatter = frontmatter;
+    this.bodyContent = body;
+    this.fileContent = rawContent;
+    this.isDirty = false;
+
+    // Increment reloadKey to force React component remount
+    this.reloadKey++;
+
+    this.renderEditor();
+  }
+
   async saveFile(): Promise<void> {
     if (this.currentFile && this.isDirty) {
       await this.app.vault.modify(this.currentFile, this.fileContent);
@@ -260,14 +291,6 @@ export class WysimarkView extends ItemView {
     this.saveTimeout = setTimeout(() => {
       void this.saveFile();
     }, 1000);
-  }
-
-  handleManualSave = () => {
-    if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout);
-      this.saveTimeout = null;
-    }
-    void this.saveFile();
   }
 
   /**
@@ -309,6 +332,10 @@ export class WysimarkView extends ItemView {
     return this.app.vault.getResourcePath(savedFile);
   }
 
+  handleReload = () => {
+    void this.reloadFile();
+  }
+
   renderEditor() {
     if (!this.root) return;
 
@@ -317,8 +344,9 @@ export class WysimarkView extends ItemView {
         file={this.currentFile}
         content={this.bodyContent}  // Pass only body content (without frontmatter)
         onChange={this.handleChange}
-        onSave={this.handleManualSave}
+        onReload={this.handleReload}
         onImageSave={this.handleImageSave}
+        reloadKey={this.reloadKey}
       />
     );
   }

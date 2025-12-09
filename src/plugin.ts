@@ -99,6 +99,17 @@ export class WysimarkPlugin extends Plugin {
     }
   }
 
+  // Reload the current file from Obsidian (discard Wysimark changes)
+  async reloadWysimarkView() {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_WYSIMARK);
+    if (leaves.length > 0) {
+      const view = leaves[0].view as WysimarkView;
+      if (view && view.reloadFile) {
+        await view.reloadFile();
+      }
+    }
+  }
+
   onunload() {
     // Cleanup
   }

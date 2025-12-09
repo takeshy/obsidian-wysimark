@@ -2,7 +2,6 @@ import { Editor, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 
 import { createPlugin, curryOne, TypedPlugin } from "../sink"
-import { WysimarkEditor } from "../entry/types"
 
 import { createImageMethods } from "./methods"
 import { normalizeNode } from "./normalize-node"

@@ -9,7 +9,7 @@ import { isPlainSpace, isText } from "../is-utils"
 export function getMarksFromText(text: Text): MarkKey[] {
   const { text: _textContent, ...marks } = text
   void _textContent
-  return Object.keys(marks) as MarkKey[]
+  return Object.keys(marks) as (keyof typeof marks)[]
 }
 
 /**
