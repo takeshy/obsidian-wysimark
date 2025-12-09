@@ -17,9 +17,9 @@ export function TaskListItem({
     editor.list.toggleTaskListItem({ at: element })
   }, [editor, element])
 
-  const style = { "--list-item-depth": element.depth } as React.CSSProperties
+  const marginLeft = `${2 + element.depth * 2}em`
   return (
-    <$TaskListItem {...attributes} style={style}>
+    <$TaskListItem {...attributes} style={{ marginLeft }}>
       <div className="--list-item-icon" contentEditable={false}>
         {element.checked ? (
           <CheckedIcon onClick={toggle} style={{ cursor: "pointer" }} />

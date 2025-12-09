@@ -1,4 +1,6 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import { mergeConfig } from 'vite';
+import path from 'path';
 
 const config: StorybookConfig = {
   stories: [
@@ -12,6 +14,15 @@ const config: StorybookConfig = {
   framework: "@storybook/react-vite",
   typescript: {
     reactDocgen: 'react-docgen-typescript',
+  },
+  viteFinal: async (config) => {
+    return mergeConfig(config, {
+      resolve: {
+        alias: {
+          obsidian: path.resolve(__dirname, './obsidian-mock.ts'),
+        },
+      },
+    });
   },
 };
 

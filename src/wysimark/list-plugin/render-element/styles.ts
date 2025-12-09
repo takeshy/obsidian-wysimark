@@ -6,7 +6,6 @@ const $ListItem = styled("li")`
   margin-top: 0.5em;
   margin-bottom: 0.5em;
   list-style-position: outside;
-  margin-left: calc(2em + var(--list-item-depth) * 2em);
 `
 
 export const $UnorderedListItem = styled($ListItem)`

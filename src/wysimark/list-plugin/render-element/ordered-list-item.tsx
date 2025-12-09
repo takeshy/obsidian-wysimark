@@ -19,7 +19,7 @@ export function OrderedListItem({
     normalizeOrderedFirstAtDepth(editor, [element, path])
   }, [])
   const style = {
-    "--list-item-depth": element.depth,
+    marginLeft: `${2 + element.depth * 2}em`,
     "--list-item-var": `list-item-depth-${element.depth}`,
   } as React.CSSProperties
   const className = clsx({ "--first-at-depth": element.__firstAtDepth })

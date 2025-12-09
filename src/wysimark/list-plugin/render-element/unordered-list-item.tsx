@@ -9,9 +9,9 @@ export function UnorderedListItem({
   attributes,
   children,
 }: ConstrainedRenderElementProps<UnorderedListItemElement>) {
-  const style = { "--list-item-depth": element.depth } as React.CSSProperties
+  const marginLeft = `${2 + element.depth * 2}em`
   return (
-    <$UnorderedListItem {...attributes} style={style}>
+    <$UnorderedListItem {...attributes} style={{ marginLeft }}>
       <div className="--list-item-icon" contentEditable={false}>
         <BulletIcon />
       </div>
