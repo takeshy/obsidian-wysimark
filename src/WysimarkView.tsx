@@ -167,7 +167,7 @@ export class WysimarkView extends ItemView {
     return 'edit-3';
   }
 
-  async onOpen() {
+  onOpen(): void {
     // Get the content container
     const { contentEl } = this;
     contentEl.empty();
@@ -235,19 +235,15 @@ export class WysimarkView extends ItemView {
     this.isDirty = false;
 
     // Update display text
-    (this.leaf as any).updateHeader?.();
+    this.leaf.updateHeader();
 
     this.renderEditor();
   }
 
-  async saveFile() {
+  async saveFile(): Promise<void> {
     if (this.currentFile && this.isDirty) {
-      try {
-        await this.app.vault.modify(this.currentFile, this.fileContent);
-        this.isDirty = false;
-      } catch (error) {
-        console.error('Failed to save file:', error);
-      }
+      await this.app.vault.modify(this.currentFile, this.fileContent);
+      this.isDirty = false;
     }
   }
 
@@ -262,7 +258,7 @@ export class WysimarkView extends ItemView {
       clearTimeout(this.saveTimeout);
     }
     this.saveTimeout = setTimeout(() => {
-      this.saveFile();
+      void this.saveFile();
     }, 1000);
   }
 
@@ -271,7 +267,7 @@ export class WysimarkView extends ItemView {
       clearTimeout(this.saveTimeout);
       this.saveTimeout = null;
     }
-    this.saveFile();
+    void this.saveFile();
   }
 
   /**

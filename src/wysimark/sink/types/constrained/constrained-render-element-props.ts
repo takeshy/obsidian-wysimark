@@ -1,4 +1,5 @@
 import { BaseElement } from "slate"
+import { ReactNode, Ref } from "react"
 
 /**
  * Creates the RenderElementProps where the element argument coming in is
@@ -8,16 +9,14 @@ import { BaseElement } from "slate"
  */
 export type ConstrainedRenderElementProps<Element> = Element extends BaseElement
   ? {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      children: any
+      children: ReactNode
       element: Element
       attributes: {
         "data-slate-node": "element"
         "data-slate-inline"?: true
         "data-slate-void"?: true
         dir?: "rtl"
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ref: any
+        ref: Ref<HTMLElement>
       }
     }
   : never

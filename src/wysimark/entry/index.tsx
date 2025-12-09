@@ -1,4 +1,5 @@
 import throttle from "lodash.throttle"
+import { Platform } from "obsidian"
 import { useCallback, useRef } from "react"
 import { Descendant, Editor, Element, Transforms } from "slate"
 import { ReactEditor, RenderLeafProps, Slate } from "slate-react"
@@ -187,7 +188,7 @@ export function Editable({
      * it until the second try. This is a workaround for that.
      * Handled narrowly to avoid potentially breaking other browsers.
      */
-    if (navigator.userAgent.toLowerCase().includes("firefox")) {
+    if (Platform.isFirefox) {
       ReactEditor.focus(editor)
     }
   }, [editor])

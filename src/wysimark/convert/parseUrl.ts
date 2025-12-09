@@ -24,12 +24,11 @@ export function parseUrl(url: string): ParsedUrl {
       searchParams: urlData.searchParams,
       hash: urlData.hash,
     }
-  } catch (error) {
+  } catch {
     const matchdata = url.match(URL_REGEX)
     if (matchdata === null)
       throw new Error(`Invalid format should not happen: ${url}`)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, pathname, searchParams, hash] = [...matchdata]
+    const [, pathname, searchParams, hash] = [...matchdata]
     return {
       origin: "",
       hostname: "",

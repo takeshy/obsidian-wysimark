@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 /**
  * Creates the RenderLeafProps where the leaf/text argument coming in is
  * constrained to a specific Text type. This is useful during the creation of
@@ -12,19 +14,7 @@
  * end up with the attributes doubled up.
  */
 export type ConstrainedRenderLeafProps<Text> = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  children: any
+  children: ReactNode
   leaf: Text
   text: Text
-  /**
-   * KEEP:
-   *
-   * Removed from the props given because we don't want the user to add it
-   * themselves.
-   *
-   * Do not delete it as it's useful for reference.
-   */
-  // attributes: {
-  //   "data-slate-leaf": true
-  // }
 }

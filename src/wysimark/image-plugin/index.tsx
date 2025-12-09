@@ -2,6 +2,7 @@ import { Editor, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 
 import { createPlugin, curryOne, TypedPlugin } from "../sink"
+import { WysimarkEditor } from "../entry/types"
 
 import { createImageMethods } from "./methods"
 import { normalizeNode } from "./normalize-node"
@@ -39,19 +40,21 @@ function createOnDrop(editor: Editor) {
     }
 
     // Get the onImageChange handler from the editor
-    const onImageChange = (editor as any).wysimark?.onImageChange
+    const wysimarkEditor = editor as Editor & WysimarkEditor
+    const onImageChange = wysimarkEditor.wysimark?.onImageChange
 
     // Process each image file
-    imageFiles.forEach(async (file) => {
+    for (const file of imageFiles) {
       if (onImageChange) {
-        try {
-          const url = await onImageChange(file)
-          if (url) {
-            editor.image.insertImageFromUrl(url, file.name, "")
-          }
-        } catch (error) {
-          console.error("Failed to upload image:", error)
-        }
+        onImageChange(file)
+          .then((url) => {
+            if (url) {
+              editor.image.insertImageFromUrl(url, file.name, "")
+            }
+          })
+          .catch(() => {
+            // Failed to upload image - silently ignore
+          })
       } else {
         // If no onImageChange handler, create a data URL
         const reader = new FileReader()
@@ -61,7 +64,7 @@ function createOnDrop(editor: Editor) {
         }
         reader.readAsDataURL(file)
       }
-    })
+    }
 
     return true
   }

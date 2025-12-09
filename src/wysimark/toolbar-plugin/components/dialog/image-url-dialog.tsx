@@ -85,8 +85,6 @@ export function ImageUrlDialog({
                 editor.image.insertImageFromUrl(resultPath, alt, title)
                 clearState()
                 close()
-            } catch (error) {
-                console.error("Failed to save image:", error)
             } finally {
                 setIsSaving(false)
             }

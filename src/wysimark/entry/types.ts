@@ -33,6 +33,11 @@ export type WysimarkEditor = {
     onImageSave?: OnImageSaveHandler
 
     /**
+     * Handler for image change (drag/drop)
+     */
+    onImageChange?: (file: File) => Promise<string>
+
+    /**
      * Persisted state for the image dialog
      */
     imageDialogState?: ImageDialogState

@@ -21,7 +21,6 @@ function WysimarkEditor({
 
   const handleChange = useCallback((markdown: string) => {
     setValue(markdown);
-    console.log('Markdown changed:', markdown);
   }, []);
 
   return (

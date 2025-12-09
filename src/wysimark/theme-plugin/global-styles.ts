@@ -13,38 +13,6 @@ const blue = `
 --blue-900: rgb(30 58 138);
 `
 
-// ignore because right now we're manually swapping them in/out
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const slateShades = `
---shade-50: rgb(248 250 252);
---shade-100: rgb(241 245 249);
---shade-200: rgb(226 232 240);
---shade-300: rgb(203 213 225);
---shade-400: rgb(148 163 184);
---shade-500: rgb(100 116 139);
---shade-600: rgb(71 85 105);
---shade-700: rgb(51 65 85);
---shade-800: rgb(30 41 59);
---shade-900: rgb(15 23 42);
-`
-
-// ignore because right now we're manually swapping them in/out
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const grayShades = `
---shade-50: rgb(249 250 251);
---shade-100: rgb(243 244 246);
---shade-200: rgb(229 231 235);
---shade-300: rgb(209 213 219);
---shade-400: rgb(156 163 175);
---shade-500: rgb(107 114 128);
---shade-600: rgb(75 85 99);
---shade-700: rgb(55 65 81);
---shade-800: rgb(31 41 55);
---shade-900: rgb(17 24 39);
-`
-
-// ignore because right now we're manually swapping them in/out
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const zincShades = `
 --shade-50: rgb(250 250 250);
 --shade-100: rgb(244 244 245);

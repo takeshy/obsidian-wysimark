@@ -1,31 +1,31 @@
-import { Plugin, WorkspaceLeaf, TFile } from 'obsidian';
+import { Plugin, WorkspaceLeaf, TFile, MarkdownView } from 'obsidian';
 import { WysimarkView, VIEW_TYPE_WYSIMARK } from "src/WysimarkView";
 
 let pluginInstance: WysimarkPlugin;
 
 export class WysimarkPlugin extends Plugin {
-  async onload() {
+  onload(): void {
     pluginInstance = this;
 
     // Register the Wysimark view
     this.registerView(VIEW_TYPE_WYSIMARK, (leaf) => new WysimarkView(leaf, this));
 
     // Ensure the view exists when layout is ready
-    this.app.workspace.onLayoutReady(async () => {
-      await this.ensureWysimarkViewExists();
+    this.app.workspace.onLayoutReady(() => {
+      void this.ensureWysimarkViewExists();
     });
 
     // Add ribbon icon to show/toggle the view
     this.addRibbonIcon('edit-3', 'Wysimark Editor', () => {
-      this.activateWysimarkView();
+      void this.activateWysimarkView();
     });
 
-    // Add command to toggle Wysimark sidebar
+    // Add command to toggle sidebar
     this.addCommand({
-      id: 'toggle-wysimark-sidebar',
-      name: 'Toggle Wysimark Editor sidebar',
+      id: 'toggle-sidebar',
+      name: 'Toggle sidebar',
       callback: () => {
-        this.activateWysimarkView();
+        void this.activateWysimarkView();
       },
     });
 
@@ -34,10 +34,10 @@ export class WysimarkPlugin extends Plugin {
       this.app.workspace.on('active-leaf-change', (leaf) => {
         if (leaf) {
           const view = leaf.view;
-          if (view.getViewType() === 'markdown') {
-            const file = (view as any).file as TFile | undefined;
+          if (view instanceof MarkdownView) {
+            const file = view.file;
             if (file && file.extension === 'md') {
-              this.updateWysimarkView(file);
+              void this.updateWysimarkView(file);
             }
           }
         }

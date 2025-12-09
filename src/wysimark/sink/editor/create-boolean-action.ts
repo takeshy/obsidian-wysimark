@@ -24,13 +24,12 @@ export function createBooleanAction<
   const actionPlugins = plugins.filter((plugin) => plugin.editor?.[actionKey])
   return function nextBooleanAction(node: Node): boolean {
     for (const plugin of actionPlugins) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const result = plugin.editor?.[actionKey]?.(node)
+      const editorPlugin = plugin.editor as Record<string, ((n: Node) => boolean | undefined) | undefined> | undefined
+      const actionFn = editorPlugin?.[actionKey]
+      const result = actionFn?.(node)
       if (typeof result === "boolean") return result
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return originalAction(node)
+    const origFn = originalAction as (n: Node) => boolean
+    return origFn(node)
   }
 }

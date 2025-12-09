@@ -41,14 +41,10 @@ export type BasePluginCustomTypes = {
  * item that matches.
  */
 export type ArraySafePluginCustomTypes = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Name: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Editor: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Element: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Text: any
+  Name: string
+  Editor: Record<string, unknown>
+  Element: Record<string, unknown>
+  Text: Record<string, unknown>
 }
 
 /**
