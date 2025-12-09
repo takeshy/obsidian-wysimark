@@ -10,8 +10,9 @@ export function isElementType<T extends Element>(
   if (typeof type === "string") {
     return Element.isElement(node) && node.type === type
   }
+  const exhaustiveCheck: never = type
   throw new Error(
-    `Expected elementType to be string or array of string but is ${type}`
+    `Expected elementType to be string or array of string but is ${exhaustiveCheck as string}`
   )
 }
 

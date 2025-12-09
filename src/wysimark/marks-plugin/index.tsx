@@ -70,7 +70,7 @@ export const MarksPlugin = createPlugin<MarksPluginCustomTypes>((editor) => {
   editor.marksPlugin.removeMarks = () => {
     removeMarks()
     if (editor.selection) {
-      const point = Range.isRange(editor.selection as any) ? (editor.selection as Range).focus : editor.selection
+      const point = Range.isRange(editor.selection) ? editor.selection.focus : editor.selection
       if (Point.isPoint(point)) {
         const isAtLineEnd = Editor.after(editor, point) === null ||
           Editor.isEnd(editor, point, Editor.end(editor, []))

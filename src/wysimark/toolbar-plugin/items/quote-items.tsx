@@ -33,7 +33,7 @@ const quoteItemsList: MenuItemData[] = [
 
       // Case 1: If a code block is already active, convert it to a paragraph
       if (codeBlockEntry) {
-        const [codeBlock, path] = codeBlockEntry;
+        const [, path] = codeBlockEntry;
 
         // Extract text content from the code block
         const textContent = Editor.string(editor, path);

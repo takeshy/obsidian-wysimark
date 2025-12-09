@@ -1,4 +1,4 @@
-import { Editor, Location, Point, Range, Text, Transforms } from "slate"
+import { Editor, Location, Point, Range, Text } from "slate"
 
 /**
  * Toggles a mark.
@@ -19,7 +19,7 @@ export function toggleMark(
   if (at == null) return
 
   // Check if selection is at end of line
-  const point = Range.isRange(at as any) ? (at as Range).focus : at
+  const point = Range.isRange(at) ? at.focus : at
   const isAtLineEnd = Point.isPoint(point) && (
     Editor.after(editor, point) === null || 
     Editor.isEnd(editor, point, Editor.end(editor, []))
@@ -39,7 +39,8 @@ export function toggleMark(
       }
     } else {
       // Turning mark off
-      const { [validMarkKey]: _, ...remainingMarks } = editor.activeMarks || {}
+      const { [validMarkKey]: _unused, ...remainingMarks } = editor.activeMarks || {}
+      void _unused
       editor.activeMarks = remainingMarks
     }
   }

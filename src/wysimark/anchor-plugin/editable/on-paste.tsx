@@ -36,7 +36,7 @@ function isUrl(s: string): boolean {
   let url
   try {
     url = new URL(s)
-  } catch (_) {
+  } catch {
     return false
   }
   return (

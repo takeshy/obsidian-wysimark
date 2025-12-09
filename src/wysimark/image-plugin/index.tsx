@@ -40,8 +40,7 @@ function createOnDrop(editor: Editor) {
     }
 
     // Get the onImageChange handler from the editor
-    const wysimarkEditor = editor as Editor & WysimarkEditor
-    const onImageChange = wysimarkEditor.wysimark?.onImageChange
+    const onImageChange = editor.wysimark?.onImageChange
 
     // Process each image file
     for (const file of imageFiles) {

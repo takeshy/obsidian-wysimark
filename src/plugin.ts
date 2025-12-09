@@ -1,11 +1,11 @@
 import { Plugin, WorkspaceLeaf, TFile, MarkdownView } from 'obsidian';
 import { WysimarkView, VIEW_TYPE_WYSIMARK } from "src/WysimarkView";
 
-let pluginInstance: WysimarkPlugin;
+let pluginInstance: WysimarkPlugin | null = null;
 
 export class WysimarkPlugin extends Plugin {
   onload(): void {
-    pluginInstance = this;
+    setPluginInstance(this);
 
     // Register the Wysimark view
     this.registerView(VIEW_TYPE_WYSIMARK, (leaf) => new WysimarkView(leaf, this));
@@ -16,7 +16,7 @@ export class WysimarkPlugin extends Plugin {
     });
 
     // Add ribbon icon to show/toggle the view
-    this.addRibbonIcon('edit-3', 'Wysimark Editor', () => {
+    this.addRibbonIcon('edit-3', 'Wysimark editor', () => {
       void this.activateWysimarkView();
     });
 
@@ -75,7 +75,7 @@ export class WysimarkPlugin extends Plugin {
     }
 
     if (leaf) {
-      workspace.revealLeaf(leaf);
+      void workspace.revealLeaf(leaf);
 
       // Load the current active file
       const activeFile = this.app.workspace.getActiveFile();
@@ -102,6 +102,10 @@ export class WysimarkPlugin extends Plugin {
   onunload() {
     // Cleanup
   }
+}
+
+function setPluginInstance(plugin: WysimarkPlugin): void {
+  pluginInstance = plugin;
 }
 
 export function getPlugin(): WysimarkPlugin {

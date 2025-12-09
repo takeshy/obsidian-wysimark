@@ -204,7 +204,7 @@ export class WysimarkView extends ItemView {
         await this.loadFile(file);
       }
     }
-    super.setState(state, result);
+    await super.setState(state, result);
   }
 
   getState() {

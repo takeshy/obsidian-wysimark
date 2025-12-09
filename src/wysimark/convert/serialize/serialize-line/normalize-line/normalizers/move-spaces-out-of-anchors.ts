@@ -10,7 +10,6 @@ export function moveSpacesAtStartOfAnchor({
 }: NormalizeOptions): boolean {
   if (!isElement(node)) return false
   if (node.type !== "anchor") return false
-  node
   const firstChild = node.children[0] as Segment
   if (isText(firstChild) && isPlainSpace(firstChild)) {
     // remove the first child from the anchor
@@ -34,7 +33,6 @@ export function moveSpacesAtEndOfAnchor({
 }: NormalizeOptions): boolean {
   if (!isElement(node)) return false
   if (node.type !== "anchor") return false
-  node
   const lastChild = node.children[node.children.length - 1] as Segment
   if (isText(lastChild) && isPlainSpace(lastChild)) {
     // remove the first child from the anchor

@@ -11,7 +11,7 @@ import { InputPluginSchema, NormalizeInputPluginSchema } from "./schema-types"
 
 export type BasePluginFn = (
   editor: FullSinkEditor,
-  options: {},
+  options: Record<string, unknown>,
   helpers: { createPolicy: (value: unknown) => unknown }
 ) => BasePluginPolicy
 

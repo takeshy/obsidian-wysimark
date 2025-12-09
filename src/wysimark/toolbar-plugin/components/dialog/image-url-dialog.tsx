@@ -124,7 +124,7 @@ export function ImageUrlDialog({
         <>
             <CloseMask close={close} />
             <$FileDialog ref={ref as unknown as React.RefObject<HTMLDivElement>} style={style}>
-                <form onSubmit={handleSubmit} style={{ padding: "8px" }}>
+                <form onSubmit={(e) => void handleSubmit(e)} style={{ padding: "8px" }}>
                     {hasOnImageSave && (
                         <div style={{ marginBottom: "12px" }}>
                             <label style={{ display: "inline-flex", alignItems: "center", marginRight: "16px", cursor: "pointer" }}>

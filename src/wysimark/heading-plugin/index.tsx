@@ -55,10 +55,12 @@ export const HeadingPlugin = createPlugin<HeadingPluginCustomTypes>(
                 return <$H5 {...attributes}>{children}</$H5>
               case 6:
                 return <$H6 {...attributes}>{children}</$H6>
-              default:
+              default: {
+                const exhaustiveCheck: never = element.level
                 throw new Error(
-                  `Expected element.level to be 1-6 but got ${element.level}`
+                  `Expected element.level to be 1-6 but got ${exhaustiveCheck as number}`
                 )
+              }
             }
           }
         },

@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
 import { useCallback } from "react"
 import { useSlateStatic } from "slate-react"
-import { Editor } from "slate"
 
 import { $Panel } from "../../shared-overlays"
 import { useLayer } from "../../use-layer"
@@ -101,7 +100,7 @@ function parseUrl(s: string): { hostname: string; pathname: string } {
   try {
     const url = new URL(s)
     return { hostname: url.hostname, pathname: url.pathname }
-  } catch (e) {
+  } catch {
     return { hostname: "", pathname: "" }
   }
 }

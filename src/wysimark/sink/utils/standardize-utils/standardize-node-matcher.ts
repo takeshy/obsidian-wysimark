@@ -20,7 +20,8 @@ export function standardizeNodeMatcher(
   if (Array.isArray(matchNode))
     return (node: Node) =>
       Element.isElement(node) && matchNode.includes(node.type)
+  const exhaustiveCheck: never = matchNode
   throw new Error(
-    `Expected matchNode to be a function, string or array but is ${matchNode}`
+    `Expected matchNode to be a function, string or array but is ${exhaustiveCheck as string}`
   )
 }

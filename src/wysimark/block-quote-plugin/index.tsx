@@ -121,7 +121,7 @@ export const BlockQuotePlugin = createPlugin<BlockQuotePluginCustomTypes>(
         if (
           children.length === 1 &&
           Element.isElement(children[0]) &&
-          (children[0] as Element).type === "block-quote"
+          children[0].type === "block-quote"
         ) {
           // Unwrap the nested block-quote
           Transforms.unwrapNodes(editor, {

@@ -156,7 +156,7 @@ const getLanguage = (): string => {
     if (typeof window !== 'undefined' && window.navigator) {
       return window.navigator.language.split("-")[0];
     }
-  } catch (e) {
+  } catch {
     // Ignore any errors
   }
   // Default to 'en' in server environment

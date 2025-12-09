@@ -207,8 +207,7 @@ export function Editable({
   return (
     <Slate
       editor={editor}
-      initialValue={(initialValueRef.current ??
-        editor.children) as Descendant[]}
+      initialValue={initialValueRef.current ?? editor.children}
       onChange={onSlateChange}
     >
       <SinkEditable

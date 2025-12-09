@@ -20,7 +20,7 @@ export function selectElementBelow(editor: Editor, t: TableInfo) {
   try {
     selectStartOfElement(editor, Path.next(tablePath))
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }
@@ -41,7 +41,7 @@ export function selectElementAbove(editor: Editor, t: TableInfo) {
   try {
     selectEndOfElement(editor, Path.previous(tablePath))
     return true
-  } catch (e) {
+  } catch {
     return false
   }
 }
