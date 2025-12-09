@@ -1,10 +1,41 @@
-import { ItemView, WorkspaceLeaf, TFile } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, normalizePath } from 'obsidian';
 import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { Editable, useEditor } from './vendor/wysimark/index.mjs';
+import { Editable, useEditor, OnImageSaveHandler } from './wysimark/entry';
 import { WysimarkPlugin } from './plugin';
 
 export const VIEW_TYPE_WYSIMARK = 'wysimark-view';
+
+// Frontmatter regex: matches YAML frontmatter at the start of the file
+const FRONTMATTER_REGEX = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/;
+
+/**
+ * Extract frontmatter from markdown content
+ * Returns the frontmatter (including delimiters) and the body separately
+ */
+function extractFrontmatter(content: string): { frontmatter: string; body: string } {
+  const match = content.match(FRONTMATTER_REGEX);
+  if (match) {
+    return {
+      frontmatter: match[0],
+      body: content.slice(match[0].length),
+    };
+  }
+  return {
+    frontmatter: '',
+    body: content,
+  };
+}
+
+/**
+ * Combine frontmatter and body back into full content
+ */
+function combineFrontmatter(frontmatter: string, body: string): string {
+  if (!frontmatter) {
+    return body;
+  }
+  return frontmatter + body;
+}
 
 // Empty state component when no file is selected
 function EmptyState() {
@@ -39,11 +70,13 @@ function WysimarkEditorComponent({
   onChange,
   fileName,
   onSave,
+  onImageSave,
 }: {
   initialValue: string;
   onChange: (markdown: string) => void;
   fileName: string;
   onSave: () => void;
+  onImageSave?: OnImageSaveHandler;
 }) {
   const editor = useEditor({
     authToken: undefined,
@@ -51,17 +84,12 @@ function WysimarkEditorComponent({
     minHeight: undefined,
     maxHeight: undefined,
   });
-  const [value, setValue] = React.useState(initialValue);
+  // Use initialValue only on mount, manage internally afterwards
+  const [value] = React.useState(initialValue);
 
   const handleChange = React.useCallback((markdown: string) => {
-    setValue(markdown);
     onChange(markdown);
   }, [onChange]);
-
-  // Update value when initialValue changes (file switch)
-  React.useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
 
   return (
     <div className="wysimark-editor-wrapper">
@@ -74,7 +102,7 @@ function WysimarkEditorComponent({
           placeholder="Start writing..."
           className="wysimark-editor"
           style={{}}
-          onImageChange={undefined}
+          onImageSave={onImageSave}
         />
       </div>
     </div>
@@ -87,11 +115,13 @@ function WysimarkContainer({
   content,
   onChange,
   onSave,
+  onImageSave,
 }: {
   file: TFile | null;
   content: string;
   onChange: (markdown: string) => void;
   onSave: () => void;
+  onImageSave?: OnImageSaveHandler;
 }) {
   if (!file) {
     return <EmptyState />;
@@ -104,6 +134,7 @@ function WysimarkContainer({
       onChange={onChange}
       fileName={file.basename}
       onSave={onSave}
+      onImageSave={onImageSave}
     />
   );
 }
@@ -113,6 +144,8 @@ export class WysimarkView extends ItemView {
   root: Root | null = null;
   currentFile: TFile | null = null;
   fileContent: string = '';
+  private frontmatter: string = '';  // Store frontmatter separately
+  private bodyContent: string = '';  // Store body content (without frontmatter)
   private saveTimeout: ReturnType<typeof setTimeout> | null = null;
   private isDirty: boolean = false;
   private reactContainer: HTMLElement | null = null;
@@ -192,7 +225,13 @@ export class WysimarkView extends ItemView {
     }
 
     this.currentFile = file;
-    this.fileContent = await this.app.vault.read(file);
+    const rawContent = await this.app.vault.read(file);
+
+    // Extract frontmatter and body
+    const { frontmatter, body } = extractFrontmatter(rawContent);
+    this.frontmatter = frontmatter;
+    this.bodyContent = body;
+    this.fileContent = rawContent;
     this.isDirty = false;
 
     // Update display text
@@ -213,7 +252,9 @@ export class WysimarkView extends ItemView {
   }
 
   handleChange = (markdown: string) => {
-    this.fileContent = markdown;
+    // Update body content and combine with frontmatter for full file content
+    this.bodyContent = markdown;
+    this.fileContent = combineFrontmatter(this.frontmatter, markdown);
     this.isDirty = true;
 
     // Auto-save with debounce (1 second delay)
@@ -233,15 +274,55 @@ export class WysimarkView extends ItemView {
     this.saveFile();
   }
 
+  /**
+   * Handle saving an image file to the vault
+   * @param file - The image file to save
+   * @param path - The path within the vault to save the file
+   * @returns The URL to use for displaying the image in the editor
+   */
+  handleImageSave: OnImageSaveHandler = async (file: File, path: string) => {
+    // Normalize the path
+    const normalizedPath = normalizePath(path);
+
+    // Create parent directories if they don't exist
+    const parentDir = normalizedPath.substring(0, normalizedPath.lastIndexOf('/'));
+    if (parentDir) {
+      const existingFolder = this.app.vault.getAbstractFileByPath(parentDir);
+      if (!existingFolder) {
+        await this.app.vault.createFolder(parentDir);
+      }
+    }
+
+    // Convert File to ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    // Check if file already exists
+    let savedFile: TFile;
+    const existingFile = this.app.vault.getAbstractFileByPath(normalizedPath);
+    if (existingFile instanceof TFile) {
+      // Overwrite existing file
+      await this.app.vault.modifyBinary(existingFile, arrayBuffer);
+      savedFile = existingFile;
+    } else {
+      // Create new file
+      savedFile = await this.app.vault.createBinary(normalizedPath, arrayBuffer);
+    }
+
+    // Return the Obsidian resource URL for displaying in the editor
+    // This URL format works within Obsidian's app environment
+    return this.app.vault.getResourcePath(savedFile);
+  }
+
   renderEditor() {
     if (!this.root) return;
 
     this.root.render(
       <WysimarkContainer
         file={this.currentFile}
-        content={this.fileContent}
+        content={this.bodyContent}  // Pass only body content (without frontmatter)
         onChange={this.handleChange}
         onSave={this.handleManualSave}
+        onImageSave={this.handleImageSave}
       />
     );
   }

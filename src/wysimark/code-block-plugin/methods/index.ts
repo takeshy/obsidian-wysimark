@@ -1,0 +1,13 @@
+import { Editor } from "slate"
+
+import { curryOne } from "../../sink"
+
+import { createCodeBlock } from "./createCodeBlock"
+import { setCodeBlockLanguage } from "./setCodeBlockLanguage"
+
+export function createCodeBlockMethods(editor: Editor) {
+  return {
+    createCodeBlock: curryOne(createCodeBlock, editor),
+    setCodeBlockLanguage: curryOne(setCodeBlockLanguage, editor),
+  }
+}

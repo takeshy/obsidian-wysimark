@@ -1,0 +1,21 @@
+import { useSelected } from "slate-react"
+
+import { ConstrainedRenderElementProps } from "../sink"
+
+import { HorizontalRuleElement } from "."
+import { $HorizontalRule } from "./styles"
+
+export function HorizontalRule({
+  attributes,
+  children,
+}: ConstrainedRenderElementProps<HorizontalRuleElement>) {
+  const selected = useSelected()
+  return (
+    <div {...attributes} draggable>
+      {children}
+      <div contentEditable={false}>
+        <$HorizontalRule className={selected ? "--selected" : ""} />
+      </div>
+    </div>
+  )
+}

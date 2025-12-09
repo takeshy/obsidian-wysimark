@@ -23,3 +23,6 @@ data.json
 .DS_Store
 wysimark-lite
 obsidian-agent
+
+*storybook.log
+storybook-static

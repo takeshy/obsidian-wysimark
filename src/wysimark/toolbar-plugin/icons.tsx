@@ -1,0 +1,268 @@
+import { TablerIcon } from "../sink"
+
+export const H = () => (
+  <TablerIcon>
+    <path d="M7 12h10M7 5v14M17 5v14M15 19h4M15 5h4M5 19h4M5 5h4" />
+  </TablerIcon>
+)
+
+export const More = () => (
+  <TablerIcon className="--more-icon" width="0.5em" viewBox="0 0 12 24">
+    <path d="m2 12 4 4 4-4" />
+  </TablerIcon>
+)
+
+export const LinkPlus = () => (
+  <TablerIcon width="0.5em" viewBox="6 0 12 24">
+    <path d="M9 12h6M12 9v6" />
+  </TablerIcon>
+)
+
+export const H1 = () => (
+  <TablerIcon>
+    <path d="M19 18v-8l-2 2M4 6v12M12 6v12M11 18h2M3 18h2M4 12h8M3 6h2M11 6h2" />
+  </TablerIcon>
+)
+
+export const H2 = () => (
+  <TablerIcon>
+    <path d="M17 12a2 2 0 1 1 4 0c0 .591-.417 1.318-.816 1.858L17 18.001h4M4 6v12M12 6v12M11 18h2M3 18h2M4 12h8M3 6h2M11 6h2" />
+  </TablerIcon>
+)
+
+export const H3 = () => (
+  <TablerIcon>
+    <path d="M19 14a2 2 0 1 0-2-2M17 16a2 2 0 1 0 2-2M4 6v12M12 6v12M11 18h2M3 18h2M4 12h8M3 6h2M11 6h2" />
+  </TablerIcon>
+)
+
+export const H4 = () => (
+  <TablerIcon>
+    <path d="M20 18v-8l-4 6h5M4 6v12M12 6v12M11 18h2M3 18h2M4 12h8M3 6h2M11 6h2" />
+  </TablerIcon>
+)
+
+export const H5 = () => (
+  <TablerIcon>
+    <path d="M17 18h2a2 2 0 1 0 0-4h-2v-4h4M4 6v12M12 6v12M11 18h2M3 18h2M4 12h8M3 6h2M11 6h2" />
+  </TablerIcon>
+)
+
+export const H6 = () => (
+  <TablerIcon>
+    <path d="M19 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
+    <path d="M21 12a2 2 0 1 0-4 0v4M4 6v12M12 6v12M11 18h2M3 18h2M4 12h8M3 6h2M11 6h2" />
+  </TablerIcon>
+)
+
+export const Normal = () => (
+  <TablerIcon>
+    <path d="M8 18V6h2l6 9V6h2v12h-2l-6-9v9H8z" />
+  </TablerIcon>
+)
+
+export const Bold = () => (
+  <TablerIcon>
+    {/* <path d="M0 0h24v24H0z" stroke="none" /> */}
+    <path d="M7 5h6a3.5 3.5 0 0 1 0 7H7zM13 12h1a3.5 3.5 0 0 1 0 7H7v-7" />
+  </TablerIcon>
+)
+
+export const Italic = () => (
+  <TablerIcon>
+    <path d="M11 5h6M7 19h6M14 5l-4 14" />
+  </TablerIcon>
+)
+
+export const Style = () => (
+  <TablerIcon>
+    <path d="M4 20h3M14 20h7M6.9 15h6.9M10.2 6.3 16 20M5 20l6-16h2l7 16" />
+  </TablerIcon>
+)
+
+export const Link = () => (
+  <TablerIcon>
+    <path d="M10 14a3.5 3.5 0 0 0 5 0l4-4a3.5 3.5 0 0 0-5-5l-.5.5" />
+    <path d="M14 10a3.5 3.5 0 0 0-5 0l-4 4a3.5 3.5 0 0 0 5 5l.5-.5" />
+  </TablerIcon>
+)
+
+/**
+ * Block Quote
+ */
+
+export const Blockquote = () => (
+  <TablerIcon>
+    <path d="M6 15h15M21 19H6M15 11h6M21 7h-6M9 9h1a1 1 0 1 1-1 1V7.5a2 2 0 0 1 2-2M3 9h1a1 1 0 1 1-1 1V7.5a2 2 0 0 1 2-2" />
+  </TablerIcon>
+)
+
+export const Quote = () => (
+  <TablerIcon>
+    <path d="M10 11H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v6c0 2.667-1.333 4.333-4 5M19 11h-4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v6c0 2.667-1.333 4.333-4 5" />
+  </TablerIcon>
+)
+
+export const DoubleQuote = () => (
+  <TablerIcon>
+    <path d="M10 9l4 3-4 3" />
+    <path d="M16 9l4 3-4 3" />
+  </TablerIcon>
+)
+
+export const QuoteOff = () => (
+  <TablerIcon>
+    <path d="M10 11H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1m4 4v3c0 2.667-1.333 4.333-4 5M19 11h-4m-1-1V7a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v6c0 .66-.082 1.26-.245 1.798m-1.653 2.29c-.571.4-1.272.704-2.102.912M3 3l18 18" />
+  </TablerIcon>
+)
+
+/**
+ * List
+ */
+
+export const BulletList = () => (
+  <TablerIcon>
+    <path d="M9 6h11M9 12h11M9 18h11M5 6v.01M5 12v.01M5 18v.01" />
+  </TablerIcon>
+)
+
+/**
+ * Table
+ */
+
+export const Table = () => (
+  <TablerIcon>
+    <rect x={4} y={4} width={16} height={16} rx={2} />
+    <path d="M4 10h16M10 4v16" />
+  </TablerIcon>
+)
+
+/**
+ * Code
+ */
+
+export const Code = () => (
+  <TablerIcon>
+    <path d="m7 8-4 4 4 4M17 8l4 4-4 4M14 4l-4 16" />
+  </TablerIcon>
+)
+
+export const CodeBlock = () => (
+  <TablerIcon>
+    <path d="M9 8L5 12L9 16M15 8L19 12L15 16" />
+  </TablerIcon>
+)
+
+/**
+ * Media and Files
+ */
+
+export const Image = () => (
+  <TablerIcon>
+    <path d="M15 8h.01" />
+    <rect x={4} y={4} width={16} height={16} rx={3} />
+    <path d="m4 15 4-4a3 5 0 0 1 3 0l5 5" />
+    <path d="m14 14 1-1a3 5 0 0 1 3 0l2 2" />
+  </TablerIcon>
+)
+
+export const Attachment = () => (
+  <TablerIcon>
+    <path stroke="none" d="M0 0h24v24H0z" />
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM12 11v6M9 14h6" />
+  </TablerIcon>
+)
+
+export const FileUpload = () => (
+  <TablerIcon>
+    <path stroke="none" d="M0 0h24v24H0z" />
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM12 11v6" />
+    <path d="M9.5 13.5 12 11l2.5 2.5" />
+  </TablerIcon>
+)
+
+export const PhotoUp = () => (
+  <TablerIcon>
+    <path stroke="none" d="M0 0h24v24H0z" />
+    <path d="M15 8h.01M12.5 21H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v6.5" />
+    <path d="m3 16 5-5c.928-.893 2.072-.893 3 0l3.5 3.5" />
+    <path d="m14 14 1-1c.679-.653 1.473-.829 2.214-.526M19 22v-6M22 19l-3-3-3 3" />
+  </TablerIcon>
+)
+
+/**
+ * Text Styles
+ */
+
+export const Plus = () => (
+  <TablerIcon>
+    <path d="M12 5v14M5 12h14" />
+  </TablerIcon>
+)
+
+export const Strikethrough = () => (
+  <TablerIcon>
+    <path d="M5 12h14M16 6.5A4 2 0 0 0 12 5h-1a3.5 3.5 0 0 0 0 7h2a3.5 3.5 0 0 1 0 7h-1.5a4 2 0 0 1-4-1.5" />
+  </TablerIcon>
+)
+
+export const Underline = () => (
+  <TablerIcon>
+    <path d="M7 5v5a5 5 0 0 0 10 0V5M5 19h14" />
+  </TablerIcon>
+)
+
+export const RemoveStyles = () => (
+  <TablerIcon>
+    <path d="m14 6 7 7-2 2M10 10l-4.172 4.172a2.828 2.828 0 1 0 4 4L14 14" />
+    <path d="m16 12 4.414-4.414a2 2 0 0 0 0-2.829l-1.171-1.171a2 2 0 0 0-2.829 0L12 8M4 20l1.768-1.768M3 3l18 18" />
+  </TablerIcon>
+)
+
+export const ListCheck = () => (
+  <TablerIcon>
+    <path d="m9 11 3 3 8-8" />
+    <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9" />
+  </TablerIcon>
+)
+
+export const ListNumbers = () => (
+  <TablerIcon>
+    <path d="M11 6h9M11 12h9M12 18h8M4 16a2 2 0 1 1 4 0c0 .591-.5 1-1 1.5L4 20h4M6 10V4L4 6" />
+  </TablerIcon>
+)
+
+export const IncreaseDepth = () => (
+  <TablerIcon>
+    <path d="M4 6h16M8 12h12M12 18h8M7 12l-3-3M7 12l-3 3" />
+  </TablerIcon>
+)
+
+export const DecreaseDepth = () => (
+  <TablerIcon>
+    <path d="M4 6h16M8 12h12M12 18h8M4 12l3-3M4 12l3 3" />
+  </TablerIcon>
+)
+
+/**
+ * Markdown
+ */
+export const Markdown = () => (
+  <TablerIcon>
+    <path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+    <path d="M7 15V9l2 2 2-2v6M14 9v6h4M14 13h2" />
+  </TablerIcon>
+)
+
+/**
+ * Visual Editor
+ */
+export const VisualEditor = () => (
+  <TablerIcon>
+    <path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+    <path d="M8 8h8M8 12h8M8 16h5" />
+    <path d="M16 16h1" />
+  </TablerIcon>
+)
