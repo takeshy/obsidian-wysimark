@@ -3,6 +3,71 @@ import { Editor, Element, Node, Path, Point, Range, Transforms } from "slate"
 import { rewrapElement, TargetElement } from "../../sink"
 
 /**
+ * Calculates the character offset of a point within an element.
+ * Returns -1 if the point is not within the element.
+ */
+function getOffsetInElement(
+  editor: Editor,
+  point: Point,
+  elementPath: Path
+): number {
+  try {
+    const elementStart = Editor.start(editor, elementPath)
+    const elementEnd = Editor.end(editor, elementPath)
+
+    // Check if point is within element
+    if (Point.isBefore(point, elementStart) || Point.isAfter(point, elementEnd)) {
+      return -1
+    }
+
+    // Calculate offset from element start to point
+    const range = { anchor: elementStart, focus: point }
+    return Editor.string(editor, range).length
+  } catch {
+    return -1
+  }
+}
+
+/**
+ * Restores the selection to a specific offset within an element.
+ */
+function restoreSelectionInElement(
+  editor: Editor,
+  elementPath: Path,
+  offset: number
+): void {
+  try {
+    const element = Node.get(editor, elementPath)
+    if (!Element.isElement(element)) return
+
+    const text = Node.string(element)
+    const safeOffset = Math.min(offset, text.length)
+
+    // Find the exact point at the offset
+    const elementStart = Editor.start(editor, elementPath)
+    let currentOffset = 0
+    let targetPath = elementStart.path
+    let targetOffset = 0
+
+    // Traverse through text nodes to find the correct position
+    for (const [node, path] of Node.texts(element)) {
+      const nodeLength = node.text.length
+      if (currentOffset + nodeLength >= safeOffset) {
+        targetPath = [...elementPath, ...path.slice(elementPath.length)]
+        targetOffset = safeOffset - currentOffset
+        break
+      }
+      currentOffset += nodeLength
+    }
+
+    const point: Point = { path: targetPath, offset: targetOffset }
+    Transforms.select(editor, { anchor: point, focus: point })
+  } catch {
+    // If restoration fails, don't crash
+  }
+}
+
+/**
  * A type with generic for `convertElements` (below) to be used with the curry
  * method. TypeScript, unfortunately, cannot automatically curry generics for
  * us so we have to do it manually.
@@ -217,6 +282,14 @@ export function convertElements<T extends Element = Element>(
   if (!selection) return false
 
   /**
+   * Save the cursor position (anchor offset) within the first convertible element
+   * so we can restore it after conversion
+   */
+  let savedAnchorOffset = -1
+  let savedFocusOffset = -1
+  let isCollapsed = Range.isCollapsed(selection)
+
+  /**
    * Find convertible elements
    */
   const entries = Array.from(
@@ -226,6 +299,15 @@ export function convertElements<T extends Element = Element>(
         editor.convertElement.isConvertibleElement(node),
     })
   )
+
+  /**
+   * Save cursor offset relative to the first entry before any transformations
+   */
+  if (entries.length > 0) {
+    const [, firstPath] = entries[0]
+    savedAnchorOffset = getOffsetInElement(editor, selection.anchor, firstPath)
+    savedFocusOffset = getOffsetInElement(editor, selection.focus, firstPath)
+  }
   /**
    * If there aren't any convertible elements, there's nothing to do
    */
@@ -302,5 +384,66 @@ export function convertElements<T extends Element = Element>(
       }
     })
   }
+
+  /**
+   * Restore cursor position after conversion.
+   * Use the first updated entry's path to restore the cursor at the saved offset.
+   */
+  if (updatedEntries.length > 0 && savedAnchorOffset >= 0) {
+    const [, firstPath] = updatedEntries[0]
+    if (isCollapsed) {
+      // For collapsed selection (cursor), just restore anchor position
+      restoreSelectionInElement(editor, firstPath, savedAnchorOffset)
+    } else if (savedFocusOffset >= 0) {
+      // For expanded selection, restore both anchor and focus
+      try {
+        const element = Node.get(editor, firstPath)
+        if (Element.isElement(element)) {
+          const text = Node.string(element)
+          const safeAnchorOffset = Math.min(savedAnchorOffset, text.length)
+          const safeFocusOffset = Math.min(savedFocusOffset, text.length)
+
+          const elementStart = Editor.start(editor, firstPath)
+
+          // Calculate anchor point
+          let anchorPath = elementStart.path
+          let anchorOffset = safeAnchorOffset
+          let currentOffset = 0
+          for (const [node, path] of Node.texts(element)) {
+            const nodeLength = node.text.length
+            if (currentOffset + nodeLength >= safeAnchorOffset) {
+              anchorPath = [...firstPath, ...path.slice(firstPath.length)]
+              anchorOffset = safeAnchorOffset - currentOffset
+              break
+            }
+            currentOffset += nodeLength
+          }
+
+          // Calculate focus point
+          let focusPath = elementStart.path
+          let focusOffset = safeFocusOffset
+          currentOffset = 0
+          for (const [node, path] of Node.texts(element)) {
+            const nodeLength = node.text.length
+            if (currentOffset + nodeLength >= safeFocusOffset) {
+              focusPath = [...firstPath, ...path.slice(firstPath.length)]
+              focusOffset = safeFocusOffset - currentOffset
+              break
+            }
+            currentOffset += nodeLength
+          }
+
+          Transforms.select(editor, {
+            anchor: { path: anchorPath, offset: anchorOffset },
+            focus: { path: focusPath, offset: focusOffset },
+          })
+        }
+      } catch {
+        // Fall back to collapsed selection at anchor
+        restoreSelectionInElement(editor, firstPath, savedAnchorOffset)
+      }
+    }
+  }
+
   return true
 }
