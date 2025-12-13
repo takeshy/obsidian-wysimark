@@ -34,11 +34,16 @@ export const CollapsibleParagraphPlugin =
     editor.insertBreak = () => {
       const { selection } = editor
       if (selection && selection.anchor.path[0] === selection.focus.path[0]) {
-        // Get the current node's text
-        const text = Editor.string(editor, [selection.anchor.path[0]])
+        // Get text from start of block to cursor position
+        const blockPath = [selection.anchor.path[0]]
+        const blockStart = Editor.start(editor, blockPath)
+        const textBeforeCursor = Editor.string(editor, {
+          anchor: blockStart,
+          focus: selection.anchor,
+        })
 
-        // Check if we're creating an empty line
-        if (text.match(/\n$/) || text.match(/\n\n/)) {
+        // Check if cursor is right after a newline (creating empty line / paragraph break)
+        if (textBeforeCursor.endsWith('\n')) {
           // Create a new paragraph
           insertBreak()
         } else {

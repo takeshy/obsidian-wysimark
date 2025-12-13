@@ -53,7 +53,8 @@ function restoreSelectionInElement(
     for (const [node, path] of Node.texts(element)) {
       const nodeLength = node.text.length
       if (currentOffset + nodeLength >= safeOffset) {
-        targetPath = [...elementPath, ...path.slice(elementPath.length)]
+        // path is already relative to element, so just concat with elementPath
+        targetPath = [...elementPath, ...path]
         targetOffset = safeOffset - currentOffset
         break
       }
@@ -412,7 +413,8 @@ export function convertElements<T extends Element = Element>(
           for (const [node, path] of Node.texts(element)) {
             const nodeLength = node.text.length
             if (currentOffset + nodeLength >= safeAnchorOffset) {
-              anchorPath = [...firstPath, ...path.slice(firstPath.length)]
+              // path is already relative to element, so just concat with firstPath
+              anchorPath = [...firstPath, ...path]
               anchorOffset = safeAnchorOffset - currentOffset
               break
             }
@@ -426,7 +428,8 @@ export function convertElements<T extends Element = Element>(
           for (const [node, path] of Node.texts(element)) {
             const nodeLength = node.text.length
             if (currentOffset + nodeLength >= safeFocusOffset) {
-              focusPath = [...firstPath, ...path.slice(firstPath.length)]
+              // path is already relative to element, so just concat with firstPath
+              focusPath = [...firstPath, ...path]
               focusOffset = safeFocusOffset - currentOffset
               break
             }
