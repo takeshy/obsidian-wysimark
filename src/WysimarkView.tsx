@@ -1,8 +1,7 @@
-import { ItemView, WorkspaceLeaf, TFile, normalizePath } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin } from 'obsidian';
 import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { Editable, useEditor, OnImageSaveHandler } from './wysimark/entry';
-import { WysimarkPlugin } from './plugin';
 
 export const VIEW_TYPE_WYSIMARK = 'wysimark-view';
 
@@ -142,7 +141,7 @@ function WysimarkContainer({
 }
 
 export class WysimarkView extends ItemView {
-  plugin: WysimarkPlugin;
+  plugin: Plugin;
   root: Root | null = null;
   currentFile: TFile | null = null;
   fileContent: string = '';
@@ -153,7 +152,7 @@ export class WysimarkView extends ItemView {
   private reactContainer: HTMLElement | null = null;
   private reloadKey: number = 0;  // Used to force React component remount on reload
 
-  constructor(leaf: WorkspaceLeaf, plugin: WysimarkPlugin) {
+  constructor(leaf: WorkspaceLeaf, plugin: Plugin) {
     super(leaf);
     this.plugin = plugin;
   }
@@ -170,7 +169,7 @@ export class WysimarkView extends ItemView {
     return 'edit-3';
   }
 
-  onOpen(): void {
+  async onOpen(): Promise<void> {
     // Get the content container
     const { contentEl } = this;
     contentEl.empty();
@@ -236,9 +235,6 @@ export class WysimarkView extends ItemView {
     this.bodyContent = body;
     this.fileContent = rawContent;
     this.isDirty = false;
-
-    // Update display text
-    this.leaf.updateHeader();
 
     this.renderEditor();
   }
