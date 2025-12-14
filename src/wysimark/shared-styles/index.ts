@@ -29,6 +29,7 @@ export const $Textarea = styled("input")`
   padding: 0.5em 0.75em;
   border-radius: 0.25em;
   color: var(--shade-700);
+  background: var(--shade-50);
   font-family: inherit;
   border: 1px solid var(--shade-300);
   font-size: 0.9375em;
@@ -43,6 +44,7 @@ export const $Input = styled("input")`
   padding: 0.5em 0.75em;
   border-radius: 0.25em;
   color: var(--shade-700);
+  background: var(--shade-50);
   border: 1px solid var(--shade-300);
   font-size: 0.9375em;
   &:focus {
