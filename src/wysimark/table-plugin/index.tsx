@@ -63,10 +63,14 @@ export const TablePlugin = createPlugin<TablePluginCustomTypes>(
           deleteFragmentWithProtectedTypes(editor, ["table-cell"]),
         insertBreak: () => {
           /**
-           * IF we're anywhere in a table cell, disable insertBreak
+           * IF we're anywhere in a table cell, insert a soft break instead
            */
           const entry = findElementUp(editor, "table-cell")
-          return !!entry
+          if (entry) {
+            editor.insertText("\n")
+            return true
+          }
+          return false
         },
         isMaster(element) {
           if (element.type === "table") return true
@@ -98,6 +102,7 @@ export const TablePlugin = createPlugin<TablePluginCustomTypes>(
            */
           tab: editor.tablePlugin.tabForward,
           "shift+tab": editor.tablePlugin.tabBackward,
+          "shift+enter": editor.tablePlugin.shiftEnterForward,
           down: editor.tablePlugin.down,
           up: editor.tablePlugin.up,
           /**

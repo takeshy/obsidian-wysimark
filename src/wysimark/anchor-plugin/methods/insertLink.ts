@@ -4,7 +4,7 @@ export function insertLink(
   editor: Editor,
   href: string,
   text: string = href,
-  { select = true }: { select?: boolean } = {}
+  { select = true, title }: { select?: boolean; title?: string } = {}
 ) {
   /**
    * If there is no selection, we default by inserting at the start of document.
@@ -22,6 +22,7 @@ export function insertLink(
       {
         type: "anchor",
         href,
+        title,
         children: [{ text }],
       },
       { select, at: selection }
@@ -39,7 +40,7 @@ export function insertLink(
      */
     Transforms.wrapNodes(
       editor,
-      { type: "anchor", href, children: [] },
+      { type: "anchor", href, title, children: [] },
       {
         split: true,
         match: (node) => Text.isText(node) || Editor.isInline(editor, node),

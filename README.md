@@ -37,11 +37,20 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 
 - Block quotes (`Ctrl/Cmd + Alt + .`)
 - Code blocks with syntax highlighting
-- Tables
+
+### Tables
+
+- Insert tables from toolbar
+- Navigate cells with `Tab` / `Shift+Tab`
+- `Enter`: Insert line break within cell
+- `Shift+Enter`: Move to next cell (adds new row at end)
+- `Tab` at last cell: Exit table
 
 ### Links and Images
 
-- Insert links (`Ctrl/Cmd + K`)
+- Insert links (`Ctrl/Cmd + K`) with text and tooltip
+- Edit existing links (URL, text, and tooltip)
+- Selected text becomes link text automatically
 - Insert images from URL
 - Insert images from local files (saved to vault)
 
@@ -49,7 +58,7 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 
 - **Frontmatter Support**: YAML frontmatter (properties) at the beginning of files is preserved but hidden from the editor
 - **Auto-save**: Changes are automatically saved with a 1-second debounce
-- **Manual save**: Click the save button for immediate saving
+- **Reload button**: Click the 📥 button to reload the file from Obsidian (useful when the file is modified externally)
 
 ## Installation
 

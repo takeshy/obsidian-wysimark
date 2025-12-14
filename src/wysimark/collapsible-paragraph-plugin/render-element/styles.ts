@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 
 export const $Paragraph = styled("p")`
   padding: 0;
-  margin: 1em 0;
+  margin: 0;
   &:first-child {
     margin-top: 0;
   }
@@ -12,8 +12,8 @@ export const $Paragraph = styled("p")`
 
   &.--collapsible&.--empty {
     font-size: 0.25em; /* font-size is collapsed to 1/4 of regular em */
-    margin: -4em 0; /* margin grows to 3/4 of regular em leaving space */
-    padding: 1em 0; /* this is kind of eye-balling it */
+    margin: -0.4em 0;
+    padding: 0.1em 0; /* this is kind of eye-balling it */
     border-radius: 1em;
     &:hover {
       background: rgba(0, 127, 255, 0.1);
@@ -23,7 +23,7 @@ export const $Paragraph = styled("p")`
   &.--collapsible&.--empty&.--selected {
     font-size: 1em;
     padding: 0;
-    margin: 1em 0;
+    margin: 0;
     &:hover {
       background: none;
       cursor: default;
