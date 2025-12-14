@@ -17,7 +17,7 @@ const context = await esbuild.context({
 	},
 	entryPoints: ["src/main.ts"],
 	bundle: true,
-	platform: "node",
+	platform: "browser",
 	external: [
 		"obsidian",
 		"electron",
@@ -32,9 +32,12 @@ const context = await esbuild.context({
 		"@lezer/common",
 		"@lezer/highlight",
 		"@lezer/lr",
-		...builtins],
+	],
 	format: "cjs",
 	target: "es2018",
+	define: {
+		"process.env.NODE_ENV": JSON.stringify(prod ? "production" : "development"),
+	},
 	logLevel: "info",
 	sourcemap: prod ? false : "inline",
 	treeShaking: true,
