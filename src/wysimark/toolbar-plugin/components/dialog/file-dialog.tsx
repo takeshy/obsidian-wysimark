@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useRef, useState, useCallback } from "react"
 import { useSlateStatic } from "slate-react"
 
 import { CloseMask } from "../../../shared-overlays"
@@ -8,6 +8,7 @@ import { positionInside, useAbsoluteReposition } from "../../../use-reposition"
 import * as Icon from "../../icons"
 import { $DialogButton, $DialogHint } from "../../styles/dialog-shared-styles"
 import { $FileDialog } from "../../styles/file-dialog-styles"
+import { DraggableHeader } from "./DraggableHeader"
 
 export function FileDialog({
   dest,
@@ -24,7 +25,13 @@ export function FileDialog({
 }) {
   const editor = useSlateStatic()
   const ref = useRef<HTMLDivElement>(null)
-  const style = useAbsoluteReposition(
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+
+  const handleDrag = useCallback((deltaX: number, deltaY: number) => {
+    setDragOffset(prev => ({ x: prev.x + deltaX, y: prev.y + deltaY }))
+  }, [])
+
+  const baseStyle = useAbsoluteReposition(
     { src: ref, dest },
     ({ src, dest }, viewport) => {
       return positionInside(
@@ -38,6 +45,12 @@ export function FileDialog({
       )
     }
   )
+
+  const style = {
+    ...baseStyle,
+    left: (baseStyle.left as number) + dragOffset.x,
+    top: (baseStyle.top as number) + dragOffset.y,
+  }
 
   async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files == null || e.target.files.length === 0) return
@@ -53,20 +66,23 @@ export function FileDialog({
     <>
       <CloseMask close={close} />
       <$FileDialog ref={ref} style={style}>
-        <label>
-          <input
-            type="file"
-            multiple
-            style={{ display: "none" }}
-            onChange={onChange}
-          />
-          <$DialogButton>
-            {icon}
+        <DraggableHeader onDrag={handleDrag} />
+        <div style={{ padding: "1em" }}>
+          <label>
+            <input
+              type="file"
+              multiple
+              style={{ display: "none" }}
+              onChange={onChange}
+            />
+            <$DialogButton>
+              {icon}
 
-            <span style={{ marginLeft: "0.5em" }}>{buttonCaption}</span>
-          </$DialogButton>
-        </label>
-        <$DialogHint>{buttonHint}</$DialogHint>
+              <span style={{ marginLeft: "0.5em" }}>{buttonCaption}</span>
+            </$DialogButton>
+          </label>
+          <$DialogHint>{buttonHint}</$DialogHint>
+        </div>
       </$FileDialog>
     </>
   )

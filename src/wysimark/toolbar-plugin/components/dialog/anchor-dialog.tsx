@@ -21,6 +21,7 @@ import {
   $AnchorDialogInputLine,
 } from "../../styles"
 import { $DialogButton, $DialogHint } from "../../styles/dialog-shared-styles"
+import { DraggableHeader } from "./DraggableHeader"
 
 const isEnter = isHotkey("enter")
 
@@ -33,7 +34,13 @@ export function AnchorDialog({
 }) {
   const editor = useSlateStatic()
   const ref = useRef<HTMLDivElement>(null)
-  const style = useAbsoluteReposition(
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+
+  const handleDrag = useCallback((deltaX: number, deltaY: number) => {
+    setDragOffset(prev => ({ x: prev.x + deltaX, y: prev.y + deltaY }))
+  }, [])
+
+  const baseStyle = useAbsoluteReposition(
     { src: ref, dest },
     ({ src, dest }, viewport) => {
       return positionInside(
@@ -47,6 +54,12 @@ export function AnchorDialog({
       )
     }
   )
+
+  const style = {
+    ...baseStyle,
+    left: (baseStyle.left as number) + dragOffset.x,
+    top: (baseStyle.top as number) + dragOffset.y,
+  }
 
   // Get selected text as initial value for link text
   const initialText = useMemo(() => {
@@ -108,39 +121,42 @@ export function AnchorDialog({
     <>
       <CloseMask close={close} />
       <$AnchorDialog ref={ref} style={style}>
-        <$AnchorDialogInputLine>
-          <$AnchorDialogInput
-            type="text"
-            value={url}
-            autoFocus
-            placeholder={t("linkUrl")}
-            onChange={onChangeUrl}
-            onKeyDown={onKeyDown}
-          />
-        </$AnchorDialogInputLine>
-        <$AnchorDialogInputLine style={{ marginTop: "0.5em" }}>
-          <$AnchorDialogInput
-            type="text"
-            value={text}
-            placeholder={t("linkText")}
-            onChange={onChangeText}
-            onKeyDown={onKeyDown}
-          />
-        </$AnchorDialogInputLine>
-        <$AnchorDialogInputLine style={{ marginTop: "0.5em" }}>
-          <$AnchorDialogInput
-            type="text"
-            value={title}
-            placeholder={t("tooltipText")}
-            onChange={onChangeTitle}
-            onKeyDown={onKeyDown}
-          />
-          <$DialogButton onClick={insertLink}>
-            <Icon.Link />
-            <Icon.LinkPlus />
-          </$DialogButton>
-        </$AnchorDialogInputLine>
-        <$DialogHint>{t("tooltipHint")}</$DialogHint>
+        <DraggableHeader onDrag={handleDrag} />
+        <div style={{ padding: "0.75em" }}>
+          <$AnchorDialogInputLine>
+            <$AnchorDialogInput
+              type="text"
+              value={url}
+              autoFocus
+              placeholder={t("linkUrl")}
+              onChange={onChangeUrl}
+              onKeyDown={onKeyDown}
+            />
+          </$AnchorDialogInputLine>
+          <$AnchorDialogInputLine style={{ marginTop: "0.5em" }}>
+            <$AnchorDialogInput
+              type="text"
+              value={text}
+              placeholder={t("linkText")}
+              onChange={onChangeText}
+              onKeyDown={onKeyDown}
+            />
+          </$AnchorDialogInputLine>
+          <$AnchorDialogInputLine style={{ marginTop: "0.5em" }}>
+            <$AnchorDialogInput
+              type="text"
+              value={title}
+              placeholder={t("tooltipText")}
+              onChange={onChangeTitle}
+              onKeyDown={onKeyDown}
+            />
+            <$DialogButton onClick={insertLink}>
+              <Icon.Link />
+              <Icon.LinkPlus />
+            </$DialogButton>
+          </$AnchorDialogInputLine>
+          <$DialogHint>{t("tooltipHint")}</$DialogHint>
+        </div>
       </$AnchorDialog>
     </>
   )

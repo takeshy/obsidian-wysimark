@@ -18,11 +18,13 @@ import { useLayer } from "../../use-layer"
 import { useAbsoluteReposition } from "../../use-reposition"
 import { AnchorElement } from "../index"
 import { AnchorDialog } from "./AnchorDialog"
+import { DraggableHeader } from "../../toolbar-plugin/components/dialog/DraggableHeader"
 
 const $AnchorEditDialog = styled($Panel)`
   position: absolute;
   width: 20em;
-  padding: 1em;
+  padding: 0;
+  overflow: hidden;
 `
 
 export function AnchorEditDialog({
@@ -35,7 +37,13 @@ export function AnchorEditDialog({
   element: AnchorElement
 }) {
   const dialog = useLayer("dialog")
-  const style = useAbsoluteReposition(
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+
+  const handleDrag = useCallback((deltaX: number, deltaY: number) => {
+    setDragOffset(prev => ({ x: prev.x + deltaX, y: prev.y + deltaY }))
+  }, [])
+
+  const baseStyle = useAbsoluteReposition(
     { destAnchor, destStartEdge },
     ({ destAnchor, destStartEdge }) => {
       return {
@@ -44,6 +52,12 @@ export function AnchorEditDialog({
       }
     }
   )
+
+  const style = {
+    ...baseStyle,
+    left: (baseStyle.left as number) + dragOffset.x,
+    top: (baseStyle.top as number) + dragOffset.y,
+  }
 
   const editor = useSlateStatic()
 
@@ -90,26 +104,29 @@ export function AnchorEditDialog({
 
   return (
     <$AnchorEditDialog contentEditable={false} style={style}>
-      <$FormGroup>
-        <$FormCaption>{t("linkUrl")}</$FormCaption>
-        <$Textarea as="textarea" value={href} onChange={handleHrefChange} />
-      </$FormGroup>
-      <$FormGroup>
-        <$FormCaption>{t("linkText")}</$FormCaption>
-        <$Input type="text" value={text} onChange={handleTextChange} />
-        <$FormHint>{t("linkTextHint")}</$FormHint>
-      </$FormGroup>
-      <$FormGroup>
-        <$FormCaption>{t("tooltipText")}</$FormCaption>
-        <$Input type="text" value={title} onChange={handleTitleChange} />
-        <$FormHint>{t("tooltipHint")}</$FormHint>
-      </$FormGroup>
-      <$FormGroup>
-        <$PrimaryButton onClick={handleSubmit}>{t("apply")}</$PrimaryButton>
-      </$FormGroup>
-      <$FormGroup>
-        <$CancelButton onClick={openAnchorDialog}>{t("cancel")}</$CancelButton>
-      </$FormGroup>
+      <DraggableHeader onDrag={handleDrag} />
+      <div style={{ padding: "1em" }}>
+        <$FormGroup>
+          <$FormCaption>{t("linkUrl")}</$FormCaption>
+          <$Textarea as="textarea" value={href} onChange={handleHrefChange} />
+        </$FormGroup>
+        <$FormGroup>
+          <$FormCaption>{t("linkText")}</$FormCaption>
+          <$Input type="text" value={text} onChange={handleTextChange} />
+          <$FormHint>{t("linkTextHint")}</$FormHint>
+        </$FormGroup>
+        <$FormGroup>
+          <$FormCaption>{t("tooltipText")}</$FormCaption>
+          <$Input type="text" value={title} onChange={handleTitleChange} />
+          <$FormHint>{t("tooltipHint")}</$FormHint>
+        </$FormGroup>
+        <$FormGroup>
+          <$PrimaryButton onClick={handleSubmit}>{t("apply")}</$PrimaryButton>
+        </$FormGroup>
+        <$FormGroup>
+          <$CancelButton onClick={openAnchorDialog}>{t("cancel")}</$CancelButton>
+        </$FormGroup>
+      </div>
     </$AnchorEditDialog>
   )
 }

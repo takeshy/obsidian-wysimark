@@ -3,8 +3,9 @@ import styled from "@emotion/styled"
 import { $Panel } from "../../shared-overlays/styles/$Panel"
 
 export const $AnchorDialog = styled($Panel)`
-  padding: 1em;
   width: 24em;
+  padding: 0;
+  overflow: hidden;
 `
 export const $AnchorDialogInputLine = styled("div")`
   display: flex;

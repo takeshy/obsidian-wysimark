@@ -19,15 +19,22 @@ export function positionInside(
 
   let { left, top } = pos
 
-  // Check if it goes beyond right edge
-  const right = left + src.width
-  if (right > container.right - margin) {
-    left = container.right - src.width - margin
-  }
+  const containerWidth = container.right - container.left - margin * 2
 
-  // Check if it goes beyond left edge
-  if (left < container.left + margin) {
+  // If modal is wider than container, align to left edge
+  if (src.width >= containerWidth) {
     left = container.left + margin
+  } else {
+    // Check if it goes beyond right edge
+    const right = left + src.width
+    if (right > container.right - margin) {
+      left = container.right - src.width - margin
+    }
+
+    // Check if it goes beyond left edge
+    if (left < container.left + margin) {
+      left = container.left + margin
+    }
   }
 
   return { left, top }

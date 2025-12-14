@@ -1,6 +1,6 @@
 import { clsx } from "clsx"
 import React from "react"
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { useSelected, useSlate } from "slate-react"
 
 import { ConstrainedRenderElementProps } from "../../sink"
@@ -20,6 +20,27 @@ export function Anchor({
   const selected = useSelected()
   const editor = useSlate()
   const dialog = useLayer("dialog")
+
+  // Open dialog on touch (for iOS)
+  const openDialog = useCallback(() => {
+    const anchor = anchorRef.current
+    const startEdge = startEdgeRef.current
+    if (!anchor || !startEdge) return
+
+    dialog.open(() => (
+      <AnchorDialog
+        destAnchor={anchor}
+        destStartEdge={startEdge}
+        element={element}
+      />
+    ))
+  }, [dialog, element])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    // Prevent default to avoid triggering click and navigation
+    e.preventDefault()
+    openDialog()
+  }, [openDialog])
 
   /**
    * TODO:
@@ -80,6 +101,7 @@ export function Anchor({
       target={element.target}
       {...attributes}
       ref={anchorRef}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Edge allow Chrome to differentiate in/out of the link */}
       <$Edge ref={startEdgeRef} contentEditable={false} />
