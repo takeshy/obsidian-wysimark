@@ -58,7 +58,7 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 
 - **Frontmatter Support**: YAML frontmatter (properties) at the beginning of files is preserved but hidden from the editor
 - **Auto-save**: Changes are automatically saved with a 1-second debounce
-- **Manual save**: Click the save button for immediate saving
+- **Reload button**: Click the 📥 button to reload the file from Obsidian (useful when the file is modified externally)
 
 ## Installation
 
