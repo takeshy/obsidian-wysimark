@@ -3,14 +3,17 @@ import {
   ChangeEvent,
   KeyboardEvent,
   useCallback,
+  useMemo,
   useRef,
   useState,
 } from "react"
+import { Editor, Range } from "slate"
 import { ReactEditor, useSlateStatic } from "slate-react"
 
 import { positionInside, useAbsoluteReposition } from "../../../use-reposition"
 
 import { CloseMask } from "../../../shared-overlays/components/CloseMask"
+import { t } from "../../../utils/translations"
 import * as Icon from "../../icons"
 import {
   $AnchorDialog,
@@ -45,19 +48,53 @@ export function AnchorDialog({
     }
   )
 
+  // Get selected text as initial value for link text
+  const initialText = useMemo(() => {
+    const { selection } = editor
+    if (selection && !Range.isCollapsed(selection)) {
+      return Editor.string(editor, selection)
+    }
+    return ""
+  }, [])
+
   const [url, setUrl] = useState("")
+  const [text, setText] = useState(initialText)
+  const [title, setTitle] = useState(initialText)
+  const [titleManuallyEdited, setTitleManuallyEdited] = useState(false)
 
   const insertLink = () => {
-    editor.anchor.insertLink(url, url, { select: true })
+    const linkText = text.trim() || url
+    const linkTitle = title.trim() || undefined
+    editor.anchor.insertLink(url, linkText, { select: true, title: linkTitle })
     ReactEditor.focus(editor)
     close()
   }
 
-  const onChangeInput = useCallback(
+  const onChangeUrl = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       setUrl(e.currentTarget.value)
     },
     [setUrl]
+  )
+
+  const onChangeText = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const newText = e.currentTarget.value
+      setText(newText)
+      // Sync title with text if title hasn't been manually edited
+      if (!titleManuallyEdited) {
+        setTitle(newText)
+      }
+    },
+    [setText, setTitle, titleManuallyEdited]
+  )
+
+  const onChangeTitle = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setTitle(e.currentTarget.value)
+      setTitleManuallyEdited(true)
+    },
+    [setTitle]
   )
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -76,7 +113,26 @@ export function AnchorDialog({
             type="text"
             value={url}
             autoFocus
-            onChange={onChangeInput}
+            placeholder={t("linkUrl")}
+            onChange={onChangeUrl}
+            onKeyDown={onKeyDown}
+          />
+        </$AnchorDialogInputLine>
+        <$AnchorDialogInputLine style={{ marginTop: "0.5em" }}>
+          <$AnchorDialogInput
+            type="text"
+            value={text}
+            placeholder={t("linkText")}
+            onChange={onChangeText}
+            onKeyDown={onKeyDown}
+          />
+        </$AnchorDialogInputLine>
+        <$AnchorDialogInputLine style={{ marginTop: "0.5em" }}>
+          <$AnchorDialogInput
+            type="text"
+            value={title}
+            placeholder={t("tooltipText")}
+            onChange={onChangeTitle}
             onKeyDown={onKeyDown}
           />
           <$DialogButton onClick={insertLink}>
@@ -84,7 +140,7 @@ export function AnchorDialog({
             <Icon.LinkPlus />
           </$DialogButton>
         </$AnchorDialogInputLine>
-        <$DialogHint>Enter URL of link</$DialogHint>
+        <$DialogHint>{t("tooltipHint")}</$DialogHint>
       </$AnchorDialog>
     </>
   )

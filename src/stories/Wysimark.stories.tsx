@@ -17,20 +17,74 @@ function WysimarkEditor({
   maxHeight?: string | number;
 }) {
   const [value, setValue] = useState(initialValue);
+  const [showMarkdown, setShowMarkdown] = useState(false);
   const editor = useEditor({ height, minHeight, maxHeight });
 
   const handleChange = useCallback((markdown: string) => {
     setValue(markdown);
   }, []);
 
+  const toggleMarkdown = useCallback(() => {
+    setShowMarkdown((prev) => !prev);
+  }, []);
+
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-      <Editable
-        editor={editor}
-        value={value}
-        onChange={handleChange}
-        placeholder={placeholder}
-      />
+    <div>
+      <div style={{ marginBottom: '8px' }}>
+        <button
+          onClick={toggleMarkdown}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: showMarkdown ? '#4a9eff' : '#e0e0e0',
+            color: showMarkdown ? 'white' : 'black',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '14px',
+          }}
+        >
+          {showMarkdown ? 'Hide Markdown' : 'Show Markdown'}
+        </button>
+      </div>
+      <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+        <Editable
+          editor={editor}
+          value={value}
+          onChange={handleChange}
+          placeholder={placeholder}
+        />
+      </div>
+      {showMarkdown && (
+        <div
+          style={{
+            marginTop: '16px',
+            padding: '16px',
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px',
+            border: '1px solid #ddd',
+          }}
+        >
+          <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#666' }}>
+            Raw Markdown:
+          </div>
+          <pre
+            style={{
+              margin: 0,
+              padding: '12px',
+              backgroundColor: '#1e1e1e',
+              color: '#d4d4d4',
+              borderRadius: '4px',
+              overflow: 'auto',
+              fontSize: '13px',
+              lineHeight: '1.5',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            {value}
+          </pre>
+        </div>
+      )}
     </div>
   );
 }
