@@ -4,17 +4,17 @@ import { useSlateStatic } from "slate-react"
 
 import { $Panel } from "../../shared-overlays"
 import { useLayer } from "../../use-layer"
-import { useAbsoluteReposition } from "../../use-reposition"
+import { positionInside, useAbsoluteReposition } from "../../use-reposition"
 import { useTooltip } from "../../use-tooltip"
 import { AnchorElement } from "../index"
 import { AnchorEditDialog } from "./AnchorEditDialog"
-import { ExternalLinkIcon, LinkOffIcon, PencilIcon } from "./icons"
+import { CloseIcon, ExternalLinkIcon, LinkOffIcon, PencilIcon } from "./icons"
 import { DraggableHeader } from "../../toolbar-plugin/components/dialog/DraggableHeader"
 
 const $AnchorDialog = styled($Panel)`
   position: absolute;
   width: 20em;
-  z-index: 10;
+  z-index: 1000;
   padding: 0;
   overflow: hidden;
   color: var(--shade-400);
@@ -142,6 +142,11 @@ export function AnchorDialog({
 
   const removeTooltip = useTooltip({ title: "リンクを削除" })
   const editTooltip = useTooltip({ title: "リンクを編集" })
+  const closeTooltip = useTooltip({ title: "閉じる" })
+
+  const closeDialog = useCallback(() => {
+    dialog.close()
+  }, [dialog])
 
   const removeLink = useCallback(() => {
     editor.anchor.removeLink({ at: element })
@@ -204,6 +209,14 @@ export function AnchorDialog({
             onClick={openEditDialog}
           >
             <PencilIcon />
+          </span>
+          <span
+            className="--icon"
+            onClick={closeDialog}
+            onMouseEnter={closeTooltip.onMouseEnter}
+            onMouseLeave={closeTooltip.onMouseLeave}
+          >
+            <CloseIcon />
           </span>
         </span>
       </div>

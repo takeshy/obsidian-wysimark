@@ -266,3 +266,9 @@ export const VisualEditor = () => (
     <path d="M16 16h1" />
   </TablerIcon>
 )
+
+export const Close = () => (
+  <TablerIcon>
+    <path d="M18 6L6 18M6 6l12 12" />
+  </TablerIcon>
+)

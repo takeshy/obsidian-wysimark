@@ -10,6 +10,7 @@ export const $Menu = styled($Panel)`
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   transition: all 200ms;
+  min-width: 12em;
   /**
    * Prevent clicks from stealing focus from the editor
    */
@@ -43,9 +44,10 @@ export const $MenuItem = styled("div")`
     }
   }
   .--title {
-    flex: 1 0;
+    flex: 1 1 auto;
     font-size: 0.875em;
     color: var(--shade-800);
+    white-space: nowrap;
   }
   .--hotkey {
     flex: 0 0;

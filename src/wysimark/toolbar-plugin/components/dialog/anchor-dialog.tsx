@@ -154,6 +154,9 @@ export function AnchorDialog({
               <Icon.Link />
               <Icon.LinkPlus />
             </$DialogButton>
+            <$DialogButton onClick={close} style={{ marginLeft: "0.25em", background: "var(--shade-400)" }}>
+              <Icon.Close />
+            </$DialogButton>
           </$AnchorDialogInputLine>
           <$DialogHint>{t("tooltipHint")}</$DialogHint>
         </div>
