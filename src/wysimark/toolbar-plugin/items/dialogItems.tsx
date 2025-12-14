@@ -15,17 +15,17 @@ export const dialogItems: MenuItemData[] = [
     Component: AnchorDialog,
   },
   {
+    icon: Icon.Image,
+    title: t("insertImageFromUrl"),
+    more: true,
+    Component: ImageUrlDialog,
+  },
+  {
     icon: Icon.Table,
     title: t("insertTable"),
     more: true,
     Component: TableDialog,
   },
-  {
-    icon: Icon.Image,
-    title: t("insertImageFromUrl"),
-    more: true,
-    Component: ImageUrlDialog,
-  }
 ]
 
 export const expandedDialogItems: MenuItemData[] = dialogItems

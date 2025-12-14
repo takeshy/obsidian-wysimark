@@ -11,7 +11,7 @@ import { removeColumn } from "./remove-column"
 import { removeRow } from "./remove-row"
 import { removeTable } from "./remove-table"
 import { setTableColumnAlign } from "./setTableColumnAlign"
-import { tabBackward, tabForward } from "./tab"
+import { shiftEnterForward, tabBackward, tabForward } from "./tab"
 
 export function createTableMethods(editor: Editor) {
   return {
@@ -24,6 +24,7 @@ export function createTableMethods(editor: Editor) {
     removeRow: curryOne(removeRow, editor),
     tabForward: curryOne(tabForward, editor),
     tabBackward: curryOne(tabBackward, editor),
+    shiftEnterForward: curryOne(shiftEnterForward, editor),
     selectCell: curryOne(selectCell, editor),
     down: curryOne(down, editor),
     up: curryOne(up, editor),
