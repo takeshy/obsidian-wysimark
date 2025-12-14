@@ -36,9 +36,8 @@ export function Anchor({
     ))
   }, [dialog, element])
 
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    // Prevent default to avoid triggering click and navigation
-    e.preventDefault()
+  const handleTouchEnd = useCallback(() => {
+    // Open dialog on touch
     openDialog()
   }, [openDialog])
 

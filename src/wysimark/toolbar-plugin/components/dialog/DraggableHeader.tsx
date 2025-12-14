@@ -75,7 +75,7 @@ export function DraggableHeader({ onDrag }: DraggableHeaderProps) {
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     if (e.touches.length !== 1) return
-    e.preventDefault()
+    // touch-action: none in CSS prevents scrolling, so no need for preventDefault
     const touch = e.touches[0]
     handleMove(touch.clientX, touch.clientY)
   }, [handleMove])
