@@ -16,7 +16,19 @@ export function positionInside(
   { margin = 0 }: { margin?: number } = {}
 ) {
   if (src == null) return { ...pos, left: -1024 }
-  const right = pos.left + src.width
-  if (right <= container.right - margin) return pos
-  return { ...pos, left: container.right - src.width - margin }
+
+  let { left, top } = pos
+
+  // Check if it goes beyond right edge
+  const right = left + src.width
+  if (right > container.right - margin) {
+    left = container.right - src.width - margin
+  }
+
+  // Check if it goes beyond left edge
+  if (left < container.left + margin) {
+    left = container.left + margin
+  }
+
+  return { left, top }
 }
