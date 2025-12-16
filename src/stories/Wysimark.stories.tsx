@@ -186,3 +186,22 @@ export const TaskList: Story = {
     placeholder: 'Start writing...',
   },
 };
+
+export const WithHtmlBlock: Story = {
+  args: {
+    initialValue: `# HTML Block Example
+
+This editor preserves raw HTML blocks like video embeds:
+
+<div class="video-wrapper"><iframe src="https://player.vimeo.com/video/123456"></iframe></div>
+
+The HTML block above is displayed as a read-only block in the editor.
+
+Regular markdown formatting still works:
+
+- **Bold text**
+- *Italic text*
+`,
+    placeholder: 'Start writing...',
+  },
+};

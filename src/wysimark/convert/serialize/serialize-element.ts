@@ -68,6 +68,8 @@ export function serializeElement(element: Element, orders: number[]): string {
       throw new Error(
         `Code block line elements should only be present as children of code-block which should be handled by serializeCodeBlock. Got code-block-line may indicate an error in normalization.`
       )
+    case "html-block":
+      return `${element.html}\n\n`
   }
   assertUnreachable(element)
 }

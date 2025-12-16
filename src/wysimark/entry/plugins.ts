@@ -7,6 +7,7 @@ import { AtomicDeletePlugin } from "../atomic-delete-plugin"
 import { ImagePlugin } from "../image-plugin"
 import { BlockQuotePlugin } from "../block-quote-plugin"
 import { CodeBlockPlugin } from "../code-block-plugin"
+import { HtmlBlockPlugin } from "../html-block-plugin"
 import { CollapsibleParagraphPlugin } from "../collapsible-paragraph-plugin"
 import { ConvertElementPlugin } from "../convert-element-plugin"
 import { HeadingPlugin } from "../heading-plugin"
@@ -33,6 +34,7 @@ export const plugins = [
   InlineCodePlugin,
   BlockQuotePlugin,
   CodeBlockPlugin,
+  HtmlBlockPlugin,
   TablePlugin,
   HorizontalRulePlugin,
   TrailingBlockPlugin,

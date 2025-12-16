@@ -37,6 +37,7 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 
 - Block quotes (`Ctrl/Cmd + Alt + .`)
 - Code blocks with syntax highlighting
+- HTML blocks (iframe, video embeds, etc.) - displayed as read-only blocks and preserved as raw HTML
 
 ### Tables
 
