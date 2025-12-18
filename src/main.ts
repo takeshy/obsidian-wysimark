@@ -5,6 +5,7 @@ let pluginInstance: WysimarkEditorPlugin | null = null;
 
 export default class WysimarkEditorPlugin extends Plugin {
   async onload(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     pluginInstance = this;
 
     // Register the Wysimark view

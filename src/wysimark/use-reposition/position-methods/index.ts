@@ -17,7 +17,8 @@ export function positionInside(
 ) {
   if (src == null) return { ...pos, left: -1024 }
 
-  let { left, top } = pos
+  const { top } = pos
+  let { left } = pos
 
   const containerWidth = container.right - container.left - margin * 2
 

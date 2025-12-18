@@ -23,13 +23,13 @@ export function forceNormalizePath(editor: Editor, path: Path) {
   Editor.withoutNormalizing(editor, () => {
     Transforms.setNodes(
       editor,
-      // @ts-ignore
+      // @ts-expect-error - intentional dummy property for normalization
       { __DOESNT_MATTER_JUST_TO_START_NORMALIZING__: "123" },
       { at: path }
     )
     Transforms.setNodes(
       editor,
-      // @ts-ignore
+      // @ts-expect-error - intentional dummy property for normalization
       { __DOESNT_MATTER_JUST_TO_START_NORMALIZING__: null },
       { at: path }
     )

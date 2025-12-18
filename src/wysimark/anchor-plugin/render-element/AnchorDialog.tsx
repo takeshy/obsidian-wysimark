@@ -4,7 +4,7 @@ import { useSlateStatic } from "slate-react"
 
 import { $Panel } from "../../shared-overlays"
 import { useLayer } from "../../use-layer"
-import { positionInside, useAbsoluteReposition } from "../../use-reposition"
+import { useAbsoluteReposition } from "../../use-reposition"
 import { useTooltip } from "../../use-tooltip"
 import { AnchorElement } from "../index"
 import { AnchorEditDialog } from "./AnchorEditDialog"

@@ -116,7 +116,7 @@ export function createWysimark(
     unmount() {
       try {
         root.unmount()
-      } catch (e) {
+      } catch {
         /* ignore */
       }
     },

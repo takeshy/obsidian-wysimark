@@ -30,7 +30,7 @@ export function createVoidAction<
     let isHandled = false
     const afterHandledCallbacks: (() => void)[] = []
     for (const plugin of actionPlugins) {
-      // @ts-ignore
+      // @ts-expect-error - dynamic key access
       const response = plugin.editor?.[actionKey]?.(...args)
       if (typeof response === "function") {
         afterHandledCallbacks.push(response)
@@ -40,7 +40,7 @@ export function createVoidAction<
       }
     }
     if (!isHandled) {
-      // @ts-ignore
+      // @ts-expect-error - dynamic args spread
       originalAction(...args)
     }
     afterHandledCallbacks.forEach((callback) => callback())

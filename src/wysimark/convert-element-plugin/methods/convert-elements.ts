@@ -288,7 +288,7 @@ export function convertElements<T extends Element = Element>(
    */
   let savedAnchorOffset = -1
   let savedFocusOffset = -1
-  let isCollapsed = Range.isCollapsed(selection)
+  const isCollapsed = Range.isCollapsed(selection)
 
   /**
    * Find convertible elements

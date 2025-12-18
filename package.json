@@ -7,6 +7,7 @@
     "dev": "node esbuild.config.mjs",
     "build": "node esbuild.config.mjs production",
     "typecheck": "tsc -noEmit -skipLibCheck",
+    "lint": "eslint . --ext .ts,.tsx",
     "version": "node version-bump.mjs && git add manifest.json versions.json",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -16,6 +17,7 @@
   "license": "MIT",
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.3",
+    "@eslint/js": "^9.39.2",
     "@storybook/addon-a11y": "^10.1.4",
     "@storybook/addon-docs": "^10.1.4",
     "@storybook/addon-onboarding": "^10.1.4",
@@ -29,13 +31,15 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@types/unist": "^2.0.0",
-    "@typescript-eslint/eslint-plugin": "5.29.0",
-    "@typescript-eslint/parser": "5.29.0",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
     "@vitest/browser-playwright": "^4.0.15",
     "@vitest/coverage-v8": "^4.0.15",
     "builtin-modules": "3.3.0",
     "csstype": "^3.0.2",
     "esbuild": "^0.25.2",
+    "eslint": "^9.39.2",
+    "eslint-plugin-obsidianmd": "^0.1.9",
     "obsidian": "^1.10.0",
     "playwright": "^1.57.0",
     "prop-types": "^15.8.1",
@@ -43,6 +47,7 @@
     "tslib": "^2.4.0",
     "type-fest": "^3.2.0",
     "typescript": "^4.9.4",
+    "typescript-eslint": "^8.50.0",
     "vitest": "^4.0.15"
   },
   "dependencies": {
