@@ -26,6 +26,12 @@ export const dialogItems: MenuItemData[] = [
     more: true,
     Component: TableDialog,
   },
+  {
+    icon: Icon.HorizontalRule,
+    title: t("horizontalRule"),
+    hotkey: "super+-",
+    action: (editor) => editor.horizontalRule.insertHorizontalRule(),
+  },
 ]
 
 export const expandedDialogItems: MenuItemData[] = dialogItems

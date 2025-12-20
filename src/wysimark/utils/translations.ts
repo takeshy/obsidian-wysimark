@@ -40,6 +40,7 @@ interface Translations {
     switchToRawMarkdown: string;
     codeBlock: string;
     increaseQuoteDepth: string;
+    horizontalRule: string;
     register: string;
     imageSourceUrl: string;
     imageSourceFile: string;
@@ -93,6 +94,7 @@ export const translations: Translations = {
     switchToRawMarkdown: "マークダウン表示に切り替え",
     codeBlock: "コードブロック",
     increaseQuoteDepth: "引用を重ねる",
+    horizontalRule: "区切り線",
     register: "登録",
     imageSourceUrl: "URL",
     imageSourceFile: "ファイル",
@@ -143,6 +145,7 @@ export const translations: Translations = {
     switchToRawMarkdown: "Switch to raw markdown",
     codeBlock: "Code Block",
     increaseQuoteDepth: "Increase Quote Depth",
+    horizontalRule: "Horizontal Rule",
     register: "Register",
     imageSourceUrl: "URL",
     imageSourceFile: "File",

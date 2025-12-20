@@ -1,12 +1,8 @@
 import { Plugin, WorkspaceLeaf, TFile, MarkdownView } from 'obsidian';
 import { WysimarkView, VIEW_TYPE_WYSIMARK } from "./WysimarkView";
 
-let pluginInstance: WysimarkEditorPlugin | null = null;
-
 export default class WysimarkEditorPlugin extends Plugin {
   async onload(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    pluginInstance = this;
 
     // Register the Wysimark view
     this.registerView(VIEW_TYPE_WYSIMARK, (leaf) => new WysimarkView(leaf, this));
@@ -111,17 +107,4 @@ export default class WysimarkEditorPlugin extends Plugin {
     }
   }
 
-  onunload(): void {
-    pluginInstance = null;
-  }
-}
-
-export function getPlugin(): WysimarkEditorPlugin {
-  if (!pluginInstance) throw new Error("Plugin instance not set yet");
-  return pluginInstance;
-}
-
-export function getApp() {
-  if (!pluginInstance) throw new Error("Plugin instance not set yet");
-  return pluginInstance.app;
 }

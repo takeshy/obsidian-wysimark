@@ -272,3 +272,9 @@ export const Close = () => (
     <path d="M18 6L6 18M6 6l12 12" />
   </TablerIcon>
 )
+
+export const HorizontalRule = () => (
+  <TablerIcon>
+    <path d="M5 12h14" />
+  </TablerIcon>
+)
