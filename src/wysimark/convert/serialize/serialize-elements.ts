@@ -69,30 +69,8 @@ export function serializeElements(elements: Element[]): string {
   if (joined.trim() === "") return ""
 
   /**
-   * The following code replaces consecutive newlines with a single newline
-   * with a bit of additional logic to handle newlines at the beginning.
+   * Remove leading newlines and trim trailing whitespace.
+   * Keep consecutive newlines as-is to preserve blank lines in the source.
    */
-  return replaceConsecutiveNewlines(replaceLeadingNewlines(joined)).trim()
-}
-
-/**
- * Replace two leading newlines with a backslash to indicate a
- * paragraph that won't be collapsed.
- * Using backslash (Markdown hard line break) for Obsidian compatibility.
- */
-function replaceLeadingNewlines(input: string): string {
-  return input.replace(/^\n\n/g, "\\\n\n")
-}
-
-/**
- * In the rest of the Markdown, replace four or more consecutive newlines with
- * backslashes and newlines to indicate a paragraph that won't be collapsed.
- * Using backslash (Markdown hard line break) for Obsidian compatibility.
- */
-function replaceConsecutiveNewlines(input: string): string {
-  return input.replace(/(\n{4,})/g, (match) => {
-    const newlineCount = match.length
-    const count = Math.floor((newlineCount - 2) / 2)
-    return "\n\n" + Array(count).fill("\\").join("\n\n") + "\n\n"
-  })
+  return joined.replace(/^\n+/, "").trim()
 }
