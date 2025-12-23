@@ -51,7 +51,6 @@ export type ImagePluginConfig = {
 
 export type ImagePluginOptions = { image: Partial<ImagePluginConfig> }
 
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type ImageEditor = {
   image: ImageMethods & ImagePluginConfig
 }

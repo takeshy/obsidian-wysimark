@@ -59,7 +59,6 @@ export type Element = CustomElement
 export type Text = CustomText
 
 declare module "slate" {
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   interface CustomTypes {
     Editor: BaseEditor &
       ReactEditor &
