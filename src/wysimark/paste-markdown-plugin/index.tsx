@@ -2,7 +2,9 @@ import { createPlugin, stopEvent, TypedPlugin } from "../sink"
 
 import { createPasteMarkdownMethods } from "./methods"
 
-type PasteMarkdownMethods = ReturnType<typeof createPasteMarkdownMethods>
+type PasteMarkdownMethods = {
+  pasteMarkdown: (markdown: string) => void
+}
 
 export type PasteMarkdownEditor = {
   pasteMarkdown: PasteMarkdownMethods

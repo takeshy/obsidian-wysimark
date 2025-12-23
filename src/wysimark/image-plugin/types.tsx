@@ -1,10 +1,11 @@
 import { Descendant } from "slate"
 
-import { createImageMethods } from "./methods"
-
 export type ImageSize = { width: number; height: number }
 
-export type ImageMethods = ReturnType<typeof createImageMethods>
+export type ImageMethods = {
+  noop: () => void
+  insertImageFromUrl: (url: string, alt?: string, title?: string) => void
+}
 
 export type ImagePluginConfig = {
   /**

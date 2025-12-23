@@ -1,13 +1,28 @@
 import { Descendant } from "slate"
 
-import { createListMethods } from "./methods"
+import { BetterAt } from "../sink"
+
+type ListMethods = {
+  indent: () => boolean
+  outdent: () => boolean
+  convertUnorderedList: (allowToggle: boolean) => void
+  convertOrderedList: (allowToggle: boolean) => void
+  convertTaskList: (allowToggle: boolean) => void
+  insertBreak: () => boolean
+  toggleTaskListItem: (options?: { at?: BetterAt }) => boolean | undefined
+  getListDepth: () => number
+  canIncreaseDepth: () => boolean
+  canDecreaseDepth: () => boolean
+  increaseDepth: () => void
+  decreaseDepth: () => void
+}
 
 /**
  * List Editor
  */
 
 export type ListEditor = {
-  list: ReturnType<typeof createListMethods>
+  list: ListMethods
 }
 
 /**

@@ -1,9 +1,12 @@
 import { Descendant } from "slate"
 
-import { createHeadingMethods } from "./methods"
+type HeadingMethods = {
+  convertHeading: (level: 1 | 2 | 3 | 4 | 5 | 6, allowToggle: boolean) => void
+  isHeadingActive: (level: 1 | 2 | 3 | 4 | 5 | 6) => boolean
+}
 
 export type HeadingEditor = {
-  heading: ReturnType<typeof createHeadingMethods>
+  heading: HeadingMethods
 }
 
 export type HeadingElement = {

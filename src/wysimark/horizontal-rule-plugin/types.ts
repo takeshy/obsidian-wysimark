@@ -1,6 +1,6 @@
-import { createHorizontalRuleMethods } from "./methods"
-
-type HorizontalRuleMethods = ReturnType<typeof createHorizontalRuleMethods>
+type HorizontalRuleMethods = {
+  insertHorizontalRule: () => boolean
+}
 
 export type HorizontalRuleEditor = {
   horizontalRule: HorizontalRuleMethods

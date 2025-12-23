@@ -1,5 +1,5 @@
 import { clsx } from "clsx"
-import { Editor, Point, Range } from "slate"
+import { Editor, Location, Point, Range, Text } from "slate"
 
 import {
   createHotkeyHandler,
@@ -10,6 +10,19 @@ import {
 import { createMarksMethods } from "./methods"
 import { $MarksSpan } from "./styles"
 
+type MarksMethods = {
+  removeMarks: (options?: { at?: Location | null }) => void
+  toggleMark: (
+    markKey: keyof Text,
+    unsetKey?: keyof Text,
+    options?: { at?: Location | null }
+  ) => void
+  toggleBold: () => void
+  toggleItalic: () => void
+  toggleUnderline: () => void
+  toggleStrike: () => void
+}
+
 export type MarksEditor = {
   /**
    * IMPORTANT:
@@ -17,7 +30,7 @@ export type MarksEditor = {
    * This cannot be named `marks` because it conflicts with the `editor.marks`
    * built into the BaseEditor.j
    */
-  marksPlugin: ReturnType<typeof createMarksMethods>
+  marksPlugin: MarksMethods
   activeMarks?: {
     bold?: boolean
     italic?: boolean

@@ -1,8 +1,6 @@
 import { Text } from "slate"
 
-import { createCodeBlockMethods } from "./methods"
-
-type CodeBlockMethods = ReturnType<typeof createCodeBlockMethods>
+import { BetterAt } from "../sink"
 
 export type BuiltInLanguage =
   | "text"
@@ -56,6 +54,14 @@ export const LanguageList: BuiltInLanguage[] = [
   "java",
   "c",
 ]
+
+type CodeBlockMethods = {
+  createCodeBlock: (options: { language: BuiltInLanguage }) => void
+  setCodeBlockLanguage: (
+    language: BuiltInLanguage,
+    options?: { at?: BetterAt }
+  ) => boolean
+}
 
 export type CodeBlockEditor = {
   codeBlock: CodeBlockMethods
