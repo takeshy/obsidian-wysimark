@@ -169,7 +169,8 @@ export class WysimarkView extends ItemView {
     return 'edit-3';
   }
 
-  onOpen(): void {
+  async onOpen(): Promise<void> {
+    await super.onOpen();
     // Get the content container
     const { contentEl } = this;
     contentEl.empty();
