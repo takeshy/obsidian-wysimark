@@ -8,6 +8,7 @@ import { Element } from "./plugins"
 import { withSink } from "./SinkEditable"
 import { WysimarkEditor } from "./types"
 
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export function useEditor({
   authToken,
   height,

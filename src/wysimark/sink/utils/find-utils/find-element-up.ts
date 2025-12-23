@@ -10,6 +10,7 @@ import {
  * Checks to see if the current selection is inside of a Node that matches
  * `matchNode`.
  */
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export function findElementUp<T extends Ancestor & Element = Element>(
   editor: Editor,
   matchNode: NodeMatcher,

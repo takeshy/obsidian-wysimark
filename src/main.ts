@@ -2,7 +2,8 @@ import { Plugin, WorkspaceLeaf, TFile, MarkdownView } from 'obsidian';
 import { WysimarkView, VIEW_TYPE_WYSIMARK } from "./WysimarkView";
 
 export default class WysimarkEditorPlugin extends Plugin {
-  onload(): void {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async onload(): Promise<void> {
 
     // Register the Wysimark view
     this.registerView(VIEW_TYPE_WYSIMARK, (leaf) => new WysimarkView(leaf, this));

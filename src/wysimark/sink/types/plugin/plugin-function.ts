@@ -15,6 +15,7 @@ export type BasePluginFn = (
   helpers: { createPolicy: (value: unknown) => unknown }
 ) => BasePluginPolicy
 
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type TypedPluginFunction<T extends InputPluginSchema> = (
   /**
    * We make this T["Editor"] to make sure we get all off the properties

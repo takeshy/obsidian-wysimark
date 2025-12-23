@@ -22,6 +22,7 @@ export { SinkReset } from "./styles"
  * the editor.
  */
 export function SinkEditable(originalProps: EditableProps): React.ReactElement {
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-unsafe-assignment
   const editor = useSlateStatic() as unknown as Editor & SinkEditor
 
   /**
