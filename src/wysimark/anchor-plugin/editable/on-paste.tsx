@@ -33,7 +33,7 @@ export function onPaste(
   return true
 }
 function isUrl(s: string): boolean {
-  let url
+  let url: URL
   try {
     url = new URL(s)
   } catch {

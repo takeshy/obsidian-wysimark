@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 import { createHotkeyHandler, createPlugin, TypedPlugin } from "../sink"
 
 import { $InlineCode, $InvisibleSpan } from "./styles"
@@ -17,7 +19,7 @@ export const InlineCodePlugin = createPlugin<InlineCodePluginCustomTypes>(
     return {
       name: "inline-code",
       editableProps: {
-        renderLeaf: ({ leaf, children }) => {
+        renderLeaf: ({ leaf, children }: { leaf: { code?: boolean }; children: ReactNode }) => {
           if (leaf.code) {
             return (
               /**
@@ -32,7 +34,7 @@ export const InlineCodePlugin = createPlugin<InlineCodePluginCustomTypes>(
               </$InlineCode>
             )
           } else {
-            return children
+            return <>{children}</>
           }
         },
         onKeyDown: createHotkeyHandler({

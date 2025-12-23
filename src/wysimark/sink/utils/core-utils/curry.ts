@@ -33,7 +33,7 @@ export function curryOne<CurriedArg, RestArgs extends unknown[], R>(
   fn: (curriedArg: CurriedArg, ...restArgs: RestArgs) => R,
   curriedArg: CurriedArg
 ): (...args: RestArgs) => R {
-  return fn.bind(null, curriedArg)
+  return fn.bind(null, curriedArg) as (...args: RestArgs) => R
 }
 
 /**
@@ -44,5 +44,5 @@ export function curryTwo<Arg1, Arg2, RestArgs extends unknown[], R>(
   arg1: Arg1,
   arg2: Arg2
 ): (...args: RestArgs) => R {
-  return fn.bind(null, arg1, arg2)
+  return fn.bind(null, arg1, arg2) as (...args: RestArgs) => R
 }

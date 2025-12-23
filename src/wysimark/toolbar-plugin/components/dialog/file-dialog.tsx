@@ -48,16 +48,17 @@ export function FileDialog({
 
   const style = {
     ...baseStyle,
-    left: (baseStyle.left as number) + dragOffset.x,
-    top: (baseStyle.top as number) + dragOffset.y,
+    left: baseStyle.left + dragOffset.x,
+    top: baseStyle.top + dragOffset.y,
   }
 
-  async function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files == null || e.target.files.length === 0) return
     stopEvent(e)
     const { files } = e.target
+    const upload = editor.upload as { upload: (file: File) => void }
     for (const file of files) {
-      editor.upload.upload(file)
+      upload.upload(file)
     }
     close()
   }

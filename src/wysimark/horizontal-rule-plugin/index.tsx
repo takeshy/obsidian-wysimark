@@ -18,7 +18,8 @@ export const HorizontalRulePlugin =
         },
         editableProps: {
           renderElement: (props) => {
-            if (props.element.type === "horizontal-rule") {
+            const element = props.element as { type: string }
+            if (element.type === "horizontal-rule") {
               return <HorizontalRule {...props} />
             }
           },

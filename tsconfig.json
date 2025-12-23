@@ -22,6 +22,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/wysimark/**/*"]
+  "include": ["src/**/*"]
 }

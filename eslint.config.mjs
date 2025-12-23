@@ -1,7 +1,7 @@
 import obsidianmd from 'eslint-plugin-obsidianmd';
 import tseslint from 'typescript-eslint';
 
-export default [
+export default tseslint.config(
   {
     ignores: [
       'node_modules/**',
@@ -11,11 +11,17 @@ export default [
       '.storybook/**',
     ],
   },
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.recommendedTypeChecked,
   {
-    plugins: {
-      obsidianmd,
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
+  },
+  {
+    plugins: { obsidianmd },
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', {
         argsIgnorePattern: '^_',
@@ -24,4 +30,4 @@ export default [
       'obsidianmd/ui/sentence-case': 'warn',
     },
   },
-];
+);
