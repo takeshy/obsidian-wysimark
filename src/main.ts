@@ -2,7 +2,7 @@ import { Plugin, WorkspaceLeaf, TFile, MarkdownView } from 'obsidian';
 import { WysimarkView, VIEW_TYPE_WYSIMARK } from "./WysimarkView";
 
 export default class WysimarkEditorPlugin extends Plugin {
-  async onload(): Promise<void> {
+  onload(): void {
 
     // Register the Wysimark view
     this.registerView(VIEW_TYPE_WYSIMARK, (leaf) => new WysimarkView(leaf, this));

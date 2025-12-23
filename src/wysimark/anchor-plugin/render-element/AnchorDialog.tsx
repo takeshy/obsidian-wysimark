@@ -136,8 +136,8 @@ export function AnchorDialog({
 
   const style = {
     ...baseStyle,
-    left: (baseStyle.left as number) + dragOffset.x,
-    top: (baseStyle.top as number) + dragOffset.y,
+    left: baseStyle.left + dragOffset.x,
+    top: baseStyle.top + dragOffset.y,
   }
 
   const removeTooltip = useTooltip({ title: "リンクを削除" })
