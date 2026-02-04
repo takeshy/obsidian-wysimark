@@ -198,6 +198,8 @@ export class WysimarkView extends ItemView {
       this.root.unmount();
       this.root = null;
     }
+
+    await super.onClose();
   }
 
   async setState(state: { file?: string }, result: { history: boolean }) {
