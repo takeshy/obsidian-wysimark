@@ -1,54 +1,38 @@
-const ESCAPES = [
-  "\\", // escape
-  "`", // code
-  "*", // bold/italic/hr
-  "_", // bold/italic/hr
-  "[", // link/list
-  "]", // link/list
-  "(", // link
-  ")", // link
-  "#", // headings
-  "+", // list
-  "-", // hr/list
-  ".", // numbered list
-  "!", // image
-  "|", // table
-  "^", // sup
-  "~", // sub/strikethrough
-  "<", // link/html
-  ">", // link/html
-  /**
-   * Includes all the characters in the list of Backslash escapes in the example
-   * for GitHub Flavored Markdown.
-   *
-   * https://github.github.com/gfm/#backslash-escapes
-   */
-  "{",
-  "}",
-  "=",
-  ":",
-  ";",
-  "$",
-  "%",
-  "&",
-  "?",
-  '"',
-  "'",
-  ",",
-  "\\",
-  "/",
-  "@",
+/**
+ * Characters that always need escaping in inline markdown text.
+ */
+const INLINE_ESCAPES = [
+  "\\", // escape character
+  "`", // inline code
+  "*", // emphasis/bold
+  "_", // emphasis/bold
+  "[", // link start
+  "]", // link end
+  "~", // strikethrough (GFM)
+  "|", // table cell (GFM)
+  "<", // HTML tag
 ]
 
-const ESCAPES_REGEXP = new RegExp(
-  `(${ESCAPES.map((symbol) => `\\${symbol}`).join("|")})`,
+const INLINE_ESCAPES_REGEXP = new RegExp(
+  `(${INLINE_ESCAPES.map((symbol) => `\\${symbol}`).join("|")})`,
   "g"
 )
 
 /**
- * Escape text that could have an ambiguous meaning in markdown
+ * Escape text that could have an ambiguous meaning in markdown.
+ *
+ * Only escapes characters that genuinely need escaping:
+ * - Characters with special inline meaning (always escaped)
+ * - Characters with special meaning at the start of a line (position-aware)
  */
 export function escapeText(s: string) {
-  return s.replace(ESCAPES_REGEXP, (s: string) => `\\${s}`)
-  // .replace(/\n/g, "<br>")
+  // Escape characters that always have inline meaning
+  let result = s.replace(INLINE_ESCAPES_REGEXP, (s: string) => `\\${s}`)
+
+  // Escape characters that only have special meaning at the start of a line
+  result = result.replace(/^(#{1,6})(\s)/m, "\\$1$2") // headings
+  result = result.replace(/^(\d+)([.)]\s)/m, "$1\\$2") // ordered list
+  result = result.replace(/^([-+>])\s/m, "\\$1 ") // list / blockquote
+
+  return result
 }
