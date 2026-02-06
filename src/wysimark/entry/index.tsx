@@ -184,13 +184,9 @@ export function Editable({
 
   const onSinkeEditableMouseDown = useCallback(() => {
     /**
-     * For some reason, Firefox doesn't focus the editor when clicking on
-     * it until the second try. This is a workaround for that.
-     * Handled narrowly to avoid potentially breaking other browsers.
+     * Obsidian runs on Electron (Chromium-based), so no Firefox workaround needed.
+     * Focus the editor on mouse down to ensure consistent behavior.
      */
-    if (navigator.userAgent.includes("Firefox")) {
-      ReactEditor.focus(editor)
-    }
   }, [editor])
 
   /**

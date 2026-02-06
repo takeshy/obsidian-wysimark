@@ -101,7 +101,7 @@ export function ImageUrlDialog({
         top: (baseStyle.top as number) + dragOffset.y,
     }
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
         e.preventDefault()
 
         if (imageSource === "file" && selectedFile && editor.wysimark?.onImageSave) {
