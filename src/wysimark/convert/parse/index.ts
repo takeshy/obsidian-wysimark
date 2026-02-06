@@ -7,7 +7,6 @@ import { customRemarkGfm } from "./custom-gfm"
 import { parseContents } from "./parse-content"
 import { transformInlineLinks } from "./transform-inline-links"
 
-// @ts-expect-error - Ignore TypeScript errors for the unified plugin system
 const parser = unified().use(remarkParse).use(customRemarkGfm())
 
 export function parseToAst(markdown: string) {

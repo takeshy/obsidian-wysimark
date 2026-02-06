@@ -1,6 +1,5 @@
 import React from "react"
 import { BaseRange, NodeEntry, Path } from "slate"
-import { Editable } from "slate-react"
 import {
   EditableProps,
   RenderElementProps,
@@ -18,7 +17,7 @@ import { VoidActionReturn } from "./VoidActionReturn"
 
 export type RenderEditableProps = {
   attributes: EditableProps
-  Editable: typeof Editable
+  Editable: React.ComponentType<EditableProps>
 }
 
 export type RenderEditable = (props: RenderEditableProps) => React.ReactElement

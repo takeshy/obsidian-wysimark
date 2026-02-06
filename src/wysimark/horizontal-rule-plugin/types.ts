@@ -8,7 +8,7 @@ export type HorizontalRuleEditor = {
 
 export type HorizontalRuleElement = {
   type: "horizontal-rule"
-  children: [{ text: "" }]
+  children: [{ text: string }]
 }
 
 export type HorizontalRulePluginCustomTypes = {

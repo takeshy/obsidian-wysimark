@@ -4,7 +4,7 @@ import { EditableProps } from "slate-react/dist/components/editable"
 import { BasePluginPolicy } from "../types"
 import { defined } from "./utils"
 
-type EditableType = (editableProps: EditableProps) => React.ReactElement
+type EditableType = (editableProps: EditableProps) => React.JSX.Element
 
 /**
  * create a new Editable component that takes all the `renderEditable` functions

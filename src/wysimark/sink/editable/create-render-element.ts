@@ -1,3 +1,4 @@
+import React from "react"
 import { RenderElementProps } from "slate-react"
 import { EditableProps } from "slate-react/dist/components/editable"
 
@@ -25,7 +26,7 @@ export function createRenderElement(
     .filter(defined)
   return function renderElement(
     renderElementProps: RenderElementProps
-  ): JSX.Element {
+  ): React.JSX.Element {
     for (const fn of fns) {
       const result = fn(renderElementProps)
       if (result) return result

@@ -48,7 +48,7 @@ export type InputPluginCustomTypes = SetOptional<
 export type NormalizeInputPluginCustomTypes<T extends InputPluginCustomTypes> =
   {
     Name: T["Name"]
-    Editor: T["Editor"] extends object ? T["Editor"] : Record<string, never>
+    Editor: T["Editor"] extends object ? T["Editor"] : {}
     Element: T["Element"] extends object ? T["Element"] : never
-    Text: T["Text"] extends object ? T["Text"] : Record<string, never>
+    Text: T["Text"] extends object ? T["Text"] : {}
   }

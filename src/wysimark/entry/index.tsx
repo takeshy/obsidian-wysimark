@@ -12,8 +12,6 @@ export type { Element, Text } from "./plugins"
 
 export { useEditor }
 
-export type { OnImageSaveHandler }
-
 function renderLeaf({ children, attributes }: RenderLeafProps) {
   return <span {...attributes}>{children}</span>
 }
@@ -188,7 +186,7 @@ export function Editable({
      * it until the second try. This is a workaround for that.
      * Handled narrowly to avoid potentially breaking other browsers.
      */
-    if (Platform.isFirefox) {
+    if (navigator.userAgent.includes("Firefox")) {
       ReactEditor.focus(editor)
     }
   }, [editor])

@@ -14,7 +14,7 @@ function insertHorizontalRule(editor: Editor) {
 
   const hrElement = {
     type: "horizontal-rule" as const,
-    children: [{ text: "" }],
+    children: [{ text: "" }] as [{ text: string }],
   }
   const paragraphElement = {
     type: "paragraph" as const,

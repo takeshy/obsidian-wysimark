@@ -16,8 +16,8 @@ const duplicateSegments = (segments: Segment[]): Segment[] => {
     if (Element.isElement(segment) && segment.type === "anchor") {
       return {
         ...segment,
-        children: duplicateSegments(segment.children as Segment[]),
-      }
+        children: duplicateSegments(segment.children as Segment[]) as typeof segment.children,
+      } as typeof segment
     } else {
       return segment
     }

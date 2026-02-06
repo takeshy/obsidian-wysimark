@@ -19,9 +19,9 @@ import { SKIP, visit } from "unist-util-visit"
  * https://github.com/remarkjs/remark-inline-links
  */
 export function transformInlineLinks(tree: Root): void {
-  const definition = definitions(tree)
+  const definition = definitions(tree as Parameters<typeof definitions>[0])
 
-  visit<Node>(tree as Node, (n, index, p) => {
+  visit(tree as unknown as Node, (n: Node, index: number | undefined, p: Parent | undefined) => {
     const node = n as unknown as Content
     const parent = p as unknown as Parent | null
     if (

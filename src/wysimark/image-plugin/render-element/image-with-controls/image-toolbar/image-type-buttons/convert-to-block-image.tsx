@@ -1,4 +1,4 @@
-import { Editor, Text, Transforms } from "slate"
+import { Editor, Element, Text, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 
 import { findElementUp } from "../../../../../sink"
@@ -67,7 +67,7 @@ export function convertToBlockImage(
      */
     const parentEntry = findElementUp(
       editor,
-      (node) => Editor.isBlock(editor, node) && node.type !== "image-block"
+      (node) => Element.isElement(node) && Editor.isBlock(editor, node) && node.type !== "image-block"
     )
     if (!parentEntry) throw new Error("This shouldn't happen")
     const [parentElement, parentPath] = parentEntry

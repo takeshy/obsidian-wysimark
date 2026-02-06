@@ -1,4 +1,5 @@
 import type { Heading } from "mdast"
+import { Descendant } from "slate"
 
 import { Element } from "../types"
 import { parsePhrasingContents } from "./parse-phrasing-content/parse-phrasing-content"
@@ -8,7 +9,7 @@ export function parseHeading(content: Heading): Element[] {
     {
       type: "heading",
       level: content.depth,
-      children: parsePhrasingContents(content.children),
+      children: parsePhrasingContents(content.children) as Descendant[],
     },
   ]
 }

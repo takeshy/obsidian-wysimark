@@ -1,4 +1,5 @@
 import type { Paragraph } from "mdast"
+import { Descendant } from "slate"
 
 import { ImageBlockElement, ImageInlineElement } from "../../image-plugin/types"
 
@@ -50,7 +51,7 @@ export function parseParagraph(content: Paragraph): Element[] {
   return [
     {
       type: "paragraph",
-      children: segments,
+      children: segments as Descendant[],
     },
   ]
 }

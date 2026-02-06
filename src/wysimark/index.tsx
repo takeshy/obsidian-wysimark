@@ -10,10 +10,10 @@ import {
   useState,
 } from "react"
 import { createRoot } from "react-dom/client"
-import { Editable, useEditor, OnImageChangeHandler } from './entry/index'
+import { Editable, useEditor, OnImageSaveHandler } from './entry/index'
 
 export { Editable, useEditor }
-export type { OnImageChangeHandler }
+export type { OnImageSaveHandler }
 
 /**
  * The options passed into the standalone version of Wysimark.

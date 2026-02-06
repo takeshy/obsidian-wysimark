@@ -1,5 +1,5 @@
 import { BaseElement } from "slate"
-import { ReactNode, Ref } from "react"
+import { ReactNode, RefCallback } from "react"
 
 /**
  * Creates the RenderElementProps where the element argument coming in is
@@ -16,7 +16,7 @@ export type ConstrainedRenderElementProps<Element> = Element extends BaseElement
         "data-slate-inline"?: true
         "data-slate-void"?: true
         dir?: "rtl"
-        ref: Ref<HTMLElement>
+        ref: RefCallback<HTMLElement> | null
       }
     }
   : never

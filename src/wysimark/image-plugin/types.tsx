@@ -108,7 +108,7 @@ export type ImageInlineElement = {
 export type ImagePluginCustomTypes = {
   Name: "image"
   Editor: ImageEditor
-  Element: ImageBlockElement
+  Element: ImageBlockElement | ImageInlineElement
   Options: ImagePluginOptions
 }
 

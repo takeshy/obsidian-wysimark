@@ -85,7 +85,7 @@ export const CodeBlockPlugin = createPlugin<CodeBlockPluginCustomTypes>(
             ? tokenStyles[leaf.prismToken] || null
             : null
           if (style === null) {
-            return children
+            return <>{children}</>
           } else {
             return <span style={style}>{children}</span>
           }

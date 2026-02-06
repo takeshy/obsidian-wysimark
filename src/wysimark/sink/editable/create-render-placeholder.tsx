@@ -1,3 +1,4 @@
+import React from "react"
 import { RenderPlaceholderProps } from "slate-react"
 import { EditableProps } from "slate-react/dist/components/editable"
 
@@ -27,7 +28,7 @@ export function createRenderPlaceholder(
   if (fns.length === 0) return undefined
   return function (
     renderPlaceholderProps: RenderPlaceholderProps
-  ): JSX.Element {
+  ): React.JSX.Element {
     if (fns.length > 1) {
       throw new Error(
         `Only one plugin can define renderPlaceholder but there are ${fns.length}`

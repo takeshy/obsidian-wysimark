@@ -70,6 +70,8 @@ export function serializeElement(element: Element, orders: number[]): string {
       )
     case "html-block":
       return `${element.html}\n\n`
+    case "image-inline":
+      return `![${element.alt || ""}](${element.url})`
   }
   assertUnreachable(element)
 }

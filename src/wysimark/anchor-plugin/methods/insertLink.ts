@@ -1,4 +1,4 @@
-import { Editor, Range, Text, Transforms } from "slate"
+import { Editor, Element, Range, Text, Transforms } from "slate"
 
 export function insertLink(
   editor: Editor,
@@ -43,7 +43,7 @@ export function insertLink(
       { type: "anchor", href, title, children: [] },
       {
         split: true,
-        match: (node) => Text.isText(node) || Editor.isInline(editor, node),
+        match: (node) => Text.isText(node) || (Element.isElement(node) && Editor.isInline(editor, node)),
       }
     )
   }
