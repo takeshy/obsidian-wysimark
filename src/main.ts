@@ -8,11 +8,6 @@ export default class WysimarkEditorPlugin extends Plugin {
     // Register the Wysimark view
     this.registerView(VIEW_TYPE_WYSIMARK, (leaf) => new WysimarkView(leaf, this));
 
-    // Ensure the view exists when layout is ready
-    this.app.workspace.onLayoutReady(() => {
-      void this.ensureWysimarkViewExists();
-    });
-
     // Add ribbon icon to show/toggle the view
     this.addRibbonIcon('edit-3', 'Wysimark editor', () => {
       void this.activateWysimarkView();
@@ -43,18 +38,10 @@ export default class WysimarkEditorPlugin extends Plugin {
     );
   }
 
-  // Ensure that the Wysimark view exists in the right sidebar
-  async ensureWysimarkViewExists(): Promise<void> {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_WYSIMARK);
-    if (leaves.length === 0) {
-      let leaf = this.app.workspace.getRightLeaf(false);
-      if (!leaf) {
-        leaf = this.app.workspace.getRightLeaf(true);
-      }
-      if (leaf) {
-        await leaf.setViewState({ type: VIEW_TYPE_WYSIMARK, active: false });
-      }
-    }
+  onunload(): void {
+    // Views, events, and commands registered via registerView/registerEvent/addCommand
+    // are automatically cleaned up by Obsidian's plugin system.
+    // Do NOT call detachLeavesOfType here to preserve user's layout during plugin updates.
   }
 
   // Activate/reveal the Wysimark view

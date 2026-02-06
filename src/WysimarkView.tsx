@@ -77,12 +77,7 @@ function WysimarkEditorComponent({
   onReload: () => void;
   onImageSave?: OnImageSaveHandler;
 }) {
-  const editor = useEditor({
-    authToken: undefined,
-    height: undefined,
-    minHeight: undefined,
-    maxHeight: undefined,
-  });
+  const editor = useEditor({});
   // Use initialValue only on mount, manage internally afterwards
   const [value] = React.useState(initialValue);
 
@@ -230,7 +225,7 @@ export class WysimarkView extends ItemView {
     }
 
     this.currentFile = file;
-    const rawContent = await this.app.vault.read(file);
+    const rawContent = await this.app.vault.cachedRead(file);
 
     // Extract frontmatter and body
     const { frontmatter, body } = extractFrontmatter(rawContent);
@@ -272,7 +267,8 @@ export class WysimarkView extends ItemView {
 
   async saveFile(): Promise<void> {
     if (this.currentFile && this.isDirty) {
-      await this.app.vault.modify(this.currentFile, this.fileContent);
+      const content = this.fileContent;
+      await this.app.vault.process(this.currentFile, () => content);
       this.isDirty = false;
     }
   }
