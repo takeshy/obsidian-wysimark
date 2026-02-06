@@ -49,10 +49,10 @@ export type InputPluginSchema = SetOptional<
  */
 export type NormalizeInputPluginSchema<T extends InputPluginSchema> = {
   Name: T["Name"]
-  Options: T["Options"] extends object ? T["Options"] : {}
-  Editor: T["Editor"] extends object ? T["Editor"] : {}
+  Options: T["Options"] extends object ? T["Options"] : Record<never, never>
+  Editor: T["Editor"] extends object ? T["Editor"] : Record<never, never>
   Element: T["Element"] extends object ? T["Element"] : never
-  Text: T["Text"] extends object ? T["Text"] : {}
+  Text: T["Text"] extends object ? T["Text"] : Record<never, never>
 }
 
 /**

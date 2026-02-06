@@ -9,6 +9,7 @@ export default tseslint.config(
       'styles.css',
       '*.mjs',
       '.storybook/**',
+      'src/stories/**',
     ],
   },
   ...tseslint.configs.recommendedTypeChecked,
