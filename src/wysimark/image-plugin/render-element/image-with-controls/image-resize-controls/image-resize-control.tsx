@@ -1,5 +1,5 @@
 import { clsx } from "clsx"
-import { Dispatch, SetStateAction, useCallback } from "react"
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef } from "react"
 import { Editor, Transforms } from "slate"
 import { ReactEditor, useSlateStatic } from "slate-react"
 
@@ -52,6 +52,10 @@ export function ImageResizeControl({
   setIsDragging: Dispatch<SetStateAction<boolean>>
 }) {
   const editor = useSlateStatic()
+  const mouseMoveRef = useRef<((e: MouseEvent) => void) | null>(null)
+  const mouseUpRef = useRef<(() => void) | null>(null)
+  const touchMoveRef = useRef<((e: TouchEvent) => void) | null>(null)
+  const touchEndRef = useRef<(() => void) | null>(null)
 
   /**
    * Refreshes the rendering of the resize handle if the browser width is
@@ -126,6 +130,8 @@ export function ImageResizeControl({
       const onDocumentMouseUp = () => {
         document.removeEventListener("mousemove", onDocumentMouseMove)
         document.removeEventListener("mouseup", onDocumentMouseUp)
+        mouseMoveRef.current = null
+        mouseUpRef.current = null
         const path = ReactEditor.findPath(editor, element)
         /**
          * When we save the image to the document, at the moment, we have
@@ -162,6 +168,8 @@ export function ImageResizeControl({
       /**
        * Attach event listeners directly to document
        */
+      mouseMoveRef.current = onDocumentMouseMove
+      mouseUpRef.current = onDocumentMouseUp
       document.addEventListener("mousemove", onDocumentMouseMove)
       document.addEventListener("mouseup", onDocumentMouseUp)
     },
@@ -202,6 +210,8 @@ export function ImageResizeControl({
       const onDocumentTouchEnd = () => {
         document.removeEventListener("touchmove", onDocumentTouchMove)
         document.removeEventListener("touchend", onDocumentTouchEnd)
+        touchMoveRef.current = null
+        touchEndRef.current = null
         const path = ReactEditor.findPath(editor, element)
         Transforms.setNodes(
           editor,
@@ -211,11 +221,30 @@ export function ImageResizeControl({
         setIsDragging(false)
       }
 
+      touchMoveRef.current = onDocumentTouchMove
+      touchEndRef.current = onDocumentTouchEnd
       document.addEventListener("touchmove", onDocumentTouchMove)
       document.addEventListener("touchend", onDocumentTouchEnd)
     },
     [srcSize.width, srcSize.height, size.width, element]
   )
+
+  useEffect(() => {
+    return () => {
+      if (mouseMoveRef.current) {
+        document.removeEventListener("mousemove", mouseMoveRef.current)
+      }
+      if (mouseUpRef.current) {
+        document.removeEventListener("mouseup", mouseUpRef.current)
+      }
+      if (touchMoveRef.current) {
+        document.removeEventListener("touchmove", touchMoveRef.current)
+      }
+      if (touchEndRef.current) {
+        document.removeEventListener("touchend", touchEndRef.current)
+      }
+    }
+  }, [])
 
   /**
    * Add special classNames to modify appearance of resize controls

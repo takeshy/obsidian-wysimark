@@ -40,7 +40,7 @@ function getWidths(toolbar: HTMLDivElement) {
   const divider = toolbar.querySelector<HTMLDivElement>(
     "[data-item-type=divider]"
   )
-  if (!button || !divider) throw new Error("Button or divider not found")
+  if (!button || !divider) return null
   return {
     toolbar: toolbar.offsetWidth,
     button: button.offsetWidth,
@@ -77,6 +77,7 @@ export function Toolbar() {
         const toolbar = ref.current
         if (!toolbar) throw new Error("Toolbar not found")
         const widths = getWidths(toolbar)
+        if (!widths) return
         /**
          * Iterate through the item sets and find the first one that fits within
          * the toolbar width. If none fit, use the last item set.

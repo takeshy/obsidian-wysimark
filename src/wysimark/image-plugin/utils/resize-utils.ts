@@ -39,7 +39,7 @@ export function resizeInBounds(size: ImageSize, bounds: ImageSize): ImageSize {
       return resizeToWidth(bounds.width, size)
     }
   } else {
-    if (size.height > bounds.width) {
+    if (size.height > bounds.height) {
       return resizeToHeight(bounds.height, size)
     }
   }

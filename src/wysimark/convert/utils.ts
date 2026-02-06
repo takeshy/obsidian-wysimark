@@ -7,6 +7,10 @@ import { Element } from "./types"
 export function escapeUrlSlashes(text: string): string {
   // First, we need to identify markdown links to exclude them
   const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const placeholderPrefix = "\u0007WYSIMARK_";
+  const linkPrefix = `${placeholderPrefix}LINK_`;
+  const htmlPrefix = `${placeholderPrefix}HTML_`;
+  const placeholderSuffix = "\u0007";
 
   // Store the markdown links to restore them later
   const links: string[] = [];
@@ -15,12 +19,13 @@ export function escapeUrlSlashes(text: string): string {
   // Replace markdown links with placeholders
   let result = text.replace(markdownLinkPattern, (match) => {
     links.push(match);
-    return `__MARKDOWN_LINK_${linkIndex++}__`;
+    return `${linkPrefix}${linkIndex++}${placeholderSuffix}`;
   });
 
   // Also exclude HTML blocks (tags plus their contents when a closing tag exists)
   const htmlBlocks: string[] = [];
-  result = maskHtmlBlocks(result, htmlBlocks);
+  const masked = maskHtmlBlocks(result, htmlBlocks, htmlPrefix, placeholderSuffix);
+  result = masked;
 
   // URL regex pattern to identify plain text URLs
   const urlPattern = /(https?:\/\/[^\s]+)/g;
@@ -32,12 +37,18 @@ export function escapeUrlSlashes(text: string): string {
 
   // Restore HTML blocks first (they may contain markdown links placeholders)
   for (let i = 0; i < htmlBlocks.length; i++) {
-    result = result.replace(`__HTML_BLOCK_${i}__`, htmlBlocks[i]);
+    result = result.replace(
+      `${htmlPrefix}${i}${placeholderSuffix}`,
+      htmlBlocks[i]
+    );
   }
 
   // Restore the markdown links
   for (let i = 0; i < links.length; i++) {
-    result = result.replace(`__MARKDOWN_LINK_${i}__`, links[i]);
+    result = result.replace(
+      `${linkPrefix}${i}${placeholderSuffix}`,
+      links[i]
+    );
   }
 
   return result;
@@ -48,10 +59,8 @@ export function escapeUrlSlashes(text: string): string {
  * This is used when switching to raw mode to display the unescaped markdown
  */
 export function unescapeUrlSlashes(text: string): string {
-  // Unescape all escaped characters in the text
-  return text.replace(/\\(.)/g, (_match: string, char: string) => {
-    return char;
-  });
+  // Only unescape forward slashes that we previously escaped.
+  return text.replace(/\\\//g, "/");
 }
 
 type TagInfo = {
@@ -63,7 +72,12 @@ type TagInfo = {
 
 const RAW_TEXT_TAGS = new Set(["script", "style"])
 
-function maskHtmlBlocks(text: string, htmlBlocks: string[]): string {
+function maskHtmlBlocks(
+  text: string,
+  htmlBlocks: string[],
+  htmlPrefix: string,
+  placeholderSuffix: string
+): string {
   let output = ""
   let index = 0
 
@@ -84,7 +98,7 @@ function maskHtmlBlocks(text: string, htmlBlocks: string[]): string {
       }
       const block = text.slice(ltIndex, end + 3)
       htmlBlocks.push(block)
-      output += `__HTML_BLOCK_${htmlBlocks.length - 1}__`
+      output += `${htmlPrefix}${htmlBlocks.length - 1}${placeholderSuffix}`
       index = end + 3
       continue
     }
@@ -97,7 +111,7 @@ function maskHtmlBlocks(text: string, htmlBlocks: string[]): string {
       }
       const block = text.slice(ltIndex, end + 3)
       htmlBlocks.push(block)
-      output += `__HTML_BLOCK_${htmlBlocks.length - 1}__`
+      output += `${htmlPrefix}${htmlBlocks.length - 1}${placeholderSuffix}`
       index = end + 3
       continue
     }
@@ -110,7 +124,7 @@ function maskHtmlBlocks(text: string, htmlBlocks: string[]): string {
     }
 
     const blockIndex = htmlBlocks.length
-    const placeholder = `__HTML_BLOCK_${blockIndex}__`
+    const placeholder = `${htmlPrefix}${blockIndex}${placeholderSuffix}`
 
     if (!tag.name) {
       const block = text.slice(ltIndex, tag.endIndex + 1)
