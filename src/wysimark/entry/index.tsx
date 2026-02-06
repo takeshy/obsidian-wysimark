@@ -85,6 +85,9 @@ export function Editable({
    *   at the end of a line and the space would be removed and the cursor would
    *   have nowhere to be.
    */
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
+
   const onThrottledSlateChange = useCallback(
     throttle(
       () => {
@@ -94,12 +97,12 @@ export function Editable({
           children: editor.children,
         }
         lastEmittedValueRef.current = markdown
-        onChange(markdown)
+        onChangeRef.current(markdown)
       },
       throttleInMs,
       { leading: false, trailing: true }
     ),
-    [editor, onChange, throttleInMs]
+    [editor, throttleInMs]
   )
 
   /**
