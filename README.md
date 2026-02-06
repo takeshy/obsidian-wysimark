@@ -63,19 +63,18 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 
 ## Installation
 
-### From Obsidian Community Plugins (Recommended)
+### BRAT (Recommended)
 
-1. Open Obsidian Settings
-2. Go to Community Plugins and disable Safe Mode
-3. Click Browse and search for "Wysimark Editor"
-4. Install and enable the plugin
+1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
+2. Open BRAT settings → "Add Beta plugin"
+3. Enter: `https://github.com/takeshy/obsidian-wysimark`
+4. Enable the plugin in Community plugins settings
 
-### Manual Installation
+### Manual
 
-1. Download the latest release from GitHub
-2. Extract the files to your vault's `.obsidian/plugins/wysimark-editor/` folder
-3. Reload Obsidian
-4. Enable the plugin in Settings > Community Plugins
+1. Download `main.js`, `manifest.json`, `styles.css` from [releases](https://github.com/takeshy/obsidian-wysimark/releases)
+2. Create `wysimark-editor` folder in `.obsidian/plugins/`
+3. Copy files and enable in Obsidian settings
 
 ## Usage
 
