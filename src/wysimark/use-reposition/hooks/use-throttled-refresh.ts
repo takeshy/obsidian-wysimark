@@ -10,7 +10,7 @@
  * execution.
  */
 import throttle from "lodash.throttle"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 
 export type UseThrottledRefreshReturnType = ReturnType<typeof throttle> & {
   counter: number
@@ -28,12 +28,16 @@ export function useThrottledRefresh(
 ): UseThrottledRefreshReturnType {
   const [counter, setState] = useState(0)
 
-  const refresh = throttle(
-    () => {
-      setState((counter) => counter + 1)
-    },
-    intervalInMs,
-    { trailing: true }
+  const refresh = useMemo(
+    () =>
+      throttle(
+        () => {
+          setState((counter) => counter + 1)
+        },
+        intervalInMs,
+        { trailing: true }
+      ),
+    [intervalInMs]
   )
 
   return Object.assign(refresh, { counter })

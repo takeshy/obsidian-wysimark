@@ -36,7 +36,7 @@ export function parsePortiveImage(image: Image): ImageData | undefined {
     alt: image.alt || undefined,
     width: size.width,
     height: size.height,
-    srcWidth: parseInt(srcSizeMatch[1]),
-    srcHeight: parseInt(srcSizeMatch[2]),
+    srcWidth: parseInt(srcSizeMatch[1], 10),
+    srcHeight: parseInt(srcSizeMatch[2], 10),
   }
 }

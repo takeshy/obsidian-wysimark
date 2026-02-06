@@ -62,7 +62,7 @@ function serializeTableCell(element: TableCellElement): string {
       element.children
     )}`
   )
-  return element.children.map(serializeTableContent).join()
+  return element.children.map(serializeTableContent).join("")
 }
 
 function serializeTableContent(element: TableContentElement): string {

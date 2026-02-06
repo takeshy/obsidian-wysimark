@@ -9,7 +9,7 @@ export function parseSize(
   const sizeMatch = s.match(/^(\d+)x(\d+)$/)
   if (sizeMatch === null) return null
   return {
-    width: parseInt(sizeMatch[1]),
-    height: parseInt(sizeMatch[2]),
+    width: parseInt(sizeMatch[1], 10),
+    height: parseInt(sizeMatch[2], 10),
   }
 }

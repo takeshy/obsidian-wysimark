@@ -12,7 +12,7 @@ type ParsedUrl = {
  * - searchParams part does not include the "?"
  * - hash part includes the "#"
  */
-const URL_REGEX = /^(\/[^?#]*)(?:\?([^#]*))?(#.*)?$/
+const URL_REGEX = /^([^?#]*)(?:\?([^#]*))?(#.*)?$/
 
 export function parseUrl(url: string): ParsedUrl {
   try {

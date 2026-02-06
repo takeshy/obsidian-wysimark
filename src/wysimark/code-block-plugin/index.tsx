@@ -51,7 +51,7 @@ export const CodeBlockPlugin = createPlugin<CodeBlockPluginCustomTypes>(
         isVoid(element) {
           if (
             element.type === "code-block" ||
-            element.type == "code-block-line"
+            element.type === "code-block-line"
           )
             return false
         },

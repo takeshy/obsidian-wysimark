@@ -16,7 +16,7 @@ export function mergeAdjacentSpaces({
   index,
 }: NormalizeOptions): boolean {
   if (!isText(node) || !isPlainSpace(node) || node.code) return false
-  if (!isText(nextNode) || !isPlainSpace(nextNode) || node.code) return false
+  if (!isText(nextNode) || !isPlainSpace(nextNode) || nextNode.code) return false
   nodes.splice(index, 2, { text: `${node.text}${nextNode.text}` })
   return true
 }

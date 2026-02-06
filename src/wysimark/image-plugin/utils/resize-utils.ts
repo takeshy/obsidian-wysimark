@@ -85,6 +85,6 @@ export function getEditorWidth(editor: Editor) {
   const element = ReactEditor.toDOMNode(editor, editor)
   const computed = getComputedStyle(element)
   const padding =
-    parseInt(computed.paddingLeft) + parseInt(computed.paddingRight)
+    parseInt(computed.paddingLeft, 10) + parseInt(computed.paddingRight, 10)
   return element.clientWidth - padding
 }

@@ -17,7 +17,7 @@ export function serializeElement(element: Element, orders: number[]): string {
       const lines = serializeElements(element.children as Element[])
       return `${lines
         .split("\n")
-        .map((line) => `> ${line}`.trim())
+        .map((line) => (line ? `> ${line}` : ">"))
         .join("\n")}\n\n`
     }
     case "heading":

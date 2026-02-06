@@ -18,7 +18,7 @@ export function ImageUrlDialog({
     close: () => void
 }) {
     const editor = useSlateStatic()
-    const ref = useRef<HTMLDivElement>(undefined) as unknown as HTMLDivElement
+    const ref = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
@@ -151,7 +151,7 @@ export function ImageUrlDialog({
     return (
         <>
             <CloseMask close={close} />
-            <$FileDialog ref={ref as unknown as React.RefObject<HTMLDivElement>} style={style}>
+            <$FileDialog ref={ref} style={style}>
                 <DraggableHeader onDrag={handleDrag} />
                 <form onSubmit={(e) => void handleSubmit(e)} style={{ padding: "8px" }}>
                     {hasOnImageSave && (

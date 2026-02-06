@@ -1,5 +1,5 @@
 import { clsx } from "clsx"
-import { Editor, Location, Point, Range, Text } from "slate"
+import { Editor, Location, Range, Text } from "slate"
 
 import {
   createHotkeyHandler,
@@ -82,14 +82,12 @@ export const MarksPlugin = createPlugin<MarksPluginCustomTypes>((editor) => {
   const { removeMarks } = editor.marksPlugin
   editor.marksPlugin.removeMarks = () => {
     removeMarks()
-    if (editor.selection) {
-      const point = Range.isRange(editor.selection) ? editor.selection.focus : editor.selection
-      if (Point.isPoint(point)) {
-        const isAtLineEnd = Editor.after(editor, point) === null ||
-          Editor.isEnd(editor, point, Editor.end(editor, []))
-        if (isAtLineEnd) {
-          editor.activeMarks = {}
-        }
+    if (editor.selection && Range.isRange(editor.selection)) {
+      const point = editor.selection.focus
+      const isAtLineEnd = Editor.after(editor, point) === null ||
+        Editor.isEnd(editor, point, Editor.end(editor, []))
+      if (isAtLineEnd) {
+        editor.activeMarks = {}
       }
     }
   }

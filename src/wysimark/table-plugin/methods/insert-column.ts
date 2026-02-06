@@ -20,7 +20,8 @@ export function insertColumn(
      * Insert a Column into `TableElement.columns` which is the same as the
      * value of the current column. This is the `alignment` of the column.
      */
-    nextColumns.splice(nextCellIndex, 0, columns[nextCellIndex])
+    const sourceIndex = Math.min(nextCellIndex, columns.length - 1)
+    nextColumns.splice(nextCellIndex, 0, columns[sourceIndex])
     Transforms.setNodes(editor, { columns: nextColumns }, { at: tablePath })
 
     /**
