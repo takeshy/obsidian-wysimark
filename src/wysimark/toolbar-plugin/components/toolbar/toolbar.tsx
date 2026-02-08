@@ -1,4 +1,4 @@
-import throttle from "lodash.throttle"
+import debounce from "lodash.debounce"
 import { useEffect, useRef, useState } from "react"
 import { useSlateStatic } from "slate-react"
 
@@ -72,38 +72,36 @@ export function Toolbar() {
   const ref = useRef<HTMLDivElement>(null)
   const [items, setItems] = useState<MenuItemData[]>(initialItems)
   useEffect(() => {
-    const refresh = throttle(
-      () => {
-        const toolbar = ref.current
-        if (!toolbar) throw new Error("Toolbar not found")
-        const widths = getWidths(toolbar)
-        if (!widths) return
-        /**
-         * Iterate through the item sets and find the first one that fits within
-         * the toolbar width. If none fit, use the last item set.
-         */
-        for (let i = 0; i < itemSets.length - 1; i++) {
-          const itemSetWidth = measureItemSetWidth(
-            itemSets[i],
-            widths.button,
-            widths.divider
-          )
-          if (itemSetWidth < widths.toolbar - WIDTH_BUFFER_PX) {
-            setItems(itemSets[i])
-            return
-          }
+    const refresh = () => {
+      const toolbar = ref.current
+      if (!toolbar) throw new Error("Toolbar not found")
+      const widths = getWidths(toolbar)
+      if (!widths) return
+      /**
+       * Iterate through the item sets and find the first one that fits within
+       * the toolbar width. If none fit, use the last item set.
+       */
+      for (let i = 0; i < itemSets.length - 1; i++) {
+        const itemSetWidth = measureItemSetWidth(
+          itemSets[i],
+          widths.button,
+          widths.divider
+        )
+        if (itemSetWidth < widths.toolbar - WIDTH_BUFFER_PX) {
+          setItems(itemSets[i])
+          return
         }
-        setItems(itemSets[itemSets.length - 1])
-      },
-      100,
-      { trailing: true }
-    )
+      }
+      setItems(itemSets[itemSets.length - 1])
+    }
+    const debouncedRefresh = debounce(refresh, 150)
     // Delay initial refresh to ensure DOM is fully rendered
     const timeoutId = setTimeout(refresh, 0)
-    window.addEventListener("resize", refresh)
+    window.addEventListener("resize", debouncedRefresh)
     return () => {
       clearTimeout(timeoutId)
-      window.removeEventListener("resize", refresh)
+      debouncedRefresh.cancel()
+      window.removeEventListener("resize", debouncedRefresh)
     }
   }, [])
   return (
