@@ -24,9 +24,13 @@ import { ReactEditor } from "slate-react"
  */
 export function getUnreliableSelectionRect(): DOMRect | null {
   const s = window.getSelection()
-  if (!s) return null
-  const range = s.getRangeAt(0)
-  return range.getBoundingClientRect()
+  if (!s || s.rangeCount === 0) return null
+  try {
+    const range = s.getRangeAt(0)
+    return range.getBoundingClientRect()
+  } catch {
+    return null
+  }
 }
 
 /**

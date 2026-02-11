@@ -26,8 +26,13 @@ export function serializeElement(element: Element, orders: number[]): string {
       )}\n\n`
     case "horizontal-rule":
       return "---\n\n"
-    case "paragraph":
-      return `${serializeLine(element.children as Segment[])}\n\n`
+    case "paragraph": {
+      const content = serializeLine(element.children as Segment[])
+      if (content === "") {
+        return `\u00A0\n\n`
+      }
+      return `${content}\n\n`
+    }
     /**
      * Table
      */

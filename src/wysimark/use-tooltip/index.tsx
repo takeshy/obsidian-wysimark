@@ -56,7 +56,7 @@ export function useTooltip(
       ))
       triangle.open(() => <Triangle dest={dest} />)
     }
-  }, deps)
+  }, [title, hotkey, label, triangle, ...deps])
 
   /**
    * On hover out
@@ -64,6 +64,6 @@ export function useTooltip(
   const onMouseLeave = useCallback(() => {
     label.close()
     triangle.close()
-  }, deps)
+  }, [label, triangle, ...deps])
   return { onMouseEnter, onMouseLeave }
 }

@@ -65,7 +65,7 @@ export function ToolbarButton({
        */
       if (menuLayer.layer) openMenu()
     },
-    [menuLayer.layer]
+    [menuLayer.layer, openMenu, tooltip.onMouseEnter]
   )
 
   return (

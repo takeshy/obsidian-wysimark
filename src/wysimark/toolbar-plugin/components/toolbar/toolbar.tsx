@@ -1,4 +1,3 @@
-import debounce from "lodash.debounce"
 import { useEffect, useRef, useState } from "react"
 import { useSlateStatic } from "slate-react"
 
@@ -64,17 +63,17 @@ function measureItemSetWidth(
   return width
 }
 
-// Allow a little slack so we don't collapse the toolbar while there is still
-// plenty of visible space. This helps avoid early wrapping on wide screens.
-const WIDTH_BUFFER_PX = 48
+// Small buffer to account for sub-pixel rounding in measurements.
+// The container padding (0.5em each side) already provides visual slack.
+const WIDTH_BUFFER_PX = 4
 
 export function Toolbar() {
   const ref = useRef<HTMLDivElement>(null)
   const [items, setItems] = useState<MenuItemData[]>(initialItems)
   useEffect(() => {
+    const toolbar = ref.current
+    if (!toolbar) return
     const refresh = () => {
-      const toolbar = ref.current
-      if (!toolbar) throw new Error("Toolbar not found")
       const widths = getWidths(toolbar)
       if (!widths) return
       /**
@@ -94,14 +93,10 @@ export function Toolbar() {
       }
       setItems(itemSets[itemSets.length - 1])
     }
-    const debouncedRefresh = debounce(refresh, 150)
-    // Delay initial refresh to ensure DOM is fully rendered
-    const timeoutId = setTimeout(refresh, 0)
-    window.addEventListener("resize", debouncedRefresh)
+    const observer = new ResizeObserver(refresh)
+    observer.observe(toolbar)
     return () => {
-      clearTimeout(timeoutId)
-      debouncedRefresh.cancel()
-      window.removeEventListener("resize", debouncedRefresh)
+      observer.disconnect()
     }
   }, [])
   return (

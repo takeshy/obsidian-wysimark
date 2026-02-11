@@ -5,6 +5,10 @@ import { VoidActionReturn } from "../../../sink"
 import { getRangeBackwards } from "./get-range-backwards"
 import { getTextBeforePointInBlock } from "./get-text-before-point-in-block"
 
+function getCharacterDistance(value: string): number {
+  return [...value].length
+}
+
 export function autocompleteMark(
   editor: Editor,
   text: string,
@@ -37,6 +41,9 @@ export function autocompleteMark(
         match.length - 1
       }`
     )
+  const openingMarkerDistance = getCharacterDistance(match[1])
+  const textDistance = getCharacterDistance(match[2])
+  const closingMarkerDistance = getCharacterDistance(match[3])
 
   /**
    * This callback method we are returning gets executed after the text is
@@ -56,13 +63,7 @@ export function autocompleteMark(
     const closingMarkersRange = getRangeBackwards(
       editor,
       editor.selection.focus,
-      /**
-       * TODO:
-       *
-       * We should be using Slate's internal `getCharacterDistance` to generate
-       * a length but it is not exposed.
-       **/
-      match[3].length
+      closingMarkerDistance
     )
     Transforms.delete(editor, { at: closingMarkersRange })
 
@@ -72,14 +73,8 @@ export function autocompleteMark(
     const openingMarkersRange = getRangeBackwards(
       editor,
       editor.selection.focus,
-      /**
-       * TODO:
-       *
-       * We should be using Slate's internal `getCharacterDistance` to generate
-       * a length but it is not exposed.
-       **/
-      match[2].length + match[3].length,
-      match[2].length
+      textDistance + openingMarkerDistance,
+      textDistance
     )
     Transforms.delete(editor, { at: openingMarkersRange })
 
@@ -89,13 +84,7 @@ export function autocompleteMark(
     const matchRange = getRangeBackwards(
       editor,
       editor.selection.focus,
-      /**
-       * TODO:
-       *
-       * We should be using Slate's internal `getCharacterDistance` to generate
-       * a length but it is not exposed.
-       **/
-      match[2].length
+      textDistance
     )
 
     /**

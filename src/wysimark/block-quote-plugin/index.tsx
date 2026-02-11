@@ -147,8 +147,6 @@ export const BlockQuotePlugin = createPlugin<BlockQuotePluginCustomTypes>(
         while (
           (current as Element).children.length === 1 &&
           Element.isElement((current as Element).children[0]) &&
-          (current as Element).children[0] &&
-          (current as Element).children[0] &&
           ((current as Element).children[0] as Element).type === "block-quote"
         ) {
           depth++

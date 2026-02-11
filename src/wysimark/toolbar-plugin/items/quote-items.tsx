@@ -1,5 +1,5 @@
 import { MenuItemData } from "../../shared-overlays"
-import { Editor, Transforms } from "slate"
+import { Editor, Path, Transforms } from "slate"
 import { findElementUp } from "../../sink"
 import * as Icon from "../icons"
 import { t } from "../../utils/translations"
@@ -54,16 +54,12 @@ const quoteItemsList: MenuItemData[] = [
       }
 
       // Case 2: If text is selected, convert it to a code block
-      if (selection && JSON.stringify(selection.anchor.path) !== JSON.stringify(selection.focus.path)) {
-        // Handle multi-paragraph selection
-        // This is more complex and would require custom handling
-        // For simplicity, we'll just create a code block with default behavior
+      if (selection && !Path.equals(selection.anchor.path, selection.focus.path)) {
         editor.codeBlock.createCodeBlock({ language: "text" });
         return;
       }
 
-      if (selection && (selection.anchor.offset !== selection.focus.offset ||
-        JSON.stringify(selection.anchor.path) !== JSON.stringify(selection.focus.path))) {
+      if (selection && selection.anchor.offset !== selection.focus.offset) {
         // Get the selected text
         const selectedText = Editor.string(editor, selection);
 

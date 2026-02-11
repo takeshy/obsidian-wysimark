@@ -20,4 +20,5 @@ export function toggleTaskListItem(
     { checked: nextChecked },
     { at: taskListItem[1] }
   )
+  return true
 }

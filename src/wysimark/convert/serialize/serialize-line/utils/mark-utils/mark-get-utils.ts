@@ -61,9 +61,6 @@ export function getCommonAnchorMarks(segments: Segment[]): MarkKey[] {
       currentMarks.includes(commonMark)
     )
   }
-  if (commonMarks === undefined)
-    throw new Error(
-      `No text segments were found as children in this anchor which should not be possible`
-    )
+  if (commonMarks === undefined) return []
   return commonMarks
 }

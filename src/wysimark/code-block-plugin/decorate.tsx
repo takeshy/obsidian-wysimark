@@ -84,7 +84,7 @@ export function decorate(
    */
 
   function getPointFromOffset(offset: number) {
-    for (let i = lineOffsets.length; i >= 0; i--) {
+    for (let i = lineOffsets.length - 1; i >= 0; i--) {
       const lineOffset = lineOffsets[i]
       if (lineOffset <= offset) {
         return {

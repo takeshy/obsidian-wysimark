@@ -15,7 +15,7 @@ import {
   $Textarea,
 } from "../../shared-styles"
 import { useLayer } from "../../use-layer"
-import { useAbsoluteReposition } from "../../use-reposition"
+import { positionInside, useAbsoluteReposition } from "../../use-reposition"
 import { AnchorElement } from "../index"
 import { AnchorDialog } from "./AnchorDialog"
 import { DraggableHeader } from "../../toolbar-plugin/components/dialog/DraggableHeader"
@@ -37,6 +37,7 @@ export function AnchorEditDialog({
   element: AnchorElement
 }) {
   const dialog = useLayer("dialog")
+  const ref = useRef<HTMLDivElement>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
   const handleDrag = useCallback((deltaX: number, deltaY: number) => {
@@ -44,12 +45,17 @@ export function AnchorEditDialog({
   }, [])
 
   const baseStyle = useAbsoluteReposition(
-    { destAnchor, destStartEdge },
-    ({ destAnchor, destStartEdge }) => {
-      return {
-        left: destStartEdge.left,
-        top: destAnchor.top + destAnchor.height,
-      }
+    { src: ref, destAnchor, destStartEdge },
+    ({ src, destAnchor, destStartEdge }, viewport) => {
+      return positionInside(
+        src,
+        viewport,
+        {
+          left: destStartEdge.left,
+          top: destAnchor.top + destAnchor.height,
+        },
+        { margin: 16 }
+      )
     }
   )
 
@@ -103,7 +109,7 @@ export function AnchorEditDialog({
   }, [openAnchorDialog])
 
   return (
-    <$AnchorEditDialog contentEditable={false} style={style}>
+    <$AnchorEditDialog ref={ref} contentEditable={false} style={style}>
       <DraggableHeader onDrag={handleDrag} />
       <div style={{ padding: "1em" }}>
         <$FormGroup>

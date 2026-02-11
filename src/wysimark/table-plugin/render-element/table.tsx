@@ -24,8 +24,13 @@ export function Table({
    * `x` and `y` are purely an internal requirement for rendering.
    */
   useEffect(() => {
-    const path = ReactEditor.findPath(editor, element)
-    normalizeTableIndexes(editor, [element, path])
+    try {
+      const path = ReactEditor.findPath(editor, element)
+      normalizeTableIndexes(editor, [element, path])
+    } catch {
+      // The element path may be stale if other normalizations shifted indices
+      // before this effect runs. normalizeNode will handle x/y as needed.
+    }
   }, [])
   return (
     <TableContext.Provider value={{ isSelected }}>
