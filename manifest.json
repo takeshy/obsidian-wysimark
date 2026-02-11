@@ -6,5 +6,6 @@
 	"description": "Edit your Markdown notes with a modern WYSIWYG rich text interface while keeping pure Markdown.",
 	"author": "takeshy",
 	"authorUrl": "https://github.com/takeshy",
-	"isDesktopOnly": false
+	"isDesktopOnly": false,
+	"fundingUrl": "https://buymeacoffee.com/takeshy"
 }
