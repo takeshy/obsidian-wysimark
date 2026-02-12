@@ -91,9 +91,25 @@ export const CollapsibleParagraphPlugin =
             }
           }
         },
-        onKeyDown: createHotkeyHandler({
-          "super+0": editor.collapsibleParagraph.convertParagraph,
-        }),
+        onKeyDown: (e) => {
+          // Handle Enter key in onKeyDown to bypass the IS_NODE_MAP_DIRTY
+          // deadlock in Slate's Android beforeinput handler. On mobile,
+          // rapid IME confirmation + Enter can permanently block Enter
+          // when IS_NODE_MAP_DIRTY is true and beforeinput returns early
+          // without calling preventDefault.
+          if (
+            e.key === "Enter" &&
+            !e.nativeEvent.isComposing &&
+            !e.shiftKey
+          ) {
+            e.preventDefault()
+            editor.insertBreak()
+            return true
+          }
+          return createHotkeyHandler({
+            "super+0": editor.collapsibleParagraph.convertParagraph,
+          })(e)
+        },
       },
     }
   }) as TypedPlugin<CollapsibleParagraphPluginCustomTypes>
