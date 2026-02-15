@@ -1,4 +1,4 @@
-import { Descendant, Editor } from "slate"
+import { Descendant } from "slate"
 
 import {
   createHotkeyHandler,
@@ -32,28 +32,16 @@ export const CollapsibleParagraphPlugin =
   createPlugin<CollapsibleParagraphPluginCustomTypes>((editor) => {
     const { insertBreak } = editor
     editor.insertBreak = () => {
-      const { selection } = editor
-      if (selection && selection.anchor.path[0] === selection.focus.path[0]) {
-        // Get text from start of block to cursor position
-        const blockPath = [selection.anchor.path[0]]
-        const blockStart = Editor.start(editor, blockPath)
-        const textBeforeCursor = Editor.string(editor, {
-          anchor: blockStart,
-          focus: selection.anchor,
-        })
+      // Enter = new paragraph, Shift+Enter = soft break (handled in onKeyDown)
+      insertBreak()
+    }
 
-        // Check if cursor is right after a newline (creating empty line / paragraph break)
-        if (textBeforeCursor.endsWith('\n')) {
-          // Create a new paragraph
-          insertBreak()
-        } else {
-          // Insert a single line break
-          editor.insertText('\n')
-        }
-      } else {
-        // Otherwise fall back to default behavior
-        insertBreak()
-      }
+    /**
+     * Insert a soft break (line break within the same paragraph).
+     * Called by Shift+Enter via onKeyDown.
+     */
+    editor.insertSoftBreak = () => {
+      editor.insertText('\n')
     }
 
     editor.convertElement.addConvertElementType("paragraph")
@@ -92,18 +80,15 @@ export const CollapsibleParagraphPlugin =
           }
         },
         onKeyDown: (e) => {
-          // Handle Enter key in onKeyDown to bypass the IS_NODE_MAP_DIRTY
-          // deadlock in Slate's Android beforeinput handler. On mobile,
-          // rapid IME confirmation + Enter can permanently block Enter
-          // when IS_NODE_MAP_DIRTY is true and beforeinput returns early
-          // without calling preventDefault.
-          if (
-            e.key === "Enter" &&
-            !e.nativeEvent.isComposing &&
-            !e.shiftKey
-          ) {
+          if (e.key === "Enter" && !e.nativeEvent.isComposing) {
             e.preventDefault()
-            editor.insertBreak()
+            if (e.shiftKey) {
+              // Shift+Enter = soft break (line break within paragraph)
+              editor.insertSoftBreak()
+            } else {
+              // Enter = new paragraph
+              editor.insertBreak()
+            }
             return true
           }
           return createHotkeyHandler({

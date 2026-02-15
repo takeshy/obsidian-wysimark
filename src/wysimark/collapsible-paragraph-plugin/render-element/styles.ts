@@ -3,12 +3,16 @@ import styled from "@emotion/styled"
 export const $Paragraph = styled("p")`
   padding: 0;
   margin: 0;
-  &:first-child {
+  &:first-of-type {
     margin-top: 0;
   }
 
   transition: background-color 200ms, margin-top 200ms, padding-top 200ms,
     margin-bottom 200ms, padding-bottom 200ms, font-size 200ms;
+
+  &:not(.--collapsible)&.--empty {
+    min-height: 1em;
+  }
 
   &.--collapsible&.--empty {
     font-size: 0.25em; /* font-size is collapsed to 1/4 of regular em */

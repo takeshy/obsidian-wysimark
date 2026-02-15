@@ -14,8 +14,28 @@ import { parseThematicBreak } from "./parse-thematic-break"
 
 export function parseContents(contents: TopLevelContent[]): Element[] {
   const elements: Element[] = []
-  for (const content of contents) {
-    elements.push(...parseContent(content))
+  for (let i = 0; i < contents.length; i++) {
+    /**
+     * Detect extra blank lines between MDAST nodes using position info.
+     * remark-parse collapses consecutive blank lines, but we can recover
+     * them by comparing the end line of the previous node with the start
+     * line of the current node. A standard block separation is 1 blank line
+     * (gap === 1). Each additional blank line gets an empty paragraph.
+     */
+    if (i > 0) {
+      const prev = contents[i - 1]
+      const curr = contents[i]
+      if (prev.position && curr.position) {
+        const gap = curr.position.start.line - prev.position.end.line - 1
+        for (let b = 1; b < gap; b++) {
+          elements.push({
+            type: "paragraph",
+            children: [{ text: "" }],
+          } as Element)
+        }
+      }
+    }
+    elements.push(...parseContent(contents[i]))
   }
   return elements
 }
