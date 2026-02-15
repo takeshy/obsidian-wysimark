@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { describe, it } from "node:test"
 import assert from "node:assert"
 import { parse } from "../parse"
 import { serialize } from "../serialize"
+import type { Element } from "../types"
 
 describe("blank line round-trip", () => {
   it("preserves a single blank line between paragraphs (NBSP marker)", () => {
@@ -55,12 +57,12 @@ describe("blank line round-trip", () => {
 
   it("round-trip: empty paragraph in Slate tree serializes to NBSP and parses back", () => {
     // Simulate what happens when user enters a blank line in WYSIWYG
-    const slateTree = [
+    const slateTree: Element[] = [
       { type: "paragraph", children: [{ text: "text A" }] },
       { type: "paragraph", children: [{ text: "" }] }, // blank line
       { type: "paragraph", children: [{ text: "text B" }] },
-    ]
-    const serialized = serialize(slateTree as any)
+    ] as Element[]
+    const serialized = serialize(slateTree)
     assert.strictEqual(serialized, "text A\n\n\u00A0\n\ntext B")
     const parsed = parse(serialized)
     assert.strictEqual(parsed.length, 3)
@@ -71,10 +73,10 @@ describe("blank line round-trip", () => {
 
   it("soft break serializes as two trailing spaces + newline", () => {
     // Simulate Shift+Enter (soft break within a paragraph)
-    const slateTree = [
+    const slateTree: Element[] = [
       { type: "paragraph", children: [{ text: "line1\nline2" }] },
-    ]
-    const serialized = serialize(slateTree as any)
+    ] as Element[]
+    const serialized = serialize(slateTree)
     // \n within text should become "  \n" (two trailing spaces + newline)
     assert.strictEqual(serialized, "line1  \nline2")
   })
@@ -85,7 +87,7 @@ describe("blank line round-trip", () => {
     assert.strictEqual(parsed.length, 1)
     // remark-parse creates break node → parse converts to \n → Slate merges text
     const children = parsed[0].children as { text: string }[]
-    const fullText = children.map(c => c.text).join("")
+    const fullText = children.map((c) => c.text).join("")
     assert.strictEqual(fullText, "line1\nline2")
   })
 })
