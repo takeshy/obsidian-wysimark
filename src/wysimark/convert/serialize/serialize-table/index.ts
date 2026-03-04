@@ -7,7 +7,7 @@ import {
 } from "../../../table-plugin"
 
 import { Segment } from "../../types"
-import { assert, assertElementType } from "../../utils"
+import { assertElementType } from "../../utils"
 import { serializeLine } from "../serialize-line"
 
 export function serializeTable(element: TableElement): string {
@@ -56,16 +56,14 @@ function serializeTableRow(element: TableRowElement): string {
 
 function serializeTableCell(element: TableCellElement): string {
   assertElementType(element, "table-cell")
-  assert(
-    element.children.length === 1,
-    `Expected table-cell to have one child but is ${JSON.stringify(
-      element.children
-    )}`
-  )
-  return element.children.map(serializeTableContent).join("")
+  // Join multiple table-content children with <br> to keep the row on one line.
+  return element.children.map(serializeTableContent).join("<br>")
 }
 
 function serializeTableContent(element: TableContentElement): string {
   assertElementType(element, "table-content")
-  return serializeLine(element.children as Segment[])
+  const line = serializeLine(element.children as Segment[])
+  // Replace soft breaks (two trailing spaces + newline) and bare newlines
+  // with <br> so the table row stays on a single line in GFM markdown.
+  return line.replace(/ {2}\n/g, "<br>").replace(/\n/g, "<br>")
 }

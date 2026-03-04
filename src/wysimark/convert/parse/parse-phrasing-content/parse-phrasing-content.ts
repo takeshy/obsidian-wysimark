@@ -36,6 +36,10 @@ function parsePhrasingContent(
     case "footnoteReference":
       return [{ text: `[${phrasingContent.identifier}]` }]
     case "html":
+      // Check for <br> / <br/> / <br /> tags — treat as soft line break
+      if (/^<br\s*\/?>$/i.test(phrasingContent.value)) {
+        return [{ text: "\n", ...marks }]
+      }
       return [{ text: phrasingContent.value, code: true }]
     case "image":
       return parseInlineImage(phrasingContent)
