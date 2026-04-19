@@ -6,6 +6,18 @@ import { normalizeSegments } from "./normalize-segments"
 import { parseInlineImage } from "./parse-inline-image"
 import { Descendant } from "slate"
 
+/**
+ * Parse inline HTML content, with special handling for <br> tags.
+ */
+function parseInlineHtml(htmlValue: string, marks: MarkProps): Segment[] {
+  // Check for <br> / <br/> / <br /> tags — treat as soft line break
+  if (/^<br\s*\/?>$/i.test(htmlValue)) {
+    return [{ text: "\n", ...marks }]
+  }
+  // For other HTML, treat as code
+  return [{ text: htmlValue, code: true }]
+}
+
 export function parsePhrasingContents(
   phrasingContents: PhrasingContent[],
   marks: MarkProps = {}
@@ -36,11 +48,7 @@ function parsePhrasingContent(
     case "footnoteReference":
       return [{ text: `[${phrasingContent.identifier}]` }]
     case "html":
-      // Check for <br> / <br/> / <br /> tags — treat as soft line break
-      if (/^<br\s*\/?>$/i.test(phrasingContent.value)) {
-        return [{ text: "\n", ...marks }]
-      }
-      return [{ text: phrasingContent.value, code: true }]
+      return parseInlineHtml(phrasingContent.value, marks)
     case "image":
       return parseInlineImage(phrasingContent)
     case "inlineCode": {
