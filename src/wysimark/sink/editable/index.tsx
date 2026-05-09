@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from "react"
-import { Editor } from "slate"
-import { useSlateStatic } from "slate-react"
+import { useEffect, useMemo, useRef } from "react"
+import { Editor, Transforms } from "slate"
+import { ReactEditor, useSlateStatic } from "slate-react"
 import { EditableProps } from "slate-react/dist/components/editable"
 
 import { SinkEditor } from "../types"
@@ -17,12 +17,95 @@ import { createRenderLeaf } from "./create-render-leaf"
 import { createRenderPlaceholder } from "./create-render-placeholder"
 export { SinkReset } from "./styles"
 
+type DOMBeforeInputHandler = NonNullable<EditableProps["onDOMBeforeInput"]>
+type InputHandler = NonNullable<EditableProps["onInput"]>
+
+const hasNonAsciiText = (text: string): boolean => /[^\x00-\x7F]/.test(text)
+
+function selectDOMTargetRange(editor: Editor, event: InputEvent): void {
+  const [targetRange] = event.getTargetRanges()
+
+  if (!targetRange) return
+
+  try {
+    const range = ReactEditor.toSlateRange(
+      editor as unknown as ReactEditor,
+      targetRange,
+      {
+        exactMatch: false,
+        suppressThrow: false,
+      }
+    )
+    Transforms.select(editor, range)
+  } catch {
+    // Keep the current Slate selection if the browser target range is stale.
+  }
+}
+
+function createOnDOMBeforeInput(
+  originalFn: DOMBeforeInputHandler | undefined,
+  editor: Editor,
+  skipInputTextRef: React.MutableRefObject<string | null>
+): DOMBeforeInputHandler {
+  return (event) => {
+    const originalResult = originalFn?.(event)
+
+    if (originalResult != null || event.defaultPrevented) return originalResult
+    if (event.inputType !== "insertText") return originalResult
+    if (event.isComposing) return originalResult
+    if (typeof event.data !== "string" || event.data.length === 0) {
+      return originalResult
+    }
+    if (!hasNonAsciiText(event.data)) return originalResult
+
+    selectDOMTargetRange(editor, event)
+    event.preventDefault()
+    Editor.insertText(editor, event.data)
+    skipInputTextRef.current = event.data
+    return true
+  }
+}
+
+function createOnInput(
+  originalFn: InputHandler | undefined,
+  editor: Editor,
+  skipInputTextRef: React.MutableRefObject<string | null>
+): InputHandler {
+  return (event) => {
+    const originalResult = originalFn?.(event)
+
+    if (originalResult != null || event.defaultPrevented) return originalResult
+
+    const nativeEvent = event.nativeEvent
+
+    if (!(nativeEvent instanceof InputEvent)) return originalResult
+    if (nativeEvent.inputType !== "insertText") return originalResult
+    if (nativeEvent.isComposing) return originalResult
+    if (
+      typeof nativeEvent.data !== "string" ||
+      nativeEvent.data.length === 0
+    ) {
+      return originalResult
+    }
+    if (!hasNonAsciiText(nativeEvent.data)) return originalResult
+
+    if (skipInputTextRef.current === nativeEvent.data) {
+      skipInputTextRef.current = null
+      return originalResult
+    }
+
+    Editor.insertText(editor, nativeEvent.data)
+    return originalResult
+  }
+}
+
 /**
  * In Editable, we use the Slate context to grab the right things from
  * the editor.
  */
 export function SinkEditable(originalProps: EditableProps): React.ReactElement {
   const editor = useSlateStatic() as unknown as Editor & SinkEditor
+  const skipInputTextRef = useRef<string | null>(null)
 
   /**
    * We ask Slate to normalize the editor once at the very start.
@@ -72,6 +155,12 @@ export function SinkEditable(originalProps: EditableProps): React.ReactElement {
       onKeyUp: createOnKeyUp(originalProps.onKeyUp, plugins),
       onPaste: createOnPaste(originalProps.onPaste, plugins),
       onDrop: createOnDrop(originalProps.onDrop, plugins),
+      onDOMBeforeInput: createOnDOMBeforeInput(
+        originalProps.onDOMBeforeInput,
+        editor,
+        skipInputTextRef
+      ),
+      onInput: createOnInput(originalProps.onInput, editor, skipInputTextRef),
     }),
     [
       originalProps.decorate,
@@ -82,8 +171,11 @@ export function SinkEditable(originalProps: EditableProps): React.ReactElement {
       originalProps.onKeyUp,
       originalProps.onPaste,
       originalProps.onDrop,
+      originalProps.onDOMBeforeInput,
+      originalProps.onInput,
       originalProps.placeholder,
       originalProps.className,
+      editor,
       plugins,
     ]
   )
