@@ -20,7 +20,7 @@ export { SinkReset } from "./styles"
 type DOMBeforeInputHandler = NonNullable<EditableProps["onDOMBeforeInput"]>
 type InputHandler = NonNullable<EditableProps["onInput"]>
 
-const hasNonAsciiText = (text: string): boolean => /[^\x00-\x7F]/.test(text)
+const hasNonAsciiText = (text: string): boolean => /[^\u0000-\u007F]/.test(text)
 
 function selectDOMTargetRange(editor: Editor, event: InputEvent): void {
   const [targetRange] = event.getTargetRanges()
@@ -45,7 +45,7 @@ function selectDOMTargetRange(editor: Editor, event: InputEvent): void {
 function createOnDOMBeforeInput(
   originalFn: DOMBeforeInputHandler | undefined,
   editor: Editor,
-  skipInputTextRef: React.MutableRefObject<string | null>
+  skipInputTextRef: React.RefObject<string | null>
 ): DOMBeforeInputHandler {
   return (event) => {
     const originalResult = originalFn?.(event)
@@ -69,7 +69,7 @@ function createOnDOMBeforeInput(
 function createOnInput(
   originalFn: InputHandler | undefined,
   editor: Editor,
-  skipInputTextRef: React.MutableRefObject<string | null>
+  skipInputTextRef: React.RefObject<string | null>
 ): InputHandler {
   return (event) => {
     const originalResult = originalFn?.(event)
