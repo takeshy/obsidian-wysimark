@@ -1,6 +1,6 @@
 {
   "name": "obsidian-wysimark",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "description": "WYSIWYG Markdown editor for Obsidian using Wysimark",
   "main": "main.js",
   "scripts": {
