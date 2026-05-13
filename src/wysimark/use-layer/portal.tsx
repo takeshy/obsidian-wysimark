@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom"
 
 /**
- * Portal to `document.body`
+ * Portal to the active document body.
  *
  * NOTE:
  * Consider creating a version of Portal with a Reset in it.
@@ -10,6 +10,6 @@ import { createPortal } from "react-dom"
  * any styling from `<html>` and `<body>` element.
  */
 export function Portal({ children }: { children: React.ReactNode }) {
-  if (typeof document === "undefined" || !document.body) return null
-  return createPortal(children, document.body)
+  if (typeof activeDocument === "undefined" || !activeDocument.body) return null
+  return createPortal(children, activeDocument.body)
 }

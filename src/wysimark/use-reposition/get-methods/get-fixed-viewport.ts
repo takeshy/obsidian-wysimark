@@ -11,7 +11,7 @@ export function getFixedViewport(): Rect {
    * https://stackoverflow.com/a/25298418
    */
   const width =
-    document.documentElement.clientWidth || document.body.clientWidth
+    activeDocument.documentElement.clientWidth || activeDocument.body.clientWidth
   return {
     top: 0,
     right: width,

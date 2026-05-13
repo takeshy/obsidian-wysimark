@@ -20,7 +20,7 @@ export { SinkReset } from "./styles"
 type DOMBeforeInputHandler = NonNullable<EditableProps["onDOMBeforeInput"]>
 type InputHandler = NonNullable<EditableProps["onInput"]>
 
-const hasNonAsciiText = (text: string): boolean => /[^\u0000-\u007F]/.test(text)
+const hasNonAsciiText = (text: string): boolean => /[^\u{0}-\u{7F}]/u.test(text)
 
 function selectDOMTargetRange(editor: Editor, event: InputEvent): void {
   const [targetRange] = event.getTargetRanges()
@@ -78,7 +78,7 @@ function createOnInput(
 
     const nativeEvent = event.nativeEvent
 
-    if (!(nativeEvent instanceof InputEvent)) return originalResult
+    if (!nativeEvent.instanceOf(InputEvent)) return originalResult
     if (nativeEvent.inputType !== "insertText") return originalResult
     if (nativeEvent.isComposing) return originalResult
     if (

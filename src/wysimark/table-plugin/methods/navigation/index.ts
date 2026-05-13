@@ -13,7 +13,7 @@ export function down(editor: Editor): boolean {
    * don't handle if we're not in a table
    */
   if (!t) return false
-  setTimeout(() => {
+  window.setTimeout(() => {
     if (!checkIsInElement(editor, t.cellElement)) {
       selectElementBelow(editor, t)
     }
@@ -30,7 +30,7 @@ export function up(editor: Editor): boolean {
    * don't handle if we're not in a table
    */
   if (!t) return false
-  setTimeout(() => {
+  window.setTimeout(() => {
     if (!checkIsInElement(editor, t.cellElement)) {
       selectElementAbove(editor, t)
     }

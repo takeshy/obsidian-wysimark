@@ -142,7 +142,7 @@ export class WysimarkView extends ItemView {
   fileContent: string = '';
   private frontmatter: string = '';  // Store frontmatter separately
   private bodyContent: string = '';  // Store body content (without frontmatter)
-  private saveTimeout: ReturnType<typeof setTimeout> | null = null;
+  private saveTimeout: number | null = null;
   private isDirty: boolean = false;
   private reactContainer: HTMLElement | null = null;
   private reloadKey: number = 0;  // Used to force React component remount on reload
@@ -182,7 +182,7 @@ export class WysimarkView extends ItemView {
   async onClose() {
     // Clear any pending save timeout
     if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout);
+      window.clearTimeout(this.saveTimeout);
       this.saveTimeout = null;
     }
 
@@ -245,7 +245,7 @@ export class WysimarkView extends ItemView {
 
     // Clear any pending save timeout
     if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout);
+      window.clearTimeout(this.saveTimeout);
       this.saveTimeout = null;
     }
 
@@ -281,9 +281,9 @@ export class WysimarkView extends ItemView {
 
     // Auto-save with debounce (1 second delay)
     if (this.saveTimeout) {
-      clearTimeout(this.saveTimeout);
+      window.clearTimeout(this.saveTimeout);
     }
-    this.saveTimeout = setTimeout(() => {
+    this.saveTimeout = window.setTimeout(() => {
       void this.saveFile();
     }, 1000);
   }

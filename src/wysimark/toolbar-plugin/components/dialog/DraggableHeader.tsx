@@ -58,12 +58,12 @@ export function DraggableHeader({ onDrag }: DraggableHeaderProps) {
     }
     const onMouseUp = () => {
       handleEnd()
-      document.removeEventListener("mousemove", onMouseMove)
-      document.removeEventListener("mouseup", onMouseUp)
+      activeDocument.removeEventListener("mousemove", onMouseMove)
+      activeDocument.removeEventListener("mouseup", onMouseUp)
     }
 
-    document.addEventListener("mousemove", onMouseMove)
-    document.addEventListener("mouseup", onMouseUp)
+    activeDocument.addEventListener("mousemove", onMouseMove)
+    activeDocument.addEventListener("mouseup", onMouseUp)
   }, [handleStart, handleMove, handleEnd])
 
   // Touch events

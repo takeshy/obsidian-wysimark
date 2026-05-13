@@ -1,9 +1,9 @@
-import throttle from "lodash.throttle"
 import { useCallback, useRef } from "react"
 import { Descendant, Editor, Element, Transforms } from "slate"
 import { RenderLeafProps, Slate } from "slate-react"
 
 import { parse, serialize, escapeUrlSlashes } from "../convert"
+import { throttle } from "../utils/throttle"
 import { SinkEditable } from "./SinkEditable"
 import { useEditor } from "./useEditor"
 

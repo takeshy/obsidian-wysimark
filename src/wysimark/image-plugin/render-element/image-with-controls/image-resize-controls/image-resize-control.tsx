@@ -128,8 +128,8 @@ export function ImageResizeControl({
        * Remove dragging event listeners when releasing mouse button
        */
       const onDocumentMouseUp = () => {
-        document.removeEventListener("mousemove", onDocumentMouseMove)
-        document.removeEventListener("mouseup", onDocumentMouseUp)
+        activeDocument.removeEventListener("mousemove", onDocumentMouseMove)
+        activeDocument.removeEventListener("mouseup", onDocumentMouseUp)
         mouseMoveRef.current = null
         mouseUpRef.current = null
         const path = ReactEditor.findPath(editor, element)
@@ -170,8 +170,8 @@ export function ImageResizeControl({
        */
       mouseMoveRef.current = onDocumentMouseMove
       mouseUpRef.current = onDocumentMouseUp
-      document.addEventListener("mousemove", onDocumentMouseMove)
-      document.addEventListener("mouseup", onDocumentMouseUp)
+      activeDocument.addEventListener("mousemove", onDocumentMouseMove)
+      activeDocument.addEventListener("mouseup", onDocumentMouseUp)
     },
     [srcSize.width, srcSize.height, size.width, element]
   )
@@ -208,8 +208,8 @@ export function ImageResizeControl({
         setSize(nextSize)
       }
       const onDocumentTouchEnd = () => {
-        document.removeEventListener("touchmove", onDocumentTouchMove)
-        document.removeEventListener("touchend", onDocumentTouchEnd)
+        activeDocument.removeEventListener("touchmove", onDocumentTouchMove)
+        activeDocument.removeEventListener("touchend", onDocumentTouchEnd)
         touchMoveRef.current = null
         touchEndRef.current = null
         const path = ReactEditor.findPath(editor, element)
@@ -223,8 +223,8 @@ export function ImageResizeControl({
 
       touchMoveRef.current = onDocumentTouchMove
       touchEndRef.current = onDocumentTouchEnd
-      document.addEventListener("touchmove", onDocumentTouchMove)
-      document.addEventListener("touchend", onDocumentTouchEnd)
+      activeDocument.addEventListener("touchmove", onDocumentTouchMove)
+      activeDocument.addEventListener("touchend", onDocumentTouchEnd)
     },
     [srcSize.width, srcSize.height, size.width, element]
   )
@@ -232,16 +232,16 @@ export function ImageResizeControl({
   useEffect(() => {
     return () => {
       if (mouseMoveRef.current) {
-        document.removeEventListener("mousemove", mouseMoveRef.current)
+        activeDocument.removeEventListener("mousemove", mouseMoveRef.current)
       }
       if (mouseUpRef.current) {
-        document.removeEventListener("mouseup", mouseUpRef.current)
+        activeDocument.removeEventListener("mouseup", mouseUpRef.current)
       }
       if (touchMoveRef.current) {
-        document.removeEventListener("touchmove", touchMoveRef.current)
+        activeDocument.removeEventListener("touchmove", touchMoveRef.current)
       }
       if (touchEndRef.current) {
-        document.removeEventListener("touchend", touchEndRef.current)
+        activeDocument.removeEventListener("touchend", touchEndRef.current)
       }
     }
   }, [])

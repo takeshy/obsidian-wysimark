@@ -59,7 +59,7 @@ export function Anchor({
        * and when switching from one link to another. Without it, the dialog
        * will not open.
        */
-      setTimeout(() => {
+      window.setTimeout(() => {
         dialog.open(() => (
           <AnchorDialog
             destAnchor={anchor}
