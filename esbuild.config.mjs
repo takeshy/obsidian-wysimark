@@ -1,5 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
+import fs from "fs/promises";
 
 const banner =
 `/*
@@ -8,12 +9,26 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
+const reactDomNoDynamicScriptPlugin = {
+	name: "react-dom-no-dynamic-script-elements",
+	setup(build) {
+		build.onLoad({ filter: /react-dom[\\/]cjs[\\/]react-dom-(client|profiling)\.(production|development|profiling)\.js$/ }, async (args) => {
+			const contents = await fs.readFile(args.path, "utf8");
+			return {
+				contents: contents.replaceAll('createElement("script")', 'createElement("template")'),
+				loader: "js",
+			};
+		});
+	},
+};
+
 const prod = (process.argv[2] === "production");
 
 const context = await esbuild.context({
 	banner: {
 		js: banner,
 	},
+	plugins: [reactDomNoDynamicScriptPlugin],
 	entryPoints: ["src/main.ts"],
 	bundle: true,
 	platform: "browser",
