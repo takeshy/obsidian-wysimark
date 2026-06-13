@@ -3,11 +3,15 @@ import { Text as SlateText } from "slate"
 import { Segment } from "../../../types"
 import { assertUnreachable } from "../../../utils"
 import { serializeImageShared } from "../../serialize-image-shared"
+import { EscapeTextOptions } from "../utils"
 import { serializeCodeText } from "../segment/serialize-code-text"
 import { serializeAnchor } from "./serialize-anchor"
 import { serializeNonCodeText } from "./serialize-non-code-text"
 
-export function serializeSegment(segment: Segment): string {
+export function serializeSegment(
+  segment: Segment,
+  options?: EscapeTextOptions
+): string {
   if (SlateText.isText(segment)) {
     /**
      * If the segment is a `code` segment, we need to use a different strategy
@@ -18,11 +22,11 @@ export function serializeSegment(segment: Segment): string {
     /**
      * Otherwise, we use the standard text escaping code.
      */
-    return serializeNonCodeText(segment)
+    return serializeNonCodeText(segment, options)
   }
   switch (segment.type) {
     case "anchor": {
-      return serializeAnchor(segment)
+      return serializeAnchor(segment, options)
     }
     case "image-inline":
       return serializeImageShared(segment)

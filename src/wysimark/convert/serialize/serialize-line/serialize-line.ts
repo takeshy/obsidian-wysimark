@@ -5,10 +5,36 @@ import { diffMarks } from "./diff-marks"
 import { normalizeLine } from "./normalize-line"
 import { serializeSegment } from "./segment/serialize-segment"
 import {
-  convertMarksToSymbolsExceptCode,
+  EscapeTextOptions,
+  convertMarksToOpenSymbols,
+  convertMarksToCloseSymbols,
   getMarksFromSegment,
   isPlainSpace,
 } from "./utils"
+
+/**
+ * A lone literal backtick in a line cannot form a code span, so it does not
+ * need escaping. With two or more backticks in the line — or a `code` mark,
+ * which serializes with its own backtick delimiters — a code span could form
+ * across segments, so every literal backtick in the line must be escaped.
+ */
+function lineHasBacktickPairRisk(segments: Segment[]): boolean {
+  let count = 0
+  const visit = (segs: Segment[]): boolean => {
+    for (const segment of segs) {
+      if (SlateText.isText(segment)) {
+        if (segment.code) return true
+        for (const ch of segment.text) {
+          if (ch === "`" && ++count >= 2) return true
+        }
+      } else if (segment.type === "anchor") {
+        if (visit(segment.children as Segment[])) return true
+      }
+    }
+    return false
+  }
+  return visit(segments)
+}
 
 /**
  * Takes a line (an array of Segment) and turns it into markdown.
@@ -28,7 +54,8 @@ import {
 export function serializeLine(
   inputSegments: Segment[],
   leadingMarks: MarkKey[] = [],
-  trailingMarks: MarkKey[] = []
+  trailingMarks: MarkKey[] = [],
+  options?: EscapeTextOptions
 ): string {
   /**
    * Normalize line does a lot of the work here to take any spaces that can be
@@ -42,6 +69,16 @@ export function serializeLine(
    */
   const segments = normalizeLine(inputSegments)
   const substrings: string[] = []
+
+  /**
+   * When called recursively (e.g. for anchor children), the backtick decision
+   * was already made for the whole line, so keep the value that was passed in.
+   */
+  const resolvedOptions: EscapeTextOptions = {
+    ...options,
+    escapeBackticks:
+      options?.escapeBackticks ?? lineHasBacktickPairRisk(segments),
+  }
 
   /**
    * In order to seed the loop, we start by creating a `leadingDiff` going from
@@ -92,12 +129,12 @@ export function serializeLine(
      * First we start by adding the symbols needed to add the marks to this
      * segment.
      */
-    substrings.push(convertMarksToSymbolsExceptCode(leadingDiff.add))
+    substrings.push(convertMarksToOpenSymbols(leadingDiff.add))
 
     /**
      * Then we add the Text or the Anchor for the segment
      */
-    substrings.push(serializeSegment(segment))
+    substrings.push(serializeSegment(segment, resolvedOptions))
 
     /**
      * Now we are searching for the next segment which we want to grab the marks
@@ -108,7 +145,7 @@ export function serializeLine(
      */
     const nextMarks = getNextMarks(segments, i, trailingMarks)
     const trailingDiff = diffMarks(leadingDiff.nextOrderedMarks, nextMarks)
-    substrings.push(convertMarksToSymbolsExceptCode(trailingDiff.remove))
+    substrings.push(convertMarksToCloseSymbols(trailingDiff.remove))
 
     /**
      * The `trailingDiff` becomes the new `leadingDiff`

@@ -7,12 +7,17 @@ import { parseInlineImage } from "./parse-inline-image"
 import { Descendant } from "slate"
 
 /**
- * Parse inline HTML content, with special handling for <br> tags.
+ * Parse inline HTML content, with special handling for <mark> tags
  */
 function parseInlineHtml(htmlValue: string, marks: MarkProps): Segment[] {
   // Check for <br> / <br/> / <br /> tags — treat as soft line break
   if (/^<br\s*\/?>$/i.test(htmlValue)) {
     return [{ text: "\n", ...marks }]
+  }
+  // Check for <mark>...</mark> pattern when the parser keeps it in one node.
+  const markMatch = htmlValue.match(/^<mark\b[^>]*>(.+?)<\/mark>$/is)
+  if (markMatch) {
+    return [{ text: markMatch[1], ...marks, highlight: true }]
   }
   // For other HTML, treat as code
   return [{ text: htmlValue, code: true }]
@@ -23,8 +28,20 @@ export function parsePhrasingContents(
   marks: MarkProps = {}
 ): Segment[] {
   const segments: Segment[] = []
+  let activeMarks = { ...marks }
   for (const phrasingContent of phrasingContents) {
-    segments.push(...parsePhrasingContent(phrasingContent, marks))
+    if (phrasingContent.type === "html") {
+      if (/^<mark\b[^>]*>$/i.test(phrasingContent.value)) {
+        activeMarks = { ...activeMarks, highlight: true }
+        continue
+      }
+      if (/^<\/mark>$/i.test(phrasingContent.value)) {
+        const { highlight: _highlight, ...nextMarks } = activeMarks
+        activeMarks = nextMarks
+        continue
+      }
+    }
+    segments.push(...parsePhrasingContent(phrasingContent, activeMarks))
   }
   const nextInlines = normalizeSegments(segments)
   return nextInlines

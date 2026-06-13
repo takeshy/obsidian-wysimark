@@ -20,4 +20,7 @@ export const $MarksSpan = styled("span")`
   &.--underline.--strike {
     text-decoration: underline line-through;
   }
+  &.--highlight {
+    background-color: #ffff00;
+  }
 `

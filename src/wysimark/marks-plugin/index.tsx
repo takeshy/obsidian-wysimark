@@ -36,6 +36,7 @@ export type MarksEditor = {
     italic?: boolean
     underline?: boolean
     strike?: boolean
+    highlight?: boolean
   }
 }
 
@@ -45,6 +46,7 @@ export type MarksText = {
   italic?: true
   underline?: true
   strike?: true
+  highlight?: true
 }
 
 export type MarksPluginCustomTypes = {
@@ -103,6 +105,7 @@ export const MarksPlugin = createPlugin<MarksPluginCustomTypes>((editor) => {
               "--italic": leaf.italic,
               "--underline": leaf.underline,
               "--strike": leaf.strike,
+              "--highlight": leaf.highlight,
             })}
           >
             {children}

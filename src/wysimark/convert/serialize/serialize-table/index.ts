@@ -68,7 +68,13 @@ function serializeTableCell(element: TableCellElement): string {
 function serializeTableContent(element: TableContentElement): string {
   assertElementType(element, "table-content")
   const line = serializeLine(element.children as Segment[])
+  // GFM splits a row into cells on unescaped pipes before any inline parsing,
+  // so every pipe in a cell (even inside code spans or URLs) must be escaped.
+  // Pipes outside of tables are literal and `escapeText` leaves them alone.
   // Replace soft breaks (two trailing spaces + newline) and bare newlines
   // with <br> so the table row stays on a single line in GFM markdown.
-  return line.replace(/ {2}\n/g, "<br>").replace(/\n/g, "<br>")
+  return line
+    .replace(/\|/g, "\\|")
+    .replace(/ {2}\n/g, "<br>")
+    .replace(/\n/g, "<br>")
 }

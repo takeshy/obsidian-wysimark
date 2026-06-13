@@ -2,19 +2,28 @@ import { AnchorElement } from "../../../../anchor-plugin"
 
 import { Segment } from "../../../types"
 import { serializeLine } from "../serialize-line"
-import { getCommonAnchorMarks } from "../utils"
+import { EscapeTextOptions, getCommonAnchorMarks } from "../utils"
 
 function escapeTitle(title: string): string {
   return title.replace(/"/g, '\\"')
 }
 
-export function serializeAnchor(anchor: AnchorElement): string {
+export function serializeAnchor(
+  anchor: AnchorElement,
+  options?: EscapeTextOptions
+): string {
   const commonAnchorMarks = getCommonAnchorMarks(anchor.children as Segment[])
+  /**
+   * An unbalanced bracket in the label text would change where the `[label]`
+   * ends, so brackets inside the label are always escaped.
+   */
+  const labelOptions: EscapeTextOptions = { ...options, inAnchorLabel: true }
   if (anchor.href.startsWith("$"))
     return serializeLine(
       anchor.children as Segment[],
       commonAnchorMarks,
-      commonAnchorMarks
+      commonAnchorMarks,
+      options
     )
   if (typeof anchor.title === "string" && anchor.title.length > 0) {
     return (
@@ -34,7 +43,8 @@ export function serializeAnchor(anchor: AnchorElement): string {
       `[${serializeLine(
         anchor.children as Segment[],
         commonAnchorMarks,
-        commonAnchorMarks
+        commonAnchorMarks,
+        labelOptions
       )}](${anchor.href} "${escapeTitle(anchor.title)}")`
     )
   } else {
@@ -55,7 +65,8 @@ export function serializeAnchor(anchor: AnchorElement): string {
       `[${serializeLine(
         anchor.children as Segment[],
         commonAnchorMarks,
-        commonAnchorMarks
+        commonAnchorMarks,
+        labelOptions
       )}](${anchor.href})`
     )
   }
