@@ -1,13 +1,45 @@
 import type { Plugin, Processor } from 'unified'
-import { gfmTableFromMarkdown } from 'mdast-util-gfm-table'
+import type { CompileContext, Extension, Handle } from 'mdast-util-from-markdown'
 import { gfm } from 'micromark-extension-gfm'
-import { gfmToMarkdown } from 'mdast-util-gfm'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
 
 // Internal type for unified processor data
 interface ProcessorData {
   micromarkExtensions?: unknown[];
   fromMarkdownExtensions?: unknown[];
   toMarkdownExtensions?: unknown[];
+}
+
+type PatchedCompileContext = Omit<CompileContext, "data"> & {
+  data?: CompileContext["data"];
+}
+
+function wrapHandler(originalHandler: Handle): Handle {
+  return function(this: CompileContext, token) {
+    const context = this as PatchedCompileContext;
+    context.data ||= {};
+
+    originalHandler.call(context as CompileContext, token);
+    return undefined;
+  };
+}
+
+function patchFromMarkdownExtension(extension: Extension): Extension {
+  const { enter, exit } = extension;
+
+  if (enter) {
+    for (const key of Object.keys(enter)) {
+      enter[key] = wrapHandler(enter[key]);
+    }
+  }
+
+  if (exit) {
+    for (const key of Object.keys(exit)) {
+      exit[key] = wrapHandler(exit[key]);
+    }
+  }
+
+  return extension;
 }
 
 /**
@@ -35,57 +67,10 @@ export function customRemarkGfm(): Plugin {
     // Add the GFM extensions
     // We're using the original extensions from remark-gfm
     micromarkExtensions.push(gfm());
-    
-    // Create a patched version of gfmTableFromMarkdown
-    const patchedFromMarkdown = function() {
-      const extension = gfmTableFromMarkdown();
-      
-      // Make sure enter exists
-      if (extension.enter) {
-        // Patch the enterTable function
-        const originalEnterTable = extension.enter.table;
-        if (originalEnterTable) {
-          extension.enter.table = function(token) {
-            // Make sure this.data exists before the original function is called
-            if (!this.data) {
-              this.data = {};
-            }
-            
-            // Call the original function
-            originalEnterTable.call(this, token);
-            
-            // Make sure inTable is set
-            this.data.inTable = true;
-          };
-        }
-      }
-      
-      // Make sure exit exists and patch the exitTable function
-      if (extension.exit) {
-        const originalExitTable = extension.exit.table;
-        if (originalExitTable) {
-          extension.exit.table = function(token) {
-            // Make sure this.data exists before the original function is called
-            if (!this.data) {
-              this.data = {};
-            }
-            
-            // Call the original function
-            originalExitTable.call(this, token);
-            
-            // Make sure inTable is safely unset
-            if (this.data) {
-              this.data.inTable = undefined;
-            }
-          };
-        }
-      }
-      
-      return extension;
-    };
-    
-    // Add our patched extensions
-    fromMarkdownExtensions.push(patchedFromMarkdown());
+
+    // Add all GFM from-markdown extensions, including task list items.
+    const patchedFromMarkdown = gfmFromMarkdown().map(patchFromMarkdownExtension);
+    fromMarkdownExtensions.push(...patchedFromMarkdown);
     toMarkdownExtensions.push(gfmToMarkdown());
     
     return undefined; // Return undefined as the plugin doesn't need to return anything
