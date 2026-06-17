@@ -100,6 +100,7 @@
 .wysimark-editor {
     min-height: 100%;
     padding: 1rem;
+    --wysimark-block-spacing: var(--p-spacing, 1rem);
     font-family: var(--font-text);
     font-size: var(--font-text-size);
     line-height: var(--line-height-normal);
@@ -112,6 +113,23 @@
     outline: none;
 }
 
+/* Match Obsidian's rendered Markdown rhythm more closely. Wysimark's vendored
+   paragraph component resets margins to zero, which makes long notes too dense. */
+.wysimark-editor p:not(.--collapsible) {
+    margin-block-start: var(--wysimark-block-spacing);
+    margin-block-end: var(--wysimark-block-spacing);
+}
+
+.wysimark-editor p:first-child,
+.wysimark-editor [data-slate-editor="true"] > p:first-child {
+    margin-block-start: 0;
+}
+
+.wysimark-editor p:last-child,
+.wysimark-editor [data-slate-editor="true"] > p:last-child {
+    margin-block-end: 0;
+}
+
 /* Headings */
 .wysimark-editor h1,
 .wysimark-editor h2,
@@ -121,8 +139,8 @@
 .wysimark-editor h6 {
     color: var(--text-normal);
     font-weight: var(--font-bold);
-    margin-top: 1em;
-    margin-bottom: 0.5em;
+    margin-top: calc(var(--wysimark-block-spacing) * 1.5);
+    margin-bottom: var(--wysimark-block-spacing);
 }
 
 .wysimark-editor h1 {
@@ -164,6 +182,7 @@
     background-color: var(--code-background);
     border-radius: var(--radius-s);
     padding: 1em;
+    margin-block: var(--wysimark-block-spacing);
     overflow-x: auto;
     font-family: var(--font-monospace);
     font-size: var(--font-smaller);
@@ -180,7 +199,7 @@
 /* Blockquotes */
 .wysimark-editor blockquote {
     border-left: 3px solid var(--text-accent);
-    margin: 1em 0;
+    margin: var(--wysimark-block-spacing) 0;
     padding-left: 1em;
     color: var(--text-muted);
 }
@@ -189,11 +208,12 @@
 .wysimark-editor ul,
 .wysimark-editor ol {
     padding-left: 2em;
-    margin: 0.5em 0;
+    margin: var(--wysimark-block-spacing) 0;
 }
 
 .wysimark-editor li {
-    margin: 0.25em 0;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 
 /* Tables */
