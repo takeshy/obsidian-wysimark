@@ -1,7 +1,7 @@
 {
 	"id": "wysimark-editor",
 	"name": "Wysimark Editor",
-	"version": "1.0.40",
+	"version": "1.0.41",
 	"minAppVersion": "1.7.2",
 	"description": "Edit your Markdown notes with a modern WYSIWYG rich text interface while keeping pure Markdown.",
 	"author": "takeshy",
