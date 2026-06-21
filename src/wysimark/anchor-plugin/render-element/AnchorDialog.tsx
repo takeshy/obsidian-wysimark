@@ -27,8 +27,13 @@ const $AnchorDialog = styled($Panel)`
 
   .--icons {
     display: flex;
-    overflow: hidden;
-    flex: 0 0 6em;
+    gap: 0.75em;
+    overflow: visible;
+    flex: 0 0 auto;
+  }
+
+  .--internal-icons {
+    margin-bottom: 0.75em;
   }
 
   .--link {
@@ -45,17 +50,29 @@ const $AnchorDialog = styled($Panel)`
   }
 
   .--internal-link {
-    display: flex;
+    cursor: pointer;
+  }
+
+  .--internal-content {
     flex: 1 1 auto;
     min-width: 0;
+  }
+
+  .--internal-title {
+    margin-bottom: 0.5em;
+    max-width: 100%;
+    color: var(--blue-600);
+    font-size: 0.875em;
+    font-weight: 600;
+    line-height: 1.35;
     overflow: hidden;
-    color: var(--shade-400);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .--internal-preview {
     box-sizing: border-box;
-    margin-top: 0.75em;
-    max-width: 14em;
+    width: 100%;
     max-height: 14em;
     overflow: auto;
     border: 1px solid var(--shade-200);
@@ -66,6 +83,37 @@ const $AnchorDialog = styled($Panel)`
     font-size: 0.8125em;
     line-height: 1.45;
     overflow-wrap: break-word;
+  }
+
+  .--internal-preview,
+  .--internal-preview * {
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+  }
+
+  .--internal-preview:empty {
+    display: none;
+  }
+
+  .--internal-preview .markdown-preview-view {
+    padding: 0;
+  }
+
+  .--internal-preview a {
+    display: inline;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .--internal-preview p:first-child {
+    margin-top: 0;
+  }
+
+  .--internal-preview p:last-child {
+    margin-bottom: 0;
   }
 
   .--url {
@@ -114,7 +162,6 @@ const $AnchorDialog = styled($Panel)`
 
   .--icon {
     cursor: pointer;
-    margin-left: 0.5em;
     &:hover {
       color: var(--blue-600);
     }
@@ -137,6 +184,10 @@ function parseUrl(s: string): { hostname: string; pathname: string } {
   }
 }
 
+function internalLinkPath(target: string): string {
+  return target.trim() || target
+}
+
 export function AnchorDialog({
   destAnchor,
   destStartEdge,
@@ -154,6 +205,7 @@ export function AnchorDialog({
   const internalTarget = isInternalLink
     ? wikiLinkTarget(wikiLinkSpecFromHref(element.href))
     : ""
+  const internalTitle = isInternalLink ? internalLinkPath(internalTarget) : ""
   const internalPreview = isInternalLink
     ? editor.wysimark.renderInternalLinkPreview?.(internalTarget)
     : null
@@ -185,12 +237,19 @@ export function AnchorDialog({
   }
 
   const removeTooltip = useTooltip({ title: "リンクを削除" })
+  const openTooltip = useTooltip({ title: "リンクを開く" })
   const editTooltip = useTooltip({ title: "リンクを編集" })
   const closeTooltip = useTooltip({ title: "閉じる" })
 
   const closeDialog = useCallback(() => {
     dialog.close()
   }, [dialog])
+
+  const openInternalLink = useCallback(() => {
+    if (!isInternalLink) return
+    void editor.wysimark.openInternalLink?.(internalTarget)
+    dialog.close()
+  }, [dialog, editor, internalTarget, isInternalLink])
 
   const removeLink = useCallback(() => {
     editor.anchor.removeLink({ at: element })
@@ -216,66 +275,81 @@ export function AnchorDialog({
     })
   }, [destAnchor, destStartEdge, element])
 
+  const iconButtons = (
+    <span className={`--icons${isInternalLink ? " --internal-icons" : ""}`}>
+      {isInternalLink ? (
+        <span
+          className="--icon --internal-link"
+          onClick={openInternalLink}
+          onMouseEnter={openTooltip.onMouseEnter}
+          onMouseLeave={openTooltip.onMouseLeave}
+        >
+          <ExternalLinkIcon />
+        </span>
+      ) : null}
+      <span
+        className="--icon"
+        onClick={removeLink}
+        onMouseEnter={removeTooltip.onMouseEnter}
+        onMouseLeave={removeTooltip.onMouseLeave}
+      >
+        <LinkOffIcon />
+      </span>
+      <span
+        className="--icon"
+        onMouseEnter={editTooltip.onMouseEnter}
+        onMouseLeave={editTooltip.onMouseLeave}
+        onClick={openEditDialog}
+      >
+        <PencilIcon />
+      </span>
+      <span
+        className="--icon"
+        onClick={closeDialog}
+        onMouseEnter={closeTooltip.onMouseEnter}
+        onMouseLeave={closeTooltip.onMouseLeave}
+      >
+        <CloseIcon />
+      </span>
+    </span>
+  )
+
   return (
     <$AnchorDialog ref={ref} contentEditable={false} style={style}>
       <DraggableHeader onDrag={handleDrag} />
-      <div style={{ display: "flex", padding: "1em" }}>
+      <div style={{ padding: "1em" }}>
         {isInternalLink ? (
-          <span className="--internal-link">
-            <ExternalLinkIcon />
-            <div className="--url">
-              <div className="--hostname">{t("linkTypeInternal")}</div>
-              <div className="--pathname">{internalTarget}</div>
-              <div className="--internal-preview">
-                {internalPreview ?? internalTarget}
-              </div>
+          <div className="--internal-content">
+            <div className="--internal-title" title={internalTarget}>
+              {internalTitle}
             </div>
-          </span>
+            {iconButtons}
+            <div className="--internal-preview">
+              {internalPreview ?? internalTarget}
+            </div>
+          </div>
         ) : (
-          <a
-            className="--link"
-            href={element.href}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <ExternalLinkIcon />
-            <div className="--url">
-              <div className="--hostname">{url.hostname}</div>
-              {url.pathname === "" || url.pathname === "/" ? null : (
-                <div className="--pathname">{url.pathname}</div>
-              )}
-              {element.title == null || element.title === "" ? null : (
-                <div className="--tooltip">{element.title}</div>
-              )}
-            </div>
-          </a>
+          <div style={{ display: "flex", gap: "0.75em" }}>
+            <a
+              className="--link"
+              href={element.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ExternalLinkIcon />
+              <div className="--url">
+                <div className="--hostname">{url.hostname}</div>
+                {url.pathname === "" || url.pathname === "/" ? null : (
+                  <div className="--pathname">{url.pathname}</div>
+                )}
+                {element.title == null || element.title === "" ? null : (
+                  <div className="--tooltip">{element.title}</div>
+                )}
+              </div>
+            </a>
+            {iconButtons}
+          </div>
         )}
-        <span className="--icons">
-          <span
-            className="--icon"
-            onClick={removeLink}
-            onMouseEnter={removeTooltip.onMouseEnter}
-            onMouseLeave={removeTooltip.onMouseLeave}
-          >
-            <LinkOffIcon />
-          </span>
-          <span
-            className="--icon"
-            onMouseEnter={editTooltip.onMouseEnter}
-            onMouseLeave={editTooltip.onMouseLeave}
-            onClick={openEditDialog}
-          >
-            <PencilIcon />
-          </span>
-          <span
-            className="--icon"
-            onClick={closeDialog}
-            onMouseEnter={closeTooltip.onMouseEnter}
-            onMouseLeave={closeTooltip.onMouseLeave}
-          >
-            <CloseIcon />
-          </span>
-        </span>
       </div>
     </$AnchorDialog>
   )

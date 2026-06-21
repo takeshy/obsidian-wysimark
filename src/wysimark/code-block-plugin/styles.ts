@@ -61,9 +61,6 @@ export const $CodeBlockLine = styled("div")`
   counter-increment: line;
   font-family: "andale mono", AndaleMono, monospace;
   font-size: 0.875em;
-  &.--selected {
-    background-color: var(--shade-100);
-  }
   /*
     DO NOT REMOVE: Code for adding line numbering.
     TODO: Make optional in future.

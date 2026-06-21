@@ -9,6 +9,7 @@ import type { ReactNode } from "react"
  */
 export type OnImageSaveHandler = (file: File, path: string) => Promise<string>
 export type RenderInternalLinkPreview = (target: string) => ReactNode
+export type OpenInternalLinkHandler = (target: string) => void | Promise<void>
 
 export type ImageDialogState = {
   url: string
@@ -48,6 +49,11 @@ export type WysimarkEditor = {
      * Render preview content for an internal link target.
      */
     renderInternalLinkPreview?: RenderInternalLinkPreview
+
+    /**
+     * Open an internal link target.
+     */
+    openInternalLink?: OpenInternalLinkHandler
   }
   /**
    * Public methods for the wysimark editor.

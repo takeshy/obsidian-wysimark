@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin, App, MarkdownRenderer } from 'obsidian';
 import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { Editable, useEditor, OnImageSaveHandler } from './wysimark/entry';
@@ -63,21 +63,105 @@ function FileHeader({ fileName, onReload }: { fileName: string; onReload: () => 
   );
 }
 
+function linkPathFromInternalTarget(target: string): string {
+  const hashIndex = target.indexOf('#');
+  return (hashIndex >= 0 ? target.slice(0, hashIndex) : target).trim();
+}
+
+function InternalLinkPreview({
+  app,
+  component,
+  sourcePath,
+  target,
+}: {
+  app: App;
+  component: Plugin;
+  sourcePath: string;
+  target: string;
+}) {
+  const previewRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    const previewEl = previewRef.current;
+    if (!previewEl) return;
+
+    previewEl.empty();
+    previewEl.setText('Loading preview...');
+
+    const render = async () => {
+      const linkPath = linkPathFromInternalTarget(target);
+      const sourceFile = app.vault.getAbstractFileByPath(sourcePath);
+      const targetFile = linkPath
+        ? app.metadataCache.getFirstLinkpathDest(linkPath, sourcePath)
+        : sourceFile;
+
+      if (!(targetFile instanceof TFile)) {
+        if (!cancelled) previewEl.setText(`Not found: ${target}`);
+        return;
+      }
+
+      const markdown = await app.vault.cachedRead(targetFile);
+      if (!markdown.trim()) {
+        if (!cancelled) previewEl.setText('Empty note');
+        return;
+      }
+      if (cancelled) return;
+
+      previewEl.empty();
+      await MarkdownRenderer.render(app, markdown, previewEl, targetFile.path, component);
+    };
+
+    void render();
+
+    return () => {
+      cancelled = true;
+      previewEl.empty();
+    };
+  }, [app, component, sourcePath, target]);
+
+  return <div ref={previewRef} />;
+}
+
 // React component for the editor
 function WysimarkEditorComponent({
   initialValue,
   onChange,
+  plugin,
+  file,
   fileName,
   onReload,
   onImageSave,
 }: {
   initialValue: string;
   onChange: (markdown: string) => void;
+  plugin: Plugin;
+  file: TFile;
   fileName: string;
   onReload: () => void;
   onImageSave?: OnImageSaveHandler;
 }) {
-  const editor = useEditor({});
+  const openInternalLink = React.useCallback(async (target: string) => {
+    await plugin.app.workspace.openLinkText(target, file.path, false, {
+      active: true,
+    });
+  }, [file.path, plugin.app.workspace]);
+
+  const renderInternalLinkPreview = React.useCallback((target: string) => {
+    return (
+      <InternalLinkPreview
+        app={plugin.app}
+        component={plugin}
+        sourcePath={file.path}
+        target={target}
+      />
+    );
+  }, [file.path, plugin]);
+
+  const editor = useEditor({
+    openInternalLink,
+    renderInternalLinkPreview,
+  });
   // Use initialValue only on mount, manage internally afterwards
   const [value] = React.useState(initialValue);
 
@@ -111,6 +195,7 @@ function WysimarkContainer({
   onReload,
   onImageSave,
   reloadKey,
+  plugin,
 }: {
   file: TFile | null;
   content: string;
@@ -118,6 +203,7 @@ function WysimarkContainer({
   onReload: () => void;
   onImageSave?: OnImageSaveHandler;
   reloadKey: number;
+  plugin: Plugin;
 }) {
   if (!file) {
     return <EmptyState />;
@@ -128,6 +214,8 @@ function WysimarkContainer({
       key={`${file.path}-${reloadKey}`}
       initialValue={content}
       onChange={onChange}
+      plugin={plugin}
+      file={file}
       fileName={file.basename}
       onReload={onReload}
       onImageSave={onImageSave}
@@ -342,6 +430,7 @@ export class WysimarkView extends ItemView {
         onReload={this.handleReload}
         onImageSave={this.handleImageSave}
         reloadKey={this.reloadKey}
+        plugin={this.plugin}
       />
     );
   }
