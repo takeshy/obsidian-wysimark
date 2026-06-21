@@ -2,7 +2,7 @@
 // These are the only characters `\` can escape, so a `\` not followed by one
 // of them is a literal backslash (e.g. Windows paths like `C:\Users`).
 function isAsciiPunct(ch: string): boolean {
-  return /[!-/:-@\[-`{-~]/.test(ch)
+  return /[!-/:-@[-`{-~]/.test(ch)
 }
 
 function isWhitespace(ch: string): boolean {

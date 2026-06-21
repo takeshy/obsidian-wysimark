@@ -20,7 +20,9 @@ export { SinkReset } from "./styles"
 type DOMBeforeInputHandler = NonNullable<EditableProps["onDOMBeforeInput"]>
 type InputHandler = NonNullable<EditableProps["onInput"]>
 
-const hasNonAsciiText = (text: string): boolean => /[^\u{0}-\u{7F}]/u.test(text)
+// Matches any non-ASCII character (code point above U+007F).
+const hasNonAsciiText = (text: string): boolean =>
+  /[\u{80}-\u{10FFFF}]/u.test(text)
 
 function selectDOMTargetRange(editor: Editor, event: InputEvent): void {
   const [targetRange] = event.getTargetRanges()

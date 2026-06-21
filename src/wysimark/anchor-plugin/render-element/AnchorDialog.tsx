@@ -8,7 +8,6 @@ import {
   wikiLinkSpecFromHref,
   wikiLinkTarget,
 } from "../../convert/obsidian-links"
-import { t } from "../../utils/translations"
 import { useLayer } from "../../use-layer"
 import { positionInside, useAbsoluteReposition } from "../../use-reposition"
 import { useTooltip } from "../../use-tooltip"

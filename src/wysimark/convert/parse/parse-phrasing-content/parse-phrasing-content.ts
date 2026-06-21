@@ -86,7 +86,8 @@ export function parsePhrasingContents(
         continue
       }
       if (/^<\/mark>$/i.test(phrasingContent.value)) {
-        const { highlight: _highlight, ...nextMarks } = activeMarks
+        const nextMarks = { ...activeMarks }
+        delete nextMarks.highlight
         activeMarks = nextMarks
         continue
       }

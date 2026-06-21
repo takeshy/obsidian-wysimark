@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin, App, MarkdownRenderer } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin, App, MarkdownRenderer, Component } from 'obsidian';
 import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { Editable, useEditor, OnImageSaveHandler } from './wysimark/entry';
@@ -70,12 +70,10 @@ function linkPathFromInternalTarget(target: string): string {
 
 function InternalLinkPreview({
   app,
-  component,
   sourcePath,
   target,
 }: {
   app: App;
-  component: Plugin;
   sourcePath: string;
   target: string;
 }) {
@@ -85,6 +83,12 @@ function InternalLinkPreview({
     let cancelled = false;
     const previewEl = previewRef.current;
     if (!previewEl) return;
+
+    // Use a short-lived Component as the render lifecycle owner instead of the
+    // plugin instance, so the rendered markdown's children are cleaned up when
+    // this preview unmounts.
+    const component = new Component();
+    component.load();
 
     previewEl.empty();
     previewEl.setText('Loading preview...');
@@ -116,9 +120,10 @@ function InternalLinkPreview({
 
     return () => {
       cancelled = true;
+      component.unload();
       previewEl.empty();
     };
-  }, [app, component, sourcePath, target]);
+  }, [app, sourcePath, target]);
 
   return <div ref={previewRef} />;
 }
@@ -151,12 +156,11 @@ function WysimarkEditorComponent({
     return (
       <InternalLinkPreview
         app={plugin.app}
-        component={plugin}
         sourcePath={file.path}
         target={target}
       />
     );
-  }, [file.path, plugin]);
+  }, [file.path, plugin.app]);
 
   const editor = useEditor({
     openInternalLink,
