@@ -1,4 +1,5 @@
 import { Descendant } from "slate"
+import type { ReactNode } from "react"
 
 /**
  * Handler for saving image files to vault
@@ -7,6 +8,7 @@ import { Descendant } from "slate"
  * @returns The final path/reference to use in markdown
  */
 export type OnImageSaveHandler = (file: File, path: string) => Promise<string>
+export type RenderInternalLinkPreview = (target: string) => ReactNode
 
 export type ImageDialogState = {
   url: string
@@ -41,6 +43,11 @@ export type WysimarkEditor = {
      * Persisted state for the image dialog
      */
     imageDialogState?: ImageDialogState
+
+    /**
+     * Render preview content for an internal link target.
+     */
+    renderInternalLinkPreview?: RenderInternalLinkPreview
   }
   /**
    * Public methods for the wysimark editor.

@@ -171,6 +171,7 @@ export function escapeText(s: string, options: EscapeTextOptions = {}) {
   result = result.replace(/^(#{1,6})(\s)/m, "\\$1$2") // headings
   result = result.replace(/^(\d+)([.)]\s)/m, "$1\\$2") // ordered list
   result = result.replace(/^([-+*>])\s/m, "\\$1 ") // list / blockquote
+  result = result.replace(/\[\[/g, "\\[[")
 
   return result
 }

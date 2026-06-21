@@ -3,6 +3,7 @@ import remarkParse from "remark-parse"
 import { unified } from "unified"
 
 import { Element } from "../types"
+import { protectEscapedWikiLinks } from "../obsidian-links"
 import { customRemarkGfm } from "./custom-gfm"
 import { parseContents } from "./parse-content"
 import { transformInlineLinks } from "./transform-inline-links"
@@ -10,7 +11,7 @@ import { transformInlineLinks } from "./transform-inline-links"
 const parser = unified().use(remarkParse).use(customRemarkGfm())
 
 export function parseToAst(markdown: string) {
-  const ast = parser.parse(markdown) as Root
+  const ast = parser.parse(protectEscapedWikiLinks(markdown)) as Root
   /**
    * Takes linkReference and imageReference and turns them into link and image.
    */

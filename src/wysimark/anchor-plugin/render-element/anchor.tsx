@@ -5,6 +5,7 @@ import { useSelected, useSlate } from "slate-react"
 
 import { ConstrainedRenderElementProps } from "../../sink"
 
+import { isWikiLinkHref } from "../../convert/obsidian-links"
 import { useLayer } from "../../use-layer"
 import { AnchorElement } from "../index"
 import { $Anchor, $Edge } from "../styles"
@@ -20,6 +21,7 @@ export function Anchor({
   const selected = useSelected()
   const editor = useSlate()
   const dialog = useLayer("dialog")
+  const isInternalLink = isWikiLinkHref(element.href)
 
   /**
    * TODO:
@@ -75,9 +77,14 @@ export function Anchor({
 
   return (
     <$Anchor
-      className={clsx({ "--selected": selected })}
-      href={element.href}
-      target={element.target}
+      className={clsx({
+        "--selected": selected,
+        "--internal-link": isInternalLink,
+      })}
+      href={isInternalLink ? undefined : element.href}
+      target={isInternalLink ? undefined : element.target}
+      data-internal-link={isInternalLink ? "true" : undefined}
+      onClick={isInternalLink ? (event) => event.preventDefault() : undefined}
       {...attributes}
       ref={anchorRef}
     >

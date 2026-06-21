@@ -11,9 +11,10 @@ import {
 } from "react"
 import { createRoot } from "react-dom/client"
 import { Editable, useEditor, OnImageSaveHandler } from './entry/index'
+import type { RenderInternalLinkPreview } from './entry/types'
 
 export { Editable, useEditor }
-export type { OnImageSaveHandler }
+export type { OnImageSaveHandler, RenderInternalLinkPreview }
 
 /**
  * The options passed into the standalone version of Wysimark.

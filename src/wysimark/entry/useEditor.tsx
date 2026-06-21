@@ -6,18 +6,20 @@ import { ReactEditor, withReact } from "slate-react"
 import { parse, serialize, escapeUrlSlashes } from "../convert"
 import { Element } from "./plugins"
 import { withSink } from "./SinkEditable"
-import { WysimarkEditor } from "./types"
+import { RenderInternalLinkPreview, WysimarkEditor } from "./types"
 
 export function useEditor({
   authToken,
   height,
   minHeight,
   maxHeight,
+  renderInternalLinkPreview,
 }: {
   authToken?: string
   height?: string | number
   minHeight?: string | number
   maxHeight?: string | number
+  renderInternalLinkPreview?: RenderInternalLinkPreview
 }): Editor & ReactEditor & WysimarkEditor {
   const [editor] = useState(() => {
     const editor = createEditor()
@@ -37,6 +39,7 @@ export function useEditor({
     editor.wysimark = {
       //   initialMarkdown,
       //   initialValue: parse(initialMarkdown),
+      renderInternalLinkPreview,
     }
     editor.getMarkdown = () => {
       return serialize(editor.children as Element[])

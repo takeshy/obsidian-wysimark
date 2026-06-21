@@ -8,6 +8,9 @@ export const $Anchor = styled("a")`
   &:hover {
     color: var(--link-hover-color, blue);
   }
+  &.--internal-link {
+    cursor: pointer;
+  }
   /**
    * When the cursor is in the anchor and not outside the anchor, we style the
    * anchor with a very light shade. This is enough to subtly intuit to the user

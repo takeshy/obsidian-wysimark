@@ -3,6 +3,12 @@ import { useCallback, useRef, useState } from "react"
 import { useSlateStatic } from "slate-react"
 
 import { $Panel } from "../../shared-overlays"
+import {
+  isWikiLinkHref,
+  wikiLinkSpecFromHref,
+  wikiLinkTarget,
+} from "../../convert/obsidian-links"
+import { t } from "../../utils/translations"
 import { useLayer } from "../../use-layer"
 import { positionInside, useAbsoluteReposition } from "../../use-reposition"
 import { useTooltip } from "../../use-tooltip"
@@ -36,6 +42,30 @@ const $AnchorDialog = styled($Panel)`
       color: var(--blue-600);
     }
     transition: all 200ms;
+  }
+
+  .--internal-link {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--shade-400);
+  }
+
+  .--internal-preview {
+    box-sizing: border-box;
+    margin-top: 0.75em;
+    max-width: 14em;
+    max-height: 14em;
+    overflow: auto;
+    border: 1px solid var(--shade-200);
+    border-radius: 0.375em;
+    padding: 0.625em 0.75em;
+    color: var(--shade-600);
+    background: var(--shade-100);
+    font-size: 0.8125em;
+    line-height: 1.45;
+    overflow-wrap: break-word;
   }
 
   .--url {
@@ -120,6 +150,13 @@ export function AnchorDialog({
   const editor = useSlateStatic()
   const ref = useRef<HTMLDivElement>(null)
   const url = parseUrl(element.href)
+  const isInternalLink = isWikiLinkHref(element.href)
+  const internalTarget = isInternalLink
+    ? wikiLinkTarget(wikiLinkSpecFromHref(element.href))
+    : ""
+  const internalPreview = isInternalLink
+    ? editor.wysimark.renderInternalLinkPreview?.(internalTarget)
+    : null
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
   const handleDrag = useCallback((deltaX: number, deltaY: number) => {
@@ -183,23 +220,36 @@ export function AnchorDialog({
     <$AnchorDialog ref={ref} contentEditable={false} style={style}>
       <DraggableHeader onDrag={handleDrag} />
       <div style={{ display: "flex", padding: "1em" }}>
-        <a
-          className="--link"
-          href={element.href}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <ExternalLinkIcon />
-          <div className="--url">
-            <div className="--hostname">{url.hostname}</div>
-            {url.pathname === "" || url.pathname === "/" ? null : (
-              <div className="--pathname">{url.pathname}</div>
-            )}
-            {element.title == null || element.title === "" ? null : (
-              <div className="--tooltip">{element.title}</div>
-            )}
-          </div>
-        </a>
+        {isInternalLink ? (
+          <span className="--internal-link">
+            <ExternalLinkIcon />
+            <div className="--url">
+              <div className="--hostname">{t("linkTypeInternal")}</div>
+              <div className="--pathname">{internalTarget}</div>
+              <div className="--internal-preview">
+                {internalPreview ?? internalTarget}
+              </div>
+            </div>
+          </span>
+        ) : (
+          <a
+            className="--link"
+            href={element.href}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <ExternalLinkIcon />
+            <div className="--url">
+              <div className="--hostname">{url.hostname}</div>
+              {url.pathname === "" || url.pathname === "/" ? null : (
+                <div className="--pathname">{url.pathname}</div>
+              )}
+              {element.title == null || element.title === "" ? null : (
+                <div className="--tooltip">{element.title}</div>
+              )}
+            </div>
+          </a>
+        )}
         <span className="--icons">
           <span
             className="--icon"

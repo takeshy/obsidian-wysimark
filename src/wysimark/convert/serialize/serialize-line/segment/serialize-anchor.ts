@@ -1,4 +1,5 @@
 import { AnchorElement } from "../../../../anchor-plugin"
+import { isWikiLinkHref, serializeWikiLinkHref } from "../../../obsidian-links"
 
 import { Segment } from "../../../types"
 import { serializeLine } from "../serialize-line"
@@ -12,6 +13,13 @@ export function serializeAnchor(
   anchor: AnchorElement,
   options?: EscapeTextOptions
 ): string {
+  if (isWikiLinkHref(anchor.href)) {
+    return serializeWikiLinkHref(
+      anchor.href,
+      serializeLine(anchor.children as Segment[])
+    )
+  }
+
   const commonAnchorMarks = getCommonAnchorMarks(anchor.children as Segment[])
   /**
    * An unbalanced bracket in the label text would change where the `[label]`

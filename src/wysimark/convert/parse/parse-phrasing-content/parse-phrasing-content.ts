@@ -5,6 +5,12 @@ import { assertUnreachable } from "../../utils"
 import { normalizeSegments } from "./normalize-segments"
 import { parseInlineImage } from "./parse-inline-image"
 import { Descendant } from "slate"
+import {
+  restoreEscapedWikiLinks,
+  wikiEmbedUrl,
+  wikiLinkDisplayText,
+  wikiLinkHref,
+} from "../../obsidian-links"
 
 /**
  * Parse inline HTML content, with special handling for <mark> tags
@@ -21,6 +27,50 @@ function parseInlineHtml(htmlValue: string, marks: MarkProps): Segment[] {
   }
   // For other HTML, treat as code
   return [{ text: htmlValue, code: true }]
+}
+
+function parseObsidianLinks(value: string, marks: MarkProps): Segment[] {
+  const segments: Segment[] = []
+  const pattern = /(^|[^\\])(!)?\[\[([^\]\n]+?)\]\]/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = pattern.exec(value)) !== null) {
+    const prefix = match[1]
+    const start = match.index + prefix.length
+    if (start > lastIndex) {
+      segments.push({
+        text: restoreEscapedWikiLinks(value.slice(lastIndex, start)),
+        ...marks,
+      })
+    }
+
+    const rawSpec = match[3].trim()
+    if (match[2]) {
+      segments.push({
+        type: "image-inline",
+        url: wikiEmbedUrl(rawSpec),
+        alt: rawSpec,
+        children: [{ text: "" }],
+      })
+    } else {
+      segments.push({
+        type: "anchor",
+        href: wikiLinkHref(rawSpec),
+        children: [{ text: wikiLinkDisplayText(rawSpec), ...marks }],
+      })
+    }
+    lastIndex = start + match[0].length - prefix.length
+  }
+
+  if (lastIndex === 0) return [{ text: restoreEscapedWikiLinks(value), ...marks }]
+  if (lastIndex < value.length) {
+    segments.push({
+      text: restoreEscapedWikiLinks(value.slice(lastIndex)),
+      ...marks,
+    })
+  }
+  return segments
 }
 
 export function parsePhrasingContents(
@@ -90,7 +140,7 @@ function parsePhrasingContent(
         bold: true,
       })
     case "text":
-      return [{ text: phrasingContent.value, ...marks }]
+      return parseObsidianLinks(phrasingContent.value, marks)
     case "linkReference":
     case "imageReference":
       throw new Error(

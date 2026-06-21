@@ -19,13 +19,47 @@ import { positionInside, useAbsoluteReposition } from "../../use-reposition"
 import { AnchorElement } from "../index"
 import { AnchorDialog } from "./AnchorDialog"
 import { DraggableHeader } from "../../toolbar-plugin/components/dialog/DraggableHeader"
+import {
+  isWikiLinkHref,
+  normalizeWikiLinkInput,
+  splitWikiSpec,
+  wikiLinkDisplayText,
+  wikiLinkHref,
+  wikiLinkSpecFromHref,
+} from "../../convert/obsidian-links"
 
 const $AnchorEditDialog = styled($Panel)`
   position: absolute;
   width: 20em;
   padding: 0;
   overflow: hidden;
+
+  .--link-type {
+    display: flex;
+    gap: 0.25em;
+    padding: 0.25em;
+    border-radius: 0.375em;
+    background: var(--shade-100);
+  }
+
+  .--link-type button {
+    flex: 1 1 0;
+    border: 0;
+    border-radius: 0.25em;
+    padding: 0.375em 0.5em;
+    color: var(--shade-500);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .--link-type button.--active {
+    color: var(--shade-700);
+    background: white;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+  }
 `
+
+type LinkMode = "external" | "internal"
 
 export function AnchorEditDialog({
   destAnchor,
@@ -66,13 +100,29 @@ export function AnchorEditDialog({
   }
 
   const editor = useSlateStatic()
+  const isInitialInternal = isWikiLinkHref(element.href)
+  const initialInternalSpec = isInitialInternal
+    ? wikiLinkSpecFromHref(element.href)
+    : ""
+  const initialInternalParts = splitWikiSpec(initialInternalSpec)
+  const initialInternalTarget = isInitialInternal
+    ? initialInternalParts.target
+    : ""
 
+  const [mode, setMode] = useState<LinkMode>(
+    isInitialInternal ? "internal" : "external"
+  )
   const [href, setHref] = useState<string>(element.href)
-  const [text, setText] = useState<string>(Node.string(element))
+  const [target, setTarget] = useState<string>(initialInternalTarget)
+  const [text, setText] = useState<string>(
+    isInitialInternal
+      ? initialInternalParts.display || Node.string(element)
+      : Node.string(element)
+  )
   const [title, setTitle] = useState<string>(element.title || "")
 
-  const formRef = useRef({ href, text, title })
-  formRef.current = { href, text, title }
+  const formRef = useRef({ href, target, text, title, mode })
+  formRef.current = { href, target, text, title, mode }
 
   const handleHrefChange = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -92,6 +142,16 @@ export function AnchorEditDialog({
     setTitle(e.target.value)
   }, [])
 
+  const handleTargetChange = useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >((e) => {
+    const parsed = normalizeWikiLinkInput(e.target.value)
+    setTarget(parsed.target)
+    if (parsed.display !== undefined) {
+      setText(parsed.display)
+    }
+  }, [])
+
   const openAnchorDialog = useCallback(() => {
     dialog.open(() => (
       <AnchorDialog
@@ -103,8 +163,26 @@ export function AnchorEditDialog({
   }, [destAnchor, destStartEdge, element])
 
   const handleSubmit = useCallback(() => {
-    const { href, text, title } = formRef.current
-    editor.anchor.editLink({ href, text, title }, { at: element })
+    const { href, target, text, title, mode } = formRef.current
+    if (mode === "internal") {
+      const trimmedTarget = target.trim()
+      if (trimmedTarget === "") return
+      const trimmedText = text.trim()
+      const spec =
+        trimmedText && trimmedText !== wikiLinkDisplayText(trimmedTarget)
+          ? `${trimmedTarget}|${trimmedText}`
+          : trimmedTarget
+      editor.anchor.editLink(
+        {
+          href: wikiLinkHref(spec),
+          text: trimmedText || wikiLinkDisplayText(trimmedTarget),
+          title: undefined,
+        },
+        { at: element }
+      )
+    } else {
+      editor.anchor.editLink({ href, text, title }, { at: element })
+    }
     openAnchorDialog()
   }, [openAnchorDialog])
 
@@ -113,19 +191,47 @@ export function AnchorEditDialog({
       <DraggableHeader onDrag={handleDrag} />
       <div style={{ padding: "1em" }}>
         <$FormGroup>
-          <$FormCaption>{t("linkUrl")}</$FormCaption>
-          <$Textarea as="textarea" value={href} onChange={handleHrefChange} />
+          <div className="--link-type">
+            <button
+              type="button"
+              className={mode === "external" ? "--active" : undefined}
+              onClick={() => setMode("external")}
+            >
+              {t("linkTypeExternal")}
+            </button>
+            <button
+              type="button"
+              className={mode === "internal" ? "--active" : undefined}
+              onClick={() => setMode("internal")}
+            >
+              {t("linkTypeInternal")}
+            </button>
+          </div>
         </$FormGroup>
+        {mode === "internal" ? (
+          <$FormGroup>
+            <$FormCaption>{t("internalLinkTarget")}</$FormCaption>
+            <$Input type="text" value={target} onChange={handleTargetChange} />
+            <$FormHint>{t("internalLinkTargetHint")}</$FormHint>
+          </$FormGroup>
+        ) : (
+          <$FormGroup>
+            <$FormCaption>{t("linkUrl")}</$FormCaption>
+            <$Textarea as="textarea" value={href} onChange={handleHrefChange} />
+          </$FormGroup>
+        )}
         <$FormGroup>
           <$FormCaption>{t("linkText")}</$FormCaption>
           <$Input type="text" value={text} onChange={handleTextChange} />
           <$FormHint>{t("linkTextHint")}</$FormHint>
         </$FormGroup>
-        <$FormGroup>
-          <$FormCaption>{t("tooltipText")}</$FormCaption>
-          <$Input type="text" value={title} onChange={handleTitleChange} />
-          <$FormHint>{t("tooltipHint")}</$FormHint>
-        </$FormGroup>
+        {mode === "external" ? (
+          <$FormGroup>
+            <$FormCaption>{t("tooltipText")}</$FormCaption>
+            <$Input type="text" value={title} onChange={handleTitleChange} />
+            <$FormHint>{t("tooltipHint")}</$FormHint>
+          </$FormGroup>
+        ) : null}
         <$FormGroup>
           <$PrimaryButton onClick={handleSubmit}>{t("apply")}</$PrimaryButton>
         </$FormGroup>
