@@ -9,6 +9,7 @@ import type { ReactNode } from "react"
  */
 export type OnImageSaveHandler = (file: File, path: string) => Promise<string>
 export type RenderInternalLinkPreview = (target: string) => ReactNode
+export type RenderInternalEmbed = (spec: string) => ReactNode
 export type OpenInternalLinkHandler = (target: string) => void | Promise<void>
 
 export type ImageDialogState = {
@@ -49,6 +50,11 @@ export type WysimarkEditor = {
      * Render preview content for an internal link target.
      */
     renderInternalLinkPreview?: RenderInternalLinkPreview
+
+    /**
+     * Render inline content for an internal embed (`![[spec]]`).
+     */
+    renderInternalEmbed?: RenderInternalEmbed
 
     /**
      * Open an internal link target.

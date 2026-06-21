@@ -128,6 +128,51 @@ function InternalLinkPreview({
   return <div ref={previewRef} />;
 }
 
+function InternalEmbedView({
+  app,
+  sourcePath,
+  spec,
+}: {
+  app: App;
+  sourcePath: string;
+  spec: string;
+}) {
+  const embedRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    const embedEl = embedRef.current;
+    if (!embedEl) return;
+
+    // Use a short-lived Component as the render lifecycle owner so the
+    // embedded note's children are cleaned up when this embed unmounts.
+    const component = new Component();
+    component.load();
+
+    embedEl.empty();
+
+    // Render the literal `![[spec]]` so Obsidian resolves the embed itself
+    // (note transclusion, image, PDF, etc.) using the source file's context.
+    void MarkdownRenderer.render(
+      app,
+      `![[${spec}]]`,
+      embedEl,
+      sourcePath,
+      component
+    ).then(() => {
+      if (cancelled) embedEl.empty();
+    });
+
+    return () => {
+      cancelled = true;
+      component.unload();
+      embedEl.empty();
+    };
+  }, [app, sourcePath, spec]);
+
+  return <div ref={embedRef} className="wysimark-internal-embed" />;
+}
+
 // React component for the editor
 function WysimarkEditorComponent({
   initialValue,
@@ -162,9 +207,20 @@ function WysimarkEditorComponent({
     );
   }, [file.path, plugin.app]);
 
+  const renderInternalEmbed = React.useCallback((spec: string) => {
+    return (
+      <InternalEmbedView
+        app={plugin.app}
+        sourcePath={file.path}
+        spec={spec}
+      />
+    );
+  }, [file.path, plugin.app]);
+
   const editor = useEditor({
     openInternalLink,
     renderInternalLinkPreview,
+    renderInternalEmbed,
   });
   // Use initialValue only on mount, manage internally afterwards
   const [value] = React.useState(initialValue);

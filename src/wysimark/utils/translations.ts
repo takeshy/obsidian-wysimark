@@ -22,12 +22,16 @@ interface Translations {
     linkTypeInternal: string;
     internalLinkTarget: string;
     internalLinkTargetHint: string;
+    internalLinkEmbed: string;
+    internalLinkEmbedHint: string;
     linkText: string;
     linkTextHint: string;
     tooltipText: string;
     tooltipHint: string;
     apply: string;
     cancel: string;
+    edit: string;
+    remove: string;
     insertLink: string;
     quote: string;
     insertTable: string;
@@ -80,12 +84,16 @@ export const translations: Translations = {
     linkTypeInternal: "内部",
     internalLinkTarget: "内部リンク先",
     internalLinkTargetHint: "例: Page または Folder/Page#Heading",
+    internalLinkEmbed: "埋め込みとして挿入",
+    internalLinkEmbedHint: "オンにすると ![[...]] として埋め込まれます",
     linkText: "リンクテキスト",
     linkTextHint: "リンクとして表示されるテキスト",
     tooltipText: "ツールチップテキスト",
     tooltipHint: "マウスホバー時に表示されるツールチップ",
     apply: "適用",
     cancel: "キャンセル",
+    edit: "編集",
+    remove: "削除",
     insertLink: "リンク",
     quote: "引用",
     insertTable: "表",
@@ -135,12 +143,16 @@ export const translations: Translations = {
     linkTypeInternal: "Internal",
     internalLinkTarget: "Internal Link Target",
     internalLinkTargetHint: "Example: Page or Folder/Page#Heading",
+    internalLinkEmbed: "Insert as embed",
+    internalLinkEmbedHint: "When on, inserts as ![[...]]",
     linkText: "Link Text",
     linkTextHint: "Text displayed as the link",
     tooltipText: "Tooltip Text",
     tooltipHint: "Tooltip shown on mouse hover",
     apply: "Apply",
     cancel: "Cancel",
+    edit: "Edit",
+    remove: "Remove",
     insertLink: "Link",
     quote: "Quote",
     insertTable: "Table",

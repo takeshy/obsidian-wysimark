@@ -192,8 +192,8 @@ export function AnchorDialog({
   destStartEdge,
   element,
 }: {
-  destAnchor: HTMLAnchorElement
-  destStartEdge: HTMLSpanElement
+  destAnchor: HTMLElement
+  destStartEdge: HTMLElement
   element: AnchorElement
 }) {
   const dialog = useLayer("dialog")

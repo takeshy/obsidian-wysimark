@@ -6,7 +6,7 @@ import { ReactEditor, withReact } from "slate-react"
 import { parse, serialize, escapeUrlSlashes } from "../convert"
 import { Element } from "./plugins"
 import { withSink } from "./SinkEditable"
-import { OpenInternalLinkHandler, RenderInternalLinkPreview, WysimarkEditor } from "./types"
+import { OpenInternalLinkHandler, RenderInternalEmbed, RenderInternalLinkPreview, WysimarkEditor } from "./types"
 
 export function useEditor({
   authToken,
@@ -14,6 +14,7 @@ export function useEditor({
   minHeight,
   maxHeight,
   renderInternalLinkPreview,
+  renderInternalEmbed,
   openInternalLink,
 }: {
   authToken?: string
@@ -21,6 +22,7 @@ export function useEditor({
   minHeight?: string | number
   maxHeight?: string | number
   renderInternalLinkPreview?: RenderInternalLinkPreview
+  renderInternalEmbed?: RenderInternalEmbed
   openInternalLink?: OpenInternalLinkHandler
 }): Editor & ReactEditor & WysimarkEditor {
   const [editor] = useState(() => {
@@ -42,6 +44,7 @@ export function useEditor({
       //   initialMarkdown,
       //   initialValue: parse(initialMarkdown),
       renderInternalLinkPreview,
+      renderInternalEmbed,
       openInternalLink,
     }
     editor.getMarkdown = () => {
