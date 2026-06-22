@@ -72,7 +72,7 @@ export function WikiEmbedView({
     const result = editor.anchor.convertToLink(spec, { at })
     if (!result) return
     const [anchor] = result
-    setTimeout(() => {
+    window.setTimeout(() => {
       let anchorNode: HTMLElement = fallbackAnchor
       try {
         anchorNode = ReactEditor.toDOMNode(editor, anchor)
