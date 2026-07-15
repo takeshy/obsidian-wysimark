@@ -8,6 +8,7 @@ import { useLayer } from "../../use-layer"
 import { ChevronDownIcon } from "../icons/ChevronDownIcon"
 import { $CodeBlock, $CodeBlockLanguage, $CodeBlockScroller } from "../styles"
 import { CodeBlockElement, LanguageList } from "../types"
+import { CodeBlockActions } from "./CodeBlockActions"
 
 export function CodeBlock({
   element,
@@ -61,6 +62,7 @@ export function CodeBlock({
 
   return (
     <$CodeBlock className={selected ? "--selected" : ""} {...attributes}>
+      {selected && focused ? <CodeBlockActions element={element} /> : null}
       <$CodeBlockLanguage contentEditable={false} onClick={onClick} ref={ref}>
         <span>{element.language}</span>
         <ChevronDownIcon />

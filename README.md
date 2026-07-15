@@ -38,6 +38,11 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 - Block quotes (`Ctrl/Cmd + Alt + .`)
 - Code blocks with syntax highlighting
 - HTML blocks (iframe, video embeds, etc.) - displayed as read-only blocks and preserved as raw HTML
+- Callouts (`> [!note]`, `> [!warning]`, etc.) rendered with their icon and color
+- Mermaid code blocks rendered as live diagram previews
+
+![Callout and Mermaid preview](callout_mermaid.png)
+![Editing callout and Mermaid source](edit_callout_mermaid.png)
 
 ### Tables
 
@@ -54,6 +59,9 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 - Selected text becomes link text automatically
 - Insert images from URL
 - Insert images from local files (saved to vault)
+- Insert images already in the vault via a searchable file picker
+
+![Selecting an image from the vault](link_vault.png)
 
 ### Other Features
 

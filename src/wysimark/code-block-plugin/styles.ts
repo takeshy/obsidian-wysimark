@@ -21,6 +21,35 @@ export const $CodeBlock = styled("div")`
   overflow-x: hidden;
 `
 
+export const $CodeBlockActions = styled("div")`
+  position: absolute;
+  top: 0.25em;
+  right: 0.25em;
+  z-index: 2;
+  display: flex;
+  gap: 0.25em;
+`
+
+export const $CodeBlockActionButton = styled("button")`
+  width: 2em;
+  height: 2em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--shade-300);
+  border-radius: 0.375em;
+  color: var(--shade-700);
+  background: var(--shade-100);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--shade-900);
+    background: var(--shade-200);
+  }
+`
+
 export const $CodeBlockScroller = styled("div")`
   padding: 2.25em 1em 1.5em 1em;
   border-radius: 0.5em;
