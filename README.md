@@ -41,7 +41,6 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 - Callouts (`> [!note]`, `> [!warning]`, etc.) rendered with their icon and color
 - Mermaid code blocks rendered as live diagram previews
 
-![Callout and Mermaid preview](callout_mermaid.png)
 ![Editing callout and Mermaid source](edit_callout_mermaid.png)
 
 ### Tables

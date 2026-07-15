@@ -24,7 +24,8 @@ export const $CodeBlock = styled("div")`
 export const $CodeBlockActions = styled("div")`
   position: absolute;
   top: 0.25em;
-  right: 0.25em;
+  /* Sits to the left of $CodeBlockLanguage (right: 0.25em; width: 8em) so the two don't overlap. */
+  right: 8.5em;
   z-index: 2;
   display: flex;
   gap: 0.25em;

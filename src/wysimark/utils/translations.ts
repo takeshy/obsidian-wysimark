@@ -1,3 +1,5 @@
+import { getLanguage as getObsidianLanguage } from "obsidian";
+
 interface Translations {
   [key: string]: {
     bold: string;
@@ -190,6 +192,16 @@ export const translations: Translations = {
 export type TranslationKey = keyof Translations["en"];
 
 const getLanguage = (): string => {
+  try {
+    // Obsidian's own display language setting (Settings > About > Language),
+    // which can differ from the OS locale reported by navigator.language.
+    if (typeof getObsidianLanguage === "function") {
+      const lang = getObsidianLanguage();
+      if (lang) return lang.split("-")[0];
+    }
+  } catch {
+    // Ignore any errors (e.g. unavailable on older Obsidian versions)
+  }
   try {
     // Check if we're in a browser environment
     if (typeof window !== 'undefined' && window.navigator) {
