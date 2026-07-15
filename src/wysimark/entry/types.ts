@@ -10,6 +10,7 @@ import type { ReactNode } from "react"
 export type OnImageSaveHandler = (file: File, path: string) => Promise<string>
 export type RenderInternalLinkPreview = (target: string) => ReactNode
 export type RenderInternalEmbed = (spec: string) => ReactNode
+export type RenderMermaidPreview = (code: string) => ReactNode
 export type OpenInternalLinkHandler = (target: string) => void | Promise<void>
 export type GetVaultImagePathsHandler = () => string[]
 export type GetVaultFilePathsHandler = () => string[]
@@ -68,6 +69,11 @@ export type WysimarkEditor = {
      * Render inline content for an internal embed (`![[spec]]`).
      */
     renderInternalEmbed?: RenderInternalEmbed
+
+    /**
+     * Render a Mermaid code block using the host environment.
+     */
+    renderMermaidPreview?: RenderMermaidPreview
 
     /**
      * Open an internal link target.

@@ -222,6 +222,51 @@ function InternalEmbedView({
   return <div ref={embedRef} className="wysimark-internal-embed" />;
 }
 
+function MermaidPreview({
+  app,
+  sourcePath,
+  code,
+}: {
+  app: App;
+  sourcePath: string;
+  code: string;
+}) {
+  const previewRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    const previewEl = previewRef.current;
+    if (!previewEl) return;
+
+    const component = new Component();
+    component.load();
+    previewEl.empty();
+    previewEl.setText('Rendering diagram...');
+
+    void MarkdownRenderer.render(
+      app,
+      `\`\`\`mermaid\n${code}\n\`\`\``,
+      previewEl,
+      sourcePath,
+      component
+    ).then(() => {
+      if (cancelled) previewEl.empty();
+    }).catch((error: unknown) => {
+      if (!cancelled) {
+        previewEl.setText(error instanceof Error ? error.message : 'Invalid Mermaid diagram');
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      component.unload();
+      previewEl.empty();
+    };
+  }, [app, code, sourcePath]);
+
+  return <div ref={previewRef} className="wysimark-mermaid-preview" />;
+}
+
 // React component for the editor
 function WysimarkEditorComponent({
   initialValue,
@@ -266,6 +311,10 @@ function WysimarkEditorComponent({
     );
   }, [file.path, plugin.app]);
 
+  const renderMermaidPreview = React.useCallback((code: string) => {
+    return <MermaidPreview app={plugin.app} sourcePath={file.path} code={code} />;
+  }, [file.path, plugin.app]);
+
   const getVaultImagePaths = React.useCallback(() => {
     return plugin.app.vault
       .getFiles()
@@ -285,6 +334,7 @@ function WysimarkEditorComponent({
     openInternalLink,
     renderInternalLinkPreview,
     renderInternalEmbed,
+    renderMermaidPreview,
   });
   // Use initialValue only on mount, manage internally afterwards
   const [value] = React.useState(initialValue);

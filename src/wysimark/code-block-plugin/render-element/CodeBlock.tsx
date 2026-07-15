@@ -1,5 +1,6 @@
 import { useCallback, useRef } from "react"
-import { useSelected } from "slate-react"
+import { Editor, Node, Transforms } from "slate"
+import { ReactEditor, useFocused, useSelected, useSlateStatic } from "slate-react"
 
 import { Menu, MenuItemData } from "../../shared-overlays"
 import { ConstrainedRenderElementProps } from "../../sink"
@@ -14,7 +15,9 @@ export function CodeBlock({
   children,
 }: ConstrainedRenderElementProps<CodeBlockElement>) {
   const ref = useRef<HTMLDivElement>(null)
+  const editor = useSlateStatic()
   const selected = useSelected()
+  const focused = useFocused()
   const dropdown = useLayer("code-block-dropdown")
   const onClick = useCallback(() => {
     if (dropdown.layer) dropdown.close()
@@ -34,6 +37,27 @@ export function CodeBlock({
       <Menu dest={dest} items={items} close={dropdown.close} />
     ))
   }, [element])
+
+  const isMermaid = element.language.toLowerCase() === "mermaid"
+  if (isMermaid && !(selected && focused) && editor.wysimark.renderMermaidPreview) {
+    const code = element.children.map((line) => Node.string(line)).join("\n")
+    return (
+      <$CodeBlock
+        {...attributes}
+        onMouseDown={(event) => {
+          event.preventDefault()
+          const path = ReactEditor.findPath(editor, element)
+          Transforms.select(editor, Editor.start(editor, path))
+          ReactEditor.focus(editor)
+        }}
+      >
+        <div contentEditable={false} style={{ padding: "1em", overflowX: "auto" }}>
+          {editor.wysimark.renderMermaidPreview(code)}
+        </div>
+        <div aria-hidden="true" style={{ display: "none" }}>{children}</div>
+      </$CodeBlock>
+    )
+  }
 
   return (
     <$CodeBlock className={selected ? "--selected" : ""} {...attributes}>
