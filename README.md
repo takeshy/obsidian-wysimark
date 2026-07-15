@@ -70,12 +70,14 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 
 ## Installation
 
-### BRAT (Recommended)
+### Community Plugins (Recommended)
 
-1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
-2. Open BRAT settings → "Add Beta plugin"
-3. Enter: `https://github.com/takeshy/obsidian-wysimark`
-4. Enable the plugin in Community plugins settings
+1. Open Obsidian Settings
+2. Go to Community plugins and disable Restricted mode
+3. Click "Browse" and search for "Wysimark Editor"
+4. Install and enable the plugin
+
+Plugin page: https://community.obsidian.md/plugins/wysimark-editor
 
 ### Manual
 
