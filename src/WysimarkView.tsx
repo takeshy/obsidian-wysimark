@@ -110,12 +110,10 @@ function InternalLinkPreview({
       if (IMAGE_EXTENSIONS.has(targetFile.extension.toLowerCase())) {
         if (cancelled) return;
         previewEl.empty();
-        const image = document.createElement('img');
+        const image = activeDocument.createElement('img');
         image.src = app.vault.getResourcePath(targetFile);
         image.alt = targetFile.basename;
-        image.style.display = 'block';
-        image.style.maxWidth = '100%';
-        image.style.height = 'auto';
+        image.setCssStyles({ display: 'block', maxWidth: '100%', height: 'auto' });
         previewEl.appendChild(image);
         return;
       }

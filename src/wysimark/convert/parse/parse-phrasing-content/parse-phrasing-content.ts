@@ -4,7 +4,6 @@ import { MarkProps, Segment } from "../../types"
 import { assertUnreachable } from "../../utils"
 import { normalizeSegments } from "./normalize-segments"
 import { parseInlineImage } from "./parse-inline-image"
-import { Descendant } from "slate"
 import {
   restoreEscapedWikiLinks,
   wikiEmbedUrl,
@@ -132,7 +131,7 @@ function parsePhrasingContent(
              * Ensure that `title` is undefined if it's null.
              */
             phrasingContent.title == null ? undefined : phrasingContent.title,
-          children: parsePhrasingContents(phrasingContent.children, marks) as Descendant[],
+          children: parsePhrasingContents(phrasingContent.children, marks),
         },
       ]
     case "strong":

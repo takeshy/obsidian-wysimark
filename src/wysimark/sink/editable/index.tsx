@@ -3,7 +3,6 @@ import { Editor, Transforms } from "slate"
 import { ReactEditor, useSlateStatic } from "slate-react"
 import { EditableProps } from "slate-react/dist/components/editable"
 
-import { SinkEditor } from "../types"
 import { createDecorate } from "./create-decorate"
 import { createEditable } from "./create-editable"
 import {
@@ -31,7 +30,7 @@ function selectDOMTargetRange(editor: Editor, event: InputEvent): void {
 
   try {
     const range = ReactEditor.toSlateRange(
-      editor as unknown as ReactEditor,
+      editor,
       targetRange,
       {
         exactMatch: false,
@@ -106,7 +105,7 @@ function createOnInput(
  * the editor.
  */
 export function SinkEditable(originalProps: EditableProps): React.ReactElement {
-  const editor = useSlateStatic() as unknown as Editor & SinkEditor
+  const editor = useSlateStatic()
   const skipInputTextRef = useRef<string | null>(null)
 
   /**

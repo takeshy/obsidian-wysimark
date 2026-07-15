@@ -22,14 +22,13 @@ export function createBooleanAction<
 ): (node: Element) => boolean {
   const originalAction = editor[actionKey]
   const actionPlugins = plugins.filter((plugin) => plugin.editor?.[actionKey])
-  return function nextBooleanAction(node: Node): boolean {
+  return function nextBooleanAction(node: Element): boolean {
     for (const plugin of actionPlugins) {
       const editorPlugin = plugin.editor as Record<string, ((n: Node) => boolean | undefined) | undefined> | undefined
       const actionFn = editorPlugin?.[actionKey]
       const result = actionFn?.(node)
       if (typeof result === "boolean") return result
     }
-    const origFn = originalAction as (n: Node) => boolean
-    return origFn(node)
+    return originalAction(node)
   }
 }

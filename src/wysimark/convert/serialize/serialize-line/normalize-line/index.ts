@@ -1,4 +1,4 @@
-import { Element } from "slate"
+import { Descendant, Element } from "slate"
 
 import { Segment } from "../../../types"
 import { normalizeNodes } from "./normalize-nodes"
@@ -11,13 +11,22 @@ import { LineElement } from "./types"
  * It's designed this way to be fast and to avoid duplicating the entire tree
  * as only anchors have children that will be manipulated.
  */
+const duplicateChildren = (children: Descendant[]): Descendant[] => {
+  return children.map((child) => {
+    if (Element.isElement(child) && child.type === "anchor") {
+      return { ...child, children: duplicateChildren(child.children) }
+    }
+    return child
+  })
+}
+
 const duplicateSegments = (segments: Segment[]): Segment[] => {
   return segments.map((segment) => {
     if (Element.isElement(segment) && segment.type === "anchor") {
       return {
         ...segment,
-        children: duplicateSegments(segment.children as Segment[]) as typeof segment.children,
-      } as typeof segment
+        children: duplicateChildren(segment.children),
+      }
     } else {
       return segment
     }

@@ -1,5 +1,4 @@
 import type { Table, TableCell, TableRow } from "mdast"
-import { Descendant } from "slate"
 
 import {
   TableCellElement,
@@ -35,7 +34,7 @@ function parseTableCell(cell: TableCell): TableCellElement {
     children: [
       {
         type: "table-content",
-        children: parsePhrasingContents(cell.children) as Descendant[],
+        children: parsePhrasingContents(cell.children),
       },
     ],
   }

@@ -19,7 +19,7 @@ function wrapHandler(originalHandler: Handle): Handle {
     const context = this as PatchedCompileContext;
     context.data ||= {};
 
-    originalHandler.call(context as CompileContext, token);
+    originalHandler.call(context, token);
     return undefined;
   };
 }

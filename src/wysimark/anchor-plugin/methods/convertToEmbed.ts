@@ -2,7 +2,6 @@ import { Editor, Transforms } from "slate"
 
 import { BetterAt, findElementUp } from "../../sink"
 import { wikiEmbedUrl } from "../../convert/obsidian-links"
-import { ImageInlineElement } from "../../image-plugin/types"
 
 /**
  * Replace the anchor at `at` with an internal embed (`![[spec]]`), rendered as
@@ -25,7 +24,7 @@ export function convertToEmbed(
         url: wikiEmbedUrl(spec),
         alt: spec,
         children: [{ text: "" }],
-      } as ImageInlineElement,
+      },
       { at: path }
     )
   })

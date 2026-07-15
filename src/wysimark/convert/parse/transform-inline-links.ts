@@ -23,7 +23,7 @@ export function transformInlineLinks(tree: Root): void {
 
   visit(tree as unknown as Node, (n: Node, index: number | undefined, p: Parent | undefined) => {
     const node = n as unknown as Content
-    const parent = p as unknown as Parent | null
+    const parent = p ?? null
     if (
       node.type === "definition" &&
       parent !== null &&

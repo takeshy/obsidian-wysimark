@@ -2,7 +2,6 @@ import { Editor, Transforms } from "slate"
 import { ReactEditor } from "slate-react"
 
 import { curryOne } from "../../sink"
-import { ImageBlockElement} from "../types"
 
 function noop(_editor: Editor) {
   // Intentionally empty - noop function
@@ -24,7 +23,7 @@ function insertImageFromUrl(
     width: 320,
     height: 240,
     children: [{ text: "" }],
-  } as ImageBlockElement)
+  })
 
   /**
    * If there is no selection the element is inserted at the bottom of the

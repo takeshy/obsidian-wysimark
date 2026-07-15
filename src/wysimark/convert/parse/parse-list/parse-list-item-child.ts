@@ -1,5 +1,4 @@
 import type { ListItem } from "mdast"
-import { Descendant } from "slate"
 
 import { Element } from "../../types"
 import { parseContent } from "../parse-content"
@@ -22,7 +21,7 @@ export function parseListItemChild(
             type: "task-list-item",
             depth,
             checked,
-            children: parsePhrasingContents(child.children) as Descendant[],
+            children: parsePhrasingContents(child.children),
           },
         ]
       } else if (ordered) {
@@ -30,7 +29,7 @@ export function parseListItemChild(
           {
             type: "ordered-list-item",
             depth,
-            children: parsePhrasingContents(child.children) as Descendant[],
+            children: parsePhrasingContents(child.children),
           },
         ]
       } else {
@@ -38,7 +37,7 @@ export function parseListItemChild(
           {
             type: "unordered-list-item",
             depth,
-            children: parsePhrasingContents(child.children) as Descendant[],
+            children: parsePhrasingContents(child.children),
           },
         ]
       }

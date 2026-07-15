@@ -31,7 +31,7 @@ export function parseContents(contents: TopLevelContent[]): Element[] {
           elements.push({
             type: "paragraph",
             children: [{ text: "" }],
-          } as Element)
+          })
         }
       }
     }
