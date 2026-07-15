@@ -2,11 +2,13 @@ import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin, App, MarkdownRen
 import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { Editable, useEditor, OnImageSaveHandler } from './wysimark/entry';
+import { wikiLinkTarget } from './wysimark/convert/obsidian-links';
 
 export const VIEW_TYPE_WYSIMARK = 'wysimark-view';
 
 // Frontmatter regex: matches YAML frontmatter at the start of the file
 const FRONTMATTER_REGEX = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/;
+const IMAGE_EXTENSIONS = new Set(['avif', 'bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'webp']);
 
 /**
  * Extract frontmatter from markdown content
@@ -105,6 +107,24 @@ function InternalLinkPreview({
         return;
       }
 
+      if (IMAGE_EXTENSIONS.has(targetFile.extension.toLowerCase())) {
+        if (cancelled) return;
+        previewEl.empty();
+        const image = document.createElement('img');
+        image.src = app.vault.getResourcePath(targetFile);
+        image.alt = targetFile.basename;
+        image.style.display = 'block';
+        image.style.maxWidth = '100%';
+        image.style.height = 'auto';
+        previewEl.appendChild(image);
+        return;
+      }
+
+      if (targetFile.extension.toLowerCase() !== 'md') {
+        if (!cancelled) previewEl.setText(`Preview unavailable: ${targetFile.path}`);
+        return;
+      }
+
       const markdown = await app.vault.cachedRead(targetFile);
       if (!markdown.trim()) {
         if (!cancelled) previewEl.setText('Empty note');
@@ -137,9 +157,23 @@ function InternalEmbedView({
   sourcePath: string;
   spec: string;
 }) {
+  const target = wikiLinkTarget(spec);
+  const normalizedTarget = normalizePath(target);
+  const exactTarget = app.vault.getAbstractFileByPath(normalizedTarget);
+  const targetFile = exactTarget instanceof TFile
+    ? exactTarget
+    : app.metadataCache.getFirstLinkpathDest(target, sourcePath);
+  const targetExtension = normalizedTarget.includes('.')
+    ? normalizedTarget.slice(normalizedTarget.lastIndexOf('.') + 1).toLowerCase()
+    : '';
+  const targetsImage = IMAGE_EXTENSIONS.has(targetExtension);
+  const imageFile = targetFile instanceof TFile && IMAGE_EXTENSIONS.has(targetFile.extension.toLowerCase())
+    ? targetFile
+    : null;
   const embedRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
+    if (imageFile || targetsImage) return;
     let cancelled = false;
     const embedEl = embedRef.current;
     if (!embedEl) return;
@@ -168,7 +202,22 @@ function InternalEmbedView({
       component.unload();
       embedEl.empty();
     };
-  }, [app, sourcePath, spec]);
+  }, [app, imageFile, sourcePath, spec, targetsImage]);
+
+  if (imageFile) {
+    return (
+      <img
+        src={app.vault.getResourcePath(imageFile)}
+        alt={imageFile.basename}
+        className="wysimark-internal-embed-image"
+        style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+      />
+    );
+  }
+
+  if (targetsImage) {
+    return <span className="wysimark-internal-embed-missing">Image not found: {target}</span>;
+  }
 
   return <div ref={embedRef} className="wysimark-internal-embed" />;
 }
@@ -217,6 +266,21 @@ function WysimarkEditorComponent({
     );
   }, [file.path, plugin.app]);
 
+  const getVaultImagePaths = React.useCallback(() => {
+    return plugin.app.vault
+      .getFiles()
+      .filter((vaultFile) => IMAGE_EXTENSIONS.has(vaultFile.extension.toLowerCase()))
+      .map((vaultFile) => vaultFile.path)
+      .sort((a, b) => a.localeCompare(b));
+  }, [plugin.app.vault]);
+
+  const getVaultFilePaths = React.useCallback(() => {
+    return plugin.app.vault
+      .getFiles()
+      .map((vaultFile) => vaultFile.path)
+      .sort((a, b) => a.localeCompare(b));
+  }, [plugin.app.vault]);
+
   const editor = useEditor({
     openInternalLink,
     renderInternalLinkPreview,
@@ -241,6 +305,8 @@ function WysimarkEditorComponent({
           className="wysimark-editor"
           style={{}}
           onImageSave={onImageSave}
+          getVaultImagePaths={getVaultImagePaths}
+          getVaultFilePaths={getVaultFilePaths}
         />
       </div>
     </div>

@@ -1,375 +1,186 @@
-import { useState, useRef, CSSProperties, useEffect, useCallback } from "react"
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react"
 import { useSlateStatic } from "slate-react"
 
+import { wikiEmbedUrl } from "../../../convert/obsidian-links"
 import { CloseMask } from "../../../shared-overlays"
 import { positionInside, useAbsoluteReposition } from "../../../use-reposition"
 import { t } from "../../../utils/translations"
-
 import { $FileDialog } from "../../styles/file-dialog-styles"
 import { DraggableHeader } from "./DraggableHeader"
 
-type ImageSource = "url" | "file"
+type ImageSource = "file" | "url" | "vault"
 
-export function ImageUrlDialog({
-    dest,
-    close,
-}: {
-    dest: HTMLElement
-    close: () => void
-}) {
-    const editor = useSlateStatic()
-    const ref = useRef<HTMLDivElement>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
-    const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+const inputStyle: CSSProperties = {
+  width: "100%",
+  padding: "6px",
+  boxSizing: "border-box",
+  border: "1px solid var(--shade-300)",
+  borderRadius: "4px",
+  backgroundColor: "var(--shade-50)",
+  color: "var(--shade-700)",
+}
 
-    const handleDrag = useCallback((deltaX: number, deltaY: number) => {
-        setDragOffset(prev => ({ x: prev.x + deltaX, y: prev.y + deltaY }))
-    }, [])
+export function ImageUrlDialog({ dest, close }: { dest: HTMLElement; close: () => void }) {
+  const editor = useSlateStatic()
+  const saved = editor.wysimark.imageDialogState
+  const ref = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [source, setSource] = useState<ImageSource>(saved?.imageSource ?? "file")
+  const [url, setUrl] = useState(saved?.url ?? "")
+  const [alt, setAlt] = useState(saved?.alt ?? "")
+  const [title, setTitle] = useState(saved?.title ?? "")
+  const [vaultPath, setVaultPath] = useState(saved?.vaultPath ?? "")
+  const [vaultImagePath, setVaultImagePath] = useState(saved?.vaultImagePath ?? "")
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(saved?.selectedFile)
+  const [isSaving, setIsSaving] = useState(false)
+  const vaultImagePaths = editor.wysimark.getVaultImagePaths?.() ?? []
 
-    // Persist dialog values in editor.wysimark so they survive dialog close/reopen
-    const savedState = editor.wysimark?.imageDialogState
-    const hasOnImageSave = !!editor.wysimark?.onImageSave
+  const handleDrag = useCallback((deltaX: number, deltaY: number) => {
+    setDragOffset((previous) => ({ x: previous.x + deltaX, y: previous.y + deltaY }))
+  }, [])
 
-    const [url, setUrl] = useState(savedState?.url ?? "")
-    const [alt, setAlt] = useState(savedState?.alt ?? "")
-    const [title, setTitle] = useState(savedState?.title ?? "")
-    const [titleManuallyEdited, setTitleManuallyEdited] = useState(false)
-    const [imageSource, setImageSource] = useState<ImageSource>(savedState?.imageSource ?? (hasOnImageSave ? "file" : "url"))
-    const [vaultPath, setVaultPath] = useState(savedState?.vaultPath ?? "")
-    const [selectedFile, setSelectedFile] = useState<File | undefined>(savedState?.selectedFile)
-    const [isSaving, setIsSaving] = useState(false)
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
-    // Handlers for alt and title with sync
-    const handleAltChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const newAlt = e.target.value
-        setAlt(newAlt)
-        // Sync title with alt if title hasn't been manually edited
-        if (!titleManuallyEdited) {
-            setTitle(newAlt)
-        }
-    }, [titleManuallyEdited])
-
-    const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(e.target.value)
-        setTitleManuallyEdited(true)
-    }, [])
-
-    // Create preview URL when file is selected
-    useEffect(() => {
-        if (selectedFile) {
-            const url = URL.createObjectURL(selectedFile)
-            setPreviewUrl(url)
-            return () => URL.revokeObjectURL(url)
-        } else {
-            setPreviewUrl(null)
-        }
-    }, [selectedFile])
-
-    // Save state to editor when values change
-    useEffect(() => {
-        if (editor.wysimark) {
-            editor.wysimark.imageDialogState = { url, alt, title, imageSource, vaultPath, selectedFile }
-        }
-    }, [url, alt, title, imageSource, vaultPath, selectedFile])
-
-    // Clear state on successful submit or cancel
-    const clearState = () => {
-        if (editor.wysimark) {
-            editor.wysimark.imageDialogState = undefined
-        }
+  useEffect(() => {
+    editor.wysimark.imageDialogState = {
+      imageSource: source,
+      url,
+      alt,
+      title,
+      vaultPath,
+      vaultImagePath,
+      selectedFile,
     }
+  }, [editor, source, url, alt, title, vaultPath, vaultImagePath, selectedFile])
 
-    const baseStyle = useAbsoluteReposition(
-        { src: ref, dest },
-        ({ src, dest }, viewport) => {
-            return positionInside(
-                src,
-                viewport,
-                {
-                    left: dest.left - 16,
-                    top: dest.top + dest.height,
-                },
-                { margin: 16 }
-            )
-        }
-    ) as CSSProperties
+  const baseStyle = useAbsoluteReposition(
+    { src: ref, dest },
+    ({ src, dest }, viewport) =>
+      positionInside(src, viewport, {
+        left: dest.left - 16,
+        top: dest.top + dest.height,
+      }, { margin: 16 })
+  ) as CSSProperties
+  const style = {
+    ...baseStyle,
+    left: (baseStyle.left as number) + dragOffset.x,
+    top: (baseStyle.top as number) + dragOffset.y,
+  }
 
-    const style = {
-        ...baseStyle,
-        left: (baseStyle.left as number) + dragOffset.x,
-        top: (baseStyle.top as number) + dragOffset.y,
+  function finish() {
+    editor.wysimark.imageDialogState = undefined
+    close()
+  }
+
+  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (source === "vault") {
+      const path = vaultImagePath.trim()
+      if (!path) return
+      editor.image.insertImageFromUrl(wikiEmbedUrl(path), path)
+      finish()
+      return
     }
-
-    async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
-        e.preventDefault()
-
-        if (imageSource === "file" && selectedFile && editor.wysimark?.onImageSave) {
-            if (vaultPath.trim() === "") return
-
-            setIsSaving(true)
-            try {
-                const resultPath = await editor.wysimark.onImageSave(selectedFile, vaultPath)
-                editor.image.insertImageFromUrl(resultPath, alt, title)
-                clearState()
-                close()
-            } finally {
-                setIsSaving(false)
-            }
-        } else if (imageSource === "url") {
-            if (url.trim() === "") return
-            editor.image.insertImageFromUrl(url, alt, title)
-            clearState()
-            close()
-        }
+    if (source === "url") {
+      if (!url.trim()) return
+      editor.image.insertImageFromUrl(url.trim(), alt, title)
+      finish()
+      return
     }
-
-    function handleCancel() {
-        clearState()
-        close()
+    if (!selectedFile || !vaultPath.trim() || !editor.wysimark.onImageSave) return
+    setIsSaving(true)
+    try {
+      const resultPath = await editor.wysimark.onImageSave(selectedFile, vaultPath.trim())
+      editor.image.insertImageFromUrl(resultPath, alt, title)
+      finish()
+    } finally {
+      setIsSaving(false)
     }
+  }
 
-    function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0]
-        if (!file) return
+  const disabled = isSaving || (source === "vault"
+    ? !vaultImagePath.trim()
+    : source === "url"
+      ? !url.trim()
+      : !selectedFile || !vaultPath.trim())
 
-        setSelectedFile(file)
-        // Suggest a default path based on filename
-        if (!vaultPath) {
-            setVaultPath(`attachments/${file.name}`)
-        }
-    }
+  return (
+    <>
+      <CloseMask close={close} />
+      <$FileDialog ref={ref} style={style}>
+        <DraggableHeader onDrag={handleDrag} />
+        <form onSubmit={(event) => void handleSubmit(event)} style={{ padding: "8px" }}>
+          <div style={{ display: "flex", flexWrap: "nowrap", gap: "4px", marginBottom: "12px" }}>
+            {(["file", "url", "vault"] as const).map((value) => (
+              <label key={value} style={{ flex: "1 1 0", minWidth: 0, whiteSpace: "nowrap", cursor: "pointer" }}>
+                <input
+                  type="radio"
+                  name="imageSource"
+                  checked={source === value}
+                  onChange={() => setSource(value)}
+                  style={{ marginRight: "3px" }}
+                />
+                {value === "file" ? t("imageSourceFile") : value === "url" ? t("imageSourceUrl") : "Vault"}
+              </label>
+            ))}
+          </div>
 
-    function handleSelectFileClick() {
-        fileInputRef.current?.click()
-    }
+          {source === "vault" ? (
+            <div style={{ marginBottom: "8px" }}>
+              <label style={{ display: "block", marginBottom: "4px" }}>{t("vaultImageRequired")}</label>
+              <input
+                type="text"
+                list="wysimark-vault-images"
+                value={vaultImagePath}
+                onChange={(event) => setVaultImagePath(event.target.value)}
+                style={inputStyle}
+                placeholder={t("vaultImagePlaceholder")}
+              />
+              <datalist id="wysimark-vault-images">
+                {vaultImagePaths.map((path) => <option key={path} value={path} />)}
+              </datalist>
+            </div>
+          ) : source === "url" ? (
+            <div style={{ marginBottom: "8px" }}>
+              <label style={{ display: "block", marginBottom: "4px" }}>{t("imageUrlRequired")}</label>
+              <input type="text" value={url} onChange={(event) => setUrl(event.target.value)} style={inputStyle} />
+            </div>
+          ) : (
+            <div style={{ marginBottom: "8px" }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  if (!file) return
+                  setSelectedFile(file)
+                  if (!vaultPath) setVaultPath(`attachments/${file.name}`)
+                }}
+                style={{ display: "none" }}
+              />
+              <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isSaving}>
+                {selectedFile?.name ?? t("selectFile")}
+              </button>
+              <label style={{ display: "block", margin: "8px 0 4px" }}>{t("vaultPath")}</label>
+              <input type="text" value={vaultPath} onChange={(event) => setVaultPath(event.target.value)} style={inputStyle} />
+            </div>
+          )}
 
-    const isSubmitDisabled = imageSource === "file"
-        ? !selectedFile || vaultPath.trim() === "" || isSaving
-        : url.trim() === ""
+          {source !== "vault" ? (
+            <>
+              <label style={{ display: "block", marginBottom: "4px" }}>{t("altText")}</label>
+              <input type="text" value={alt} onChange={(event) => setAlt(event.target.value)} style={inputStyle} />
+              <label style={{ display: "block", margin: "8px 0 4px" }}>{t("title")}</label>
+              <input type="text" value={title} onChange={(event) => setTitle(event.target.value)} style={inputStyle} />
+            </>
+          ) : null}
 
-    return (
-        <>
-            <CloseMask close={close} />
-            <$FileDialog ref={ref} style={style}>
-                <DraggableHeader onDrag={handleDrag} />
-                <form onSubmit={(e) => void handleSubmit(e)} style={{ padding: "8px" }}>
-                    {hasOnImageSave && (
-                        <div style={{ marginBottom: "12px" }}>
-                            <label style={{ display: "inline-flex", alignItems: "center", marginRight: "16px", cursor: "pointer" }}>
-                                <input
-                                    type="radio"
-                                    name="imageSource"
-                                    value="file"
-                                    checked={imageSource === "file"}
-                                    onChange={() => setImageSource("file")}
-                                    style={{ marginRight: "4px" }}
-                                />
-                                {t("imageSourceFile")}
-                            </label>
-                            <label style={{ display: "inline-flex", alignItems: "center", cursor: "pointer" }}>
-                                <input
-                                    type="radio"
-                                    name="imageSource"
-                                    value="url"
-                                    checked={imageSource === "url"}
-                                    onChange={() => setImageSource("url")}
-                                    style={{ marginRight: "4px" }}
-                                />
-                                {t("imageSourceUrl")}
-                            </label>
-                        </div>
-                    )}
-
-                    {imageSource === "url" ? (
-                        <div style={{ marginBottom: "8px" }}>
-                            <label style={{ display: "block", marginBottom: "4px" }}>
-                                {t("imageUrlRequired")}
-                            </label>
-                            <input
-                                type="text"
-                                value={url}
-                                onChange={(e) => setUrl(e.target.value)}
-                                style={{
-                                    width: "100%",
-                                    padding: "6px",
-                                    boxSizing: "border-box",
-                                    border: "1px solid var(--shade-300)",
-                                    borderRadius: "4px",
-                                    backgroundColor: "var(--shade-50)",
-                                    color: "var(--shade-700)"
-                                }}
-                                placeholder="https://example.com/image.jpg"
-                            />
-                        </div>
-                    ) : (
-                        <div style={{ marginBottom: "8px" }}>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileSelect}
-                                style={{ display: "none" }}
-                            />
-                            <button
-                                type="button"
-                                onClick={handleSelectFileClick}
-                                disabled={isSaving}
-                                style={{
-                                    padding: "8px 16px",
-                                    backgroundColor: isSaving ? "#ccc" : "#0078d4",
-                                    color: isSaving ? "#666" : "white",
-                                    border: "none",
-                                    borderRadius: "4px",
-                                    cursor: isSaving ? "not-allowed" : "pointer",
-                                    marginBottom: "8px",
-                                    fontWeight: "bold"
-                                }}
-                            >
-                                {t("selectFile")}
-                            </button>
-
-                            {selectedFile && (
-                                <div style={{ marginTop: "8px" }}>
-                                    <div style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px",
-                                        padding: "8px",
-                                        backgroundColor: "var(--shade-100)",
-                                        borderRadius: "4px",
-                                        marginBottom: "8px"
-                                    }}>
-                                        {previewUrl && (
-                                            <img
-                                                src={previewUrl}
-                                                alt="Preview"
-                                                style={{
-                                                    maxWidth: "60px",
-                                                    maxHeight: "60px",
-                                                    objectFit: "contain",
-                                                    borderRadius: "4px"
-                                                }}
-                                            />
-                                        )}
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{
-                                                fontWeight: "bold",
-                                                overflow: "hidden",
-                                                textOverflow: "ellipsis",
-                                                whiteSpace: "nowrap"
-                                            }}>
-                                                {selectedFile.name}
-                                            </div>
-                                            <div style={{ fontSize: "12px", color: "var(--shade-500)" }}>
-                                                {(selectedFile.size / 1024).toFixed(1)} KB
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <label style={{ display: "block", marginBottom: "4px" }}>
-                                        {t("vaultPath")}
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={vaultPath}
-                                        onChange={(e) => setVaultPath(e.target.value)}
-                                        style={{
-                                            width: "100%",
-                                            padding: "6px",
-                                            boxSizing: "border-box",
-                                            border: "1px solid var(--shade-300)",
-                                            borderRadius: "4px",
-                                            backgroundColor: "var(--shade-50)",
-                                            color: "var(--shade-700)"
-                                        }}
-                                        placeholder="attachments/image.png"
-                                    />
-                                    <div style={{ fontSize: "12px", color: "var(--shade-500)", marginTop: "4px" }}>
-                                        {t("vaultPathHint")}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <div style={{ marginBottom: "8px" }}>
-                        <label style={{ display: "block", marginBottom: "4px" }}>
-                            {t("altText")}
-                        </label>
-                        <input
-                            type="text"
-                            value={alt}
-                            onChange={handleAltChange}
-                            style={{
-                                width: "100%",
-                                padding: "6px",
-                                boxSizing: "border-box",
-                                border: "1px solid var(--shade-300)",
-                                borderRadius: "4px",
-                                backgroundColor: "var(--shade-50)",
-                                color: "var(--shade-700)"
-                            }}
-                            placeholder={t("imageDescription")}
-                        />
-                    </div>
-
-                    <div style={{ marginBottom: "8px" }}>
-                        <label style={{ display: "block", marginBottom: "4px" }}>
-                            {t("title")}
-                        </label>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={handleTitleChange}
-                            style={{
-                                width: "100%",
-                                padding: "6px",
-                                boxSizing: "border-box",
-                                border: "1px solid var(--shade-300)",
-                                borderRadius: "4px",
-                                backgroundColor: "var(--shade-50)",
-                                color: "var(--shade-700)"
-                            }}
-                            placeholder={t("imageTitle")}
-                        />
-                    </div>
-
-                    <div style={{ display: "flex", gap: "8px" }}>
-                        <button
-                            type="submit"
-                            disabled={isSubmitDisabled}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                padding: "8px 16px",
-                                backgroundColor: isSubmitDisabled ? "#ccc" : "#0078d4",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
-                                cursor: isSubmitDisabled ? "not-allowed" : "pointer",
-                                fontWeight: "bold"
-                            }}
-                        >
-                            {isSaving ? t("saving") : t("register")}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            style={{
-                                padding: "8px 16px",
-                                backgroundColor: "var(--shade-100)",
-                                color: "var(--shade-700)",
-                                border: "1px solid var(--shade-300)",
-                                borderRadius: "4px",
-                                cursor: "pointer"
-                            }}
-                        >
-                            {t("cancel")}
-                        </button>
-                    </div>
-                </form>
-            </$FileDialog>
-        </>
-    )
+          <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+            <button type="submit" disabled={disabled}>{isSaving ? t("saving") : t("insert")}</button>
+            <button type="button" onClick={finish}>{t("cancel")}</button>
+          </div>
+        </form>
+      </$FileDialog>
+    </>
+  )
 }

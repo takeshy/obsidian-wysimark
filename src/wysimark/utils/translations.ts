@@ -52,6 +52,8 @@ interface Translations {
     register: string;
     imageSourceUrl: string;
     imageSourceFile: string;
+    vaultImageRequired: string;
+    vaultImagePlaceholder: string;
     selectFile: string;
     uploading: string;
     saving: string;
@@ -81,9 +83,9 @@ export const translations: Translations = {
     list: "リスト",
     linkUrl: "リンクのURL",
     linkTypeExternal: "外部",
-    linkTypeInternal: "内部",
-    internalLinkTarget: "内部リンク先",
-    internalLinkTargetHint: "例: Page または Folder/Page#Heading",
+    linkTypeInternal: "Vault",
+    internalLinkTarget: "Vaultファイル",
+    internalLinkTargetHint: "ファイルを選択後、必要なら #見出し を追加できます",
     internalLinkEmbed: "埋め込みとして挿入",
     internalLinkEmbedHint: "オンにすると ![[...]] として埋め込まれます",
     linkText: "リンクテキスト",
@@ -114,6 +116,8 @@ export const translations: Translations = {
     register: "登録",
     imageSourceUrl: "URL",
     imageSourceFile: "ファイル",
+    vaultImageRequired: "Vault内画像（必須）：",
+    vaultImagePlaceholder: "画像ファイルを選択またはパスを入力",
     selectFile: "ファイルを選択",
     uploading: "アップロード中...",
     saving: "保存中...",
@@ -140,9 +144,9 @@ export const translations: Translations = {
     list: "List",
     linkUrl: "Link URL",
     linkTypeExternal: "External",
-    linkTypeInternal: "Internal",
-    internalLinkTarget: "Internal Link Target",
-    internalLinkTargetHint: "Example: Page or Folder/Page#Heading",
+    linkTypeInternal: "Vault",
+    internalLinkTarget: "Vault File",
+    internalLinkTargetHint: "Select a file, then optionally append #Heading",
     internalLinkEmbed: "Insert as embed",
     internalLinkEmbedHint: "When on, inserts as ![[...]]",
     linkText: "Link Text",
@@ -173,6 +177,8 @@ export const translations: Translations = {
     register: "Register",
     imageSourceUrl: "URL",
     imageSourceFile: "File",
+    vaultImageRequired: "Vault image (required):",
+    vaultImagePlaceholder: "Select an image or enter its path",
     selectFile: "Select File",
     uploading: "Uploading...",
     saving: "Saving...",

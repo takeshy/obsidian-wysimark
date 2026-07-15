@@ -125,6 +125,7 @@ export function AnchorEditDialog({
       : Node.string(element)
   )
   const [title, setTitle] = useState<string>(element.title || "")
+  const vaultFilePaths = editor.wysimark.getVaultFilePaths?.() ?? []
 
   const formRef = useRef({ href, target, text, title, mode, embed })
   formRef.current = { href, target, text, title, mode, embed }
@@ -232,7 +233,17 @@ export function AnchorEditDialog({
           <>
             <$FormGroup>
               <$FormCaption>{t("internalLinkTarget")}</$FormCaption>
-              <$Input type="text" value={target} onChange={handleTargetChange} />
+              <$Input
+                type="text"
+                list="wysimark-vault-edit-link-files"
+                value={target}
+                onChange={handleTargetChange}
+              />
+              <datalist id="wysimark-vault-edit-link-files">
+                {vaultFilePaths.map((path) => (
+                  <option key={path} value={path} />
+                ))}
+              </datalist>
               <$FormHint>{t("internalLinkTargetHint")}</$FormHint>
             </$FormGroup>
             <$FormGroup>

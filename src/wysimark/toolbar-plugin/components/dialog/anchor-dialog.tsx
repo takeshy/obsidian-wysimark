@@ -82,6 +82,7 @@ export function AnchorDialog({
   const [title, setTitle] = useState(initialText)
   const [mode, setMode] = useState<LinkMode>("external")
   const [titleManuallyEdited, setTitleManuallyEdited] = useState(false)
+  const vaultFilePaths = editor.wysimark.getVaultFilePaths?.() ?? []
 
   const insertLink = () => {
     if (mode === "internal") {
@@ -218,6 +219,7 @@ export function AnchorDialog({
             {mode === "internal" ? (
               <$AnchorDialogInput
                 type="text"
+                list="wysimark-vault-link-files"
                 value={target}
                 autoFocus
                 placeholder={t("internalLinkTarget")}
@@ -235,6 +237,13 @@ export function AnchorDialog({
               />
             )}
           </$AnchorDialogInputLine>
+          {mode === "internal" ? (
+            <datalist id="wysimark-vault-link-files">
+              {vaultFilePaths.map((path) => (
+                <option key={path} value={path} />
+              ))}
+            </datalist>
+          ) : null}
           <$AnchorDialogInputLine style={{ marginTop: "0.5em" }}>
             <$AnchorDialogInput
               type="text"

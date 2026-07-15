@@ -27,6 +27,13 @@ export function useEditor({
 }): Editor & ReactEditor & WysimarkEditor {
   const [editor] = useState(() => {
     const editor = createEditor()
+    editor.wysimark = {
+      //   initialMarkdown,
+      //   initialValue: parse(initialMarkdown),
+      renderInternalLinkPreview,
+      renderInternalEmbed,
+      openInternalLink,
+    }
     const nextEditor = withSink(withReact(withHistory(editor)), {
       toolbar: {
         height,
@@ -40,13 +47,6 @@ export function useEditor({
       image: {}
     })
     nextEditor.convertElement.addConvertElementType("paragraph")
-    editor.wysimark = {
-      //   initialMarkdown,
-      //   initialValue: parse(initialMarkdown),
-      renderInternalLinkPreview,
-      renderInternalEmbed,
-      openInternalLink,
-    }
     editor.getMarkdown = () => {
       return serialize(editor.children as Element[])
     }

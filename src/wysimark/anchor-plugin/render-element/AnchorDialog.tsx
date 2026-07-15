@@ -191,21 +191,31 @@ export function AnchorDialog({
   destAnchor,
   destStartEdge,
   element,
+  embed,
 }: {
   destAnchor: HTMLElement
   destStartEdge: HTMLElement
-  element: AnchorElement
+  element?: AnchorElement
+  embed?: {
+    target: string
+    onEdit: () => void
+    onRemove: () => void
+  }
 }) {
   const dialog = useLayer("dialog")
   const editor = useSlateStatic()
   const ref = useRef<HTMLDivElement>(null)
-  const url = parseUrl(element.href)
-  const isInternalLink = isWikiLinkHref(element.href)
-  const internalTarget = isInternalLink
-    ? wikiLinkTarget(wikiLinkSpecFromHref(element.href))
-    : ""
+  const isEmbed = !!embed
+  const href = element?.href ?? ""
+  const url = parseUrl(href)
+  const isInternalLink = isEmbed || isWikiLinkHref(href)
+  const internalTarget = isEmbed
+    ? embed.target
+    : isWikiLinkHref(href)
+      ? wikiLinkTarget(wikiLinkSpecFromHref(href))
+      : ""
   const internalTitle = isInternalLink ? internalLinkPath(internalTarget) : ""
-  const internalPreview = isInternalLink
+  const internalPreview = isInternalLink && !isEmbed
     ? editor.wysimark.renderInternalLinkPreview?.(internalTarget)
     : null
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -251,10 +261,15 @@ export function AnchorDialog({
   }, [dialog, editor, internalTarget, isInternalLink])
 
   const removeLink = useCallback(() => {
-    editor.anchor.removeLink({ at: element })
+    if (embed) {
+      embed.onRemove()
+      dialog.close()
+      return
+    }
+    if (element) editor.anchor.removeLink({ at: element })
     // Close the dialog after removing the link
     dialog.close()
-  }, [editor, dialog])
+  }, [editor, dialog, embed, element])
 
   const openEditDialog = useCallback(() => {
     /**
@@ -263,6 +278,11 @@ export function AnchorDialog({
      * the icon through a mouse movement. The edit icon simply disappears.
      */
     editTooltip.onMouseLeave()
+    if (embed) {
+      embed.onEdit()
+      return
+    }
+    if (!element) return
     dialog.open(() => {
       return (
         <AnchorEditDialog
@@ -272,7 +292,7 @@ export function AnchorDialog({
         />
       )
     })
-  }, [destAnchor, destStartEdge, element])
+  }, [destAnchor, destStartEdge, element, embed, editTooltip, dialog])
 
   const iconButtons = (
     <span className={`--icons${isInternalLink ? " --internal-icons" : ""}`}>
@@ -323,15 +343,17 @@ export function AnchorDialog({
               {internalTitle}
             </div>
             {iconButtons}
-            <div className="--internal-preview">
-              {internalPreview ?? internalTarget}
-            </div>
+            {!isEmbed ? (
+              <div className="--internal-preview">
+                {internalPreview ?? internalTarget}
+              </div>
+            ) : null}
           </div>
         ) : (
           <div style={{ display: "flex", gap: "0.75em" }}>
             <a
               className="--link"
-              href={element.href}
+              href={href}
               target="_blank"
               rel="noreferrer"
             >
@@ -341,7 +363,7 @@ export function AnchorDialog({
                 {url.pathname === "" || url.pathname === "/" ? null : (
                   <div className="--pathname">{url.pathname}</div>
                 )}
-                {element.title == null || element.title === "" ? null : (
+                {element?.title == null || element.title === "" ? null : (
                   <div className="--tooltip">{element.title}</div>
                 )}
               </div>

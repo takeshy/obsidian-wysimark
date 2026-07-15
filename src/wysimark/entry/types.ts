@@ -11,13 +11,16 @@ export type OnImageSaveHandler = (file: File, path: string) => Promise<string>
 export type RenderInternalLinkPreview = (target: string) => ReactNode
 export type RenderInternalEmbed = (spec: string) => ReactNode
 export type OpenInternalLinkHandler = (target: string) => void | Promise<void>
+export type GetVaultImagePathsHandler = () => string[]
+export type GetVaultFilePathsHandler = () => string[]
 
 export type ImageDialogState = {
+  imageSource: "file" | "url" | "vault"
   url: string
   alt: string
   title: string
-  imageSource: "url" | "file"
   vaultPath: string
+  vaultImagePath: string
   selectedFile?: File
 }
 
@@ -35,6 +38,16 @@ export type WysimarkEditor = {
      * Handler for saving image to vault
      */
     onImageSave?: OnImageSaveHandler
+
+    /**
+     * Get the current image paths available in the host vault.
+     */
+    getVaultImagePaths?: GetVaultImagePathsHandler
+
+    /**
+     * Get the current file paths available in the host vault.
+     */
+    getVaultFilePaths?: GetVaultFilePathsHandler
 
     /**
      * Handler for image change (drag/drop)

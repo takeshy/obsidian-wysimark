@@ -6,6 +6,7 @@ import { parse, serialize, escapeUrlSlashes } from "../convert"
 import { throttle } from "../utils/throttle"
 import { SinkEditable } from "./SinkEditable"
 import { useEditor } from "./useEditor"
+import type { GetVaultFilePathsHandler, GetVaultImagePathsHandler } from "./types"
 
 export type { Element, Text } from "./plugins"
 
@@ -33,6 +34,8 @@ export type EditableProps = {
   className?: string
   style?: React.CSSProperties
   onImageSave?: OnImageSaveHandler
+  getVaultImagePaths?: GetVaultImagePathsHandler
+  getVaultFilePaths?: GetVaultFilePathsHandler
 } // & Omit<React.TextareaHTMLAttributes<HTMLDivElement>, "onChange">
 
 export function Editable({
@@ -44,6 +47,8 @@ export function Editable({
   className,
   style,
   onImageSave,
+  getVaultImagePaths,
+  getVaultFilePaths,
 }: EditableProps) {
   const ignoreNextChangeRef = useRef<boolean>(false)
 
@@ -199,6 +204,8 @@ export function Editable({
 
   // Set the onImageSave handler on the editor
   editor.wysimark.onImageSave = onImageSave;
+  editor.wysimark.getVaultImagePaths = getVaultImagePaths;
+  editor.wysimark.getVaultFilePaths = getVaultFilePaths;
 
   return (
     <Slate

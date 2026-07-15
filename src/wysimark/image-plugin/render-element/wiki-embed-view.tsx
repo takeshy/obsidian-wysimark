@@ -1,47 +1,17 @@
 import styled from "@emotion/styled"
-import { useCallback, useRef } from "react"
-import type { MouseEvent } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { Transforms } from "slate"
-import { ReactEditor, useSelected, useSlateStatic } from "slate-react"
+import { ReactEditor, useSelected, useSlate } from "slate-react"
 
-import { wikiEmbedSpecFromUrl } from "../../convert/obsidian-links"
-import { CloseIcon, PencilIcon } from "../../anchor-plugin/render-element/icons"
+import { wikiEmbedSpecFromUrl, wikiLinkTarget } from "../../convert/obsidian-links"
+import { AnchorDialog } from "../../anchor-plugin/render-element/AnchorDialog"
 import { AnchorEditDialog } from "../../anchor-plugin/render-element/AnchorEditDialog"
-import { t } from "../../utils/translations"
 import { useLayer } from "../../use-layer"
 import { ImageBlockElement, ImageInlineElement } from "../types"
 
 const $WikiEmbed = styled("span")`
   position: relative;
   display: inline-block;
-
-  .--wiki-embed-toolbar {
-    position: absolute;
-    top: 0.25em;
-    right: 0.25em;
-    display: flex;
-    gap: 0.125em;
-    padding: 0.125em;
-    border-radius: 0.25em;
-    background: var(--shade-100);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
-  }
-
-  .--wiki-embed-toolbar button {
-    display: flex;
-    align-items: center;
-    border: 0;
-    border-radius: 0.1875em;
-    padding: 0.1875em;
-    color: var(--shade-500);
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .--wiki-embed-toolbar button:hover {
-    color: var(--shade-700);
-    background: white;
-  }
 `
 
 /**
@@ -54,7 +24,7 @@ export function WikiEmbedView({
 }: {
   element: ImageInlineElement | ImageBlockElement
 }) {
-  const editor = useSlateStatic()
+  const editor = useSlate()
   const selected = useSelected()
   const dialog = useLayer("dialog")
   const embedRef = useRef<HTMLSpanElement>(null)
@@ -62,9 +32,7 @@ export function WikiEmbedView({
   const renderInternalEmbed = editor.wysimark.renderInternalEmbed
   const spec = wikiEmbedSpecFromUrl(element.url)
 
-  const handleEdit = useCallback((e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleEdit = useCallback(() => {
     const fallbackAnchor = embedRef.current
     const fallbackStartEdge = startEdgeRef.current
     if (!fallbackAnchor || !fallbackStartEdge) return
@@ -97,27 +65,41 @@ export function WikiEmbedView({
     })
   }, [dialog, editor, element, spec])
 
-  const handleRemove = (e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleRemove = useCallback(() => {
     const at = ReactEditor.findPath(editor, element)
     Transforms.removeNodes(editor, { at })
-  }
+  }, [editor, element])
+
+  useEffect(() => {
+    const anchor = embedRef.current
+    const startEdge = startEdgeRef.current
+    if (!anchor || !startEdge) return
+    const hasSelection =
+      editor.selection &&
+      editor.selection.anchor.offset !== editor.selection.focus.offset
+    if (selected && !hasSelection) {
+      window.setTimeout(() => {
+        dialog.open(() => (
+          <AnchorDialog
+            destAnchor={anchor}
+            destStartEdge={startEdge}
+            embed={{
+              target: wikiLinkTarget(spec),
+              onEdit: handleEdit,
+              onRemove: handleRemove,
+            }}
+          />
+        ))
+      })
+    } else {
+      dialog.close()
+    }
+  }, [selected, spec])
 
   return (
-    <$WikiEmbed ref={embedRef} contentEditable={false} onMouseDown={handleEdit}>
+    <$WikiEmbed ref={embedRef} contentEditable={false}>
       <span ref={startEdgeRef} style={{ display: "none" }} />
       {renderInternalEmbed?.(spec)}
-      {selected ? (
-        <span className="--wiki-embed-toolbar">
-          <button type="button" title={t("edit")} onMouseDown={handleEdit}>
-            <PencilIcon width="1em" height="1em" />
-          </button>
-          <button type="button" title={t("remove")} onMouseDown={handleRemove}>
-            <CloseIcon width="1em" height="1em" />
-          </button>
-        </span>
-      ) : null}
     </$WikiEmbed>
   )
 }
