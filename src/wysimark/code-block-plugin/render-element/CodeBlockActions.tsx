@@ -60,7 +60,7 @@ export function CodeBlockActions({ element }: CodeBlockActionsProps) {
           event.preventDefault()
           event.stopPropagation()
         }}
-        onClick={copyBlock}
+        onClick={(event) => void copyBlock(event)}
       >
         ⧉
       </$CodeBlockActionButton>
@@ -72,7 +72,7 @@ export function CodeBlockActions({ element }: CodeBlockActionsProps) {
           event.preventDefault()
           event.stopPropagation()
         }}
-        onClick={cutBlock}
+        onClick={(event) => void cutBlock(event)}
       >
         ✂
       </$CodeBlockActionButton>
