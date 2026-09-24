@@ -1,10 +1,11 @@
 import { useCallback, useRef } from "react"
-import { Descendant, Editor, Element, Transforms } from "slate"
+import { Descendant, Editor, Element } from "slate"
 import { RenderLeafProps, Slate } from "slate-react"
 
 import { parse, serialize, escapeUrlSlashes } from "../convert"
 import { throttle } from "../utils/throttle"
 import { SinkEditable } from "./SinkEditable"
+import { replaceDocument } from "./replace-document"
 import { useEditor } from "./useEditor"
 import type { GetVaultFilePathsHandler, GetVaultImagePathsHandler } from "./types"
 
@@ -179,11 +180,16 @@ export function Editable({
     const diffFromLastEmitted = value !== lastEmittedValueRef.current
     if (diffFromPrevValue && diffFromLastEmitted) {
       ignoreNextChangeRef.current = true
+      onThrottledSlateChange.cancel()
       const valueToProcess = escapeUrlSlashes(value);
       const documentValue = parse(valueToProcess)
-      editor.children = documentValue
-      editor.selection = null
-      Transforms.select(editor, Editor.start(editor, [0]))
+      replaceDocument(editor, documentValue)
+      prevValueRef.current = editor.children
+      editor.wysimark.prevValue = {
+        markdown: value,
+        children: editor.children,
+      }
+      lastEmittedValueRef.current = value
     }
   }
 

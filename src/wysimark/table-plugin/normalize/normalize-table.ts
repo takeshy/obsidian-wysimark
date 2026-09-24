@@ -1,4 +1,4 @@
-import { Editor, NodeEntry, Transforms } from "slate"
+import { Editor, Node, NodeEntry, Transforms } from "slate"
 
 import { TableElement } from "../types"
 
@@ -6,15 +6,18 @@ export function normalizeTableIndexes(
   editor: Editor,
   entry: NodeEntry<TableElement>
 ): boolean {
+  const [table, path] = entry
+  if (!Node.has(editor, path) || Node.get(editor, path) !== table) return false
+
   let isTransformed = false
-  const rowElements = entry[0].children
-  rowElements.forEach((rowElement, y) => {
-    const cellElements = rowElement.children
-    cellElements.forEach((cellElement, x) => {
-      if (cellElement.x !== x || cellElement.y !== y) {
-        Transforms.setNodes(editor, { x, y }, { at: [...entry[1], y, x] })
-        isTransformed = true
-      }
+  Editor.withoutNormalizing(editor, () => {
+    table.children.forEach((rowElement, y) => {
+      rowElement.children.forEach((cellElement, x) => {
+        if (cellElement.x !== x || cellElement.y !== y) {
+          Transforms.setNodes(editor, { x, y }, { at: [...path, y, x] })
+          isTransformed = true
+        }
+      })
     })
   })
   return isTransformed
