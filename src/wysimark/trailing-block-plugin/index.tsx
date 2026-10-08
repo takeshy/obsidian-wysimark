@@ -39,7 +39,7 @@ export const TrailingBlockPlugin = createPlugin<TrailingBlockPluginCustomType>(
           ) {
             Transforms.insertNodes(
               editor,
-              { type: "paragraph", children: [{ text: "" }] },
+              { type: "paragraph", __collapsible: true, children: [{ text: "" }] },
               {
                 at: Path.next(lastPath),
               }

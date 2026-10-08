@@ -8,6 +8,7 @@ import { ImagePlugin } from "../image-plugin"
 import { BlockQuotePlugin } from "../block-quote-plugin"
 import { CodeBlockPlugin } from "../code-block-plugin"
 import { HtmlBlockPlugin } from "../html-block-plugin"
+import { LinkDefinitionPlugin } from "../link-definition-plugin"
 import { CollapsibleParagraphPlugin } from "../collapsible-paragraph-plugin"
 import { ConvertElementPlugin } from "../convert-element-plugin"
 import { HeadingPlugin } from "../heading-plugin"
@@ -35,6 +36,7 @@ export const plugins = [
   BlockQuotePlugin,
   CodeBlockPlugin,
   HtmlBlockPlugin,
+  LinkDefinitionPlugin,
   TablePlugin,
   HorizontalRulePlugin,
   TrailingBlockPlugin,
@@ -51,7 +53,12 @@ export const plugins = [
 export type PluginTypes = ExtractCustomTypes<typeof plugins>
 
 type CustomEditor = PluginTypes["Editor"]
-type CustomElement = PluginTypes["Element"]
+type CustomElement = PluginTypes["Element"] & {
+  __markdownLeadingNewlines?: number
+  __markdownTrailingNewlines?: number
+  __markdownCompactAfter?: boolean
+  __markdownLineEnding?: "\r\n" | "\r"
+}
 type CustomText = PluginTypes["Text"]
 
 export type OptionsType = PluginTypes["Options"]

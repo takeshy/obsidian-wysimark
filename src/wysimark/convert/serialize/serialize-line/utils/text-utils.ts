@@ -2,7 +2,7 @@
 // These are the only characters `\` can escape, so a `\` not followed by one
 // of them is a literal backslash (e.g. Windows paths like `C:\Users`).
 function isAsciiPunct(ch: string): boolean {
-  return /[!-/:-@[-`{-~]/.test(ch)
+  return /[!-/:-@\[-`{-~]/.test(ch)
 }
 
 function isWhitespace(ch: string): boolean {
@@ -47,7 +47,7 @@ function getDelimitersThatCanPair(
       rightFlanking && (intraword || !leftFlanking || isPunctOrSymbol(next))
 
     if (canClose && openers.length > 0) {
-      escaped.add(openers.pop())
+      escaped.add(openers.pop() as number)
       escaped.add(i)
     }
     if (canOpen) openers.push(i)
@@ -69,7 +69,7 @@ function getTildesThatCanPair(chars: string[]): Set<number> {
     const canClose = !isWhitespace(prev)
 
     if (canClose && openers.length > 0) {
-      escaped.add(openers.pop())
+      escaped.add(openers.pop() as number)
       escaped.add(i)
     }
     if (canOpen) openers.push(i)
@@ -82,12 +82,16 @@ function getTildesThatCanPair(chars: string[]): Set<number> {
 // reference: a `[...]` pair whose `]` is directly followed by `(`, or a `[`
 // directly followed by `^`. Shortcut reference links (`[foo]` alone) cannot
 // resolve because parse inlines all reference links and drops definitions.
-function getBracketsThatCanFormLinks(chars: string[]): Set<number> {
+function getBracketsThatCanFormLinks(
+  chars: string[],
+  enableInternalLinks = false
+): Set<number> {
   const escaped = new Set<number>()
   const openers: number[] = []
 
   for (let i = 0; i < chars.length; i++) {
     if (chars[i] === "[") {
+      if (enableInternalLinks && chars[i + 1] === "[") escaped.add(i)
       if (chars[i + 1] === "^") escaped.add(i)
       openers.push(i)
     } else if (chars[i] === "]") {
@@ -103,11 +107,13 @@ function getBracketsThatCanFormLinks(chars: string[]): Set<number> {
 }
 
 export type EscapeTextOptions = {
+  inTable?: boolean
   /**
    * Inside a `[label](url)` anchor, an unbalanced bracket in the label text
    * would change where the label ends, so brackets are always escaped there.
    */
   inAnchorLabel?: boolean
+  enableInternalLinks?: boolean
   /**
    * Whether backticks in this text could pair with another backtick run in
    * the same line (a sibling text node or a code mark) to form a code span.
@@ -140,7 +146,10 @@ export function escapeText(s: string, options: EscapeTextOptions = {}) {
   const emphasisUnderscores = getDelimitersThatCanPair(chars, "_", false)
   const emphasisAsterisks = getDelimitersThatCanPair(chars, "*", true)
   const strikethroughTildes = getTildesThatCanPair(chars)
-  const linkBrackets = getBracketsThatCanFormLinks(chars)
+  const linkBrackets = getBracketsThatCanFormLinks(
+    chars,
+    options.enableInternalLinks
+  )
   const escapeBackticks =
     options.escapeBackticks ?? chars.filter((c) => c === "`").length >= 2
   let result = ""
@@ -168,10 +177,12 @@ export function escapeText(s: string, options: EscapeTextOptions = {}) {
   }
 
   // Escape characters that only have special meaning at the start of a line
-  result = result.replace(/^(#{1,6})(\s)/m, "\\$1$2") // headings
-  result = result.replace(/^(\d+)([.)]\s)/m, "$1\\$2") // ordered list
-  result = result.replace(/^([-+*>])\s/m, "\\$1 ") // list / blockquote
-  result = result.replace(/\[\[/g, "\\[[")
+  result = result.replace(/^( {0,3})(#{1,6})(?=\s|$)/gm, "$1\\$2")
+  result = result.replace(/^( {0,3})(\d+)([.)])(?=\s|$)/gm, "$1$2\\$3")
+  result = result.replace(/^( {0,3})([-+*>])(?=\s|$)/gm, "$1\\$2")
+  result = result.replace(/^( {0,3})([-_])(?=(?:[ \t]*\2){2,}[ \t]*$)/gm, "$1\\$2")
+  // Setext heading underlines: any run of `=` or `-` alone on a line
+  result = result.replace(/^( {0,3})([=-])(?=\2*[ \t]*$)/gm, "$1\\$2")
 
   return result
 }

@@ -59,6 +59,8 @@ export const LanguageList: BuiltInLanguage[] = [
 ]
 
 type CodeBlockMethods = {
+  toggleCodeBlock: () => void
+  convertCodeBlockToParagraph: () => boolean
   createCodeBlock: (options: { language: BuiltInLanguage }) => void
   setCodeBlockLanguage: (
     language: BuiltInLanguage,
@@ -81,6 +83,7 @@ export type CodeBlockElement = {
    * `BuiltInLanguage`
    */
   language: string
+  meta?: string
   children: CodeBlockLineElement[]
 }
 

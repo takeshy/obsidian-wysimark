@@ -14,7 +14,10 @@ import { findElementUp } from "../.."
 export function insertRootElement(
   editor: Editor,
   element: Element,
-  { at = editor.selection }: { at?: Location | null } = {}
+  { at = editor.selection, select = false }: {
+    at?: Location | null
+    select?: boolean
+  } = {}
 ): boolean {
   /**
    * If there's no `at` then insertion does not happen
@@ -35,8 +38,10 @@ export function insertRootElement(
      */
     const selection = editor.selection
     Editor.withoutNormalizing(editor, () => {
-      Transforms.insertNodes(editor, element, { at })
-      if (selection) {
+      Transforms.insertNodes(editor, element, { at, select })
+      // Selecting the inserted node avoids restoring paths removed by a
+      // replacement spanning several blocks.
+      if (selection && !select) {
         Transforms.select(editor, selection)
         Transforms.move(editor)
       }

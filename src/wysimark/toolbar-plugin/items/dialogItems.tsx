@@ -23,6 +23,7 @@ export const dialogItems: MenuItemData[] = [
   {
     icon: Icon.Table,
     title: t("insertTable"),
+    hotkey: "super+t",
     more: true,
     Component: TableDialog,
   },

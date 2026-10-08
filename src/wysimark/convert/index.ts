@@ -3,7 +3,7 @@
 
 export { parse } from "./parse"
 export { serialize } from "./serialize"
-export { escapeUrlSlashes, unescapeUrlSlashes } from "./utils"
+export { unescapeMarkdown } from "./utils"
 
 /**
  * Takes a Markdown string as input and returns a remarkParse AST

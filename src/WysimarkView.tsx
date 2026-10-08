@@ -1,8 +1,11 @@
-import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin, App, MarkdownRenderer, Component } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, normalizePath, Plugin, App, MarkdownRenderer, Component, Scope } from 'obsidian';
+import type { Editor } from 'slate';
 import * as React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { Editable, useEditor, OnImageSaveHandler } from './wysimark/entry';
 import { wikiLinkTarget } from './wysimark/convert/obsidian-links';
+import { getLineEnding, withLineEnding, LineEnding } from './wysimark/convert/line-endings';
+import { handleScopedHotkey } from './wysimark/entry/scoped-hotkeys';
 
 export const VIEW_TYPE_WYSIMARK = 'wysimark-view';
 
@@ -273,6 +276,7 @@ function WysimarkEditorComponent({
   fileName,
   onReload,
   onImageSave,
+  connectEditor,
 }: {
   initialValue: string;
   onChange: (markdown: string) => void;
@@ -281,6 +285,7 @@ function WysimarkEditorComponent({
   fileName: string;
   onReload: () => void;
   onImageSave?: OnImageSaveHandler;
+  connectEditor: (editor: Editor) => () => void;
 }) {
   const openInternalLink = React.useCallback(async (target: string) => {
     await plugin.app.workspace.openLinkText(target, file.path, false, {
@@ -333,6 +338,7 @@ function WysimarkEditorComponent({
     renderInternalEmbed,
     renderMermaidPreview,
   });
+  React.useEffect(() => connectEditor(editor), [connectEditor, editor]);
   // Use initialValue only on mount, manage internally afterwards
   const [value] = React.useState(initialValue);
 
@@ -369,6 +375,7 @@ function WysimarkContainer({
   onImageSave,
   reloadKey,
   plugin,
+  connectEditor,
 }: {
   file: TFile | null;
   content: string;
@@ -377,6 +384,7 @@ function WysimarkContainer({
   onImageSave?: OnImageSaveHandler;
   reloadKey: number;
   plugin: Plugin;
+  connectEditor: (editor: Editor) => () => void;
 }) {
   if (!file) {
     return <EmptyState />;
@@ -388,6 +396,7 @@ function WysimarkContainer({
       initialValue={content}
       onChange={onChange}
       plugin={plugin}
+      connectEditor={connectEditor}
       file={file}
       fileName={file.basename}
       onReload={onReload}
@@ -403,14 +412,30 @@ export class WysimarkView extends ItemView {
   fileContent: string = '';
   private frontmatter: string = '';  // Store frontmatter separately
   private bodyContent: string = '';  // Store body content (without frontmatter)
+  private lineEnding: LineEnding = '\n';
   private saveTimeout: number | null = null;
   private isDirty: boolean = false;
   private reactContainer: HTMLElement | null = null;
   private reloadKey: number = 0;  // Used to force React component remount on reload
+  private editor: Editor | null = null;
+
+  private connectEditor = (editor: Editor) => {
+    this.editor = editor;
+    return () => {
+      if (this.editor === editor) this.editor = null;
+    };
+  };
 
   constructor(leaf: WorkspaceLeaf, plugin: Plugin) {
     super(leaf);
     this.plugin = plugin;
+    this.scope = new Scope(this.app.scope);
+    this.scope.register(null, null, (event) => {
+      const target = event.target as HTMLElement | null;
+      if (!this.editor || !target?.closest?.('[data-slate-editor="true"]') ||
+        !this.reactContainer?.contains(target)) return;
+      if (handleScopedHotkey(this.editor, event)) return false;
+    });
   }
 
   getViewType(): string {
@@ -422,7 +447,7 @@ export class WysimarkView extends ItemView {
   }
 
   getIcon(): string {
-    return 'edit-3';
+    return 'pencil';
   }
 
   async onOpen(): Promise<void> {
@@ -493,6 +518,7 @@ export class WysimarkView extends ItemView {
     this.frontmatter = frontmatter;
     this.bodyContent = body;
     this.fileContent = rawContent;
+    this.lineEnding = getLineEnding(rawContent);
     this.isDirty = false;
 
     this.renderEditor();
@@ -518,6 +544,7 @@ export class WysimarkView extends ItemView {
     this.frontmatter = frontmatter;
     this.bodyContent = body;
     this.fileContent = rawContent;
+    this.lineEnding = getLineEnding(rawContent);
     this.isDirty = false;
 
     // Increment reloadKey to force React component remount
@@ -535,6 +562,8 @@ export class WysimarkView extends ItemView {
   }
 
   handleChange = (markdown: string) => {
+    markdown = withLineEnding(markdown, this.lineEnding);
+    if (markdown === this.bodyContent) return;
     // Update body content and combine with frontmatter for full file content
     this.bodyContent = markdown;
     this.fileContent = combineFrontmatter(this.frontmatter, markdown);
@@ -604,6 +633,7 @@ export class WysimarkView extends ItemView {
         onImageSave={this.handleImageSave}
         reloadKey={this.reloadKey}
         plugin={this.plugin}
+        connectEditor={this.connectEditor}
       />
     );
   }

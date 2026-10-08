@@ -64,7 +64,7 @@ export function CodeBlock({
     <$CodeBlock className={selected ? "--selected" : ""} {...attributes}>
       {selected && focused ? <CodeBlockActions element={element} /> : null}
       <$CodeBlockLanguage contentEditable={false} onClick={onClick} ref={ref}>
-        <span>{element.language}</span>
+        <span>{element.language || "text"}</span>
         <ChevronDownIcon />
       </$CodeBlockLanguage>
       <$CodeBlockScroller>{children}</$CodeBlockScroller>

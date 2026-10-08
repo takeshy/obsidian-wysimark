@@ -88,7 +88,8 @@ export function normalizeSegment(
    * If the two Text segments have the same marks, then merge them
    */
   const marksEqual = areMarksEqual(mutablePrevSegment, segment)
-  if (marksEqual) {
+  if (marksEqual && mutablePrevSegment.softBreak === segment.softBreak &&
+    mutablePrevSegment.html === segment.html && !mutablePrevSegment.footnote && !segment.footnote) {
     mutablePrevSegment.text = [mutablePrevSegment.text, segment.text].join("")
     return []
   }

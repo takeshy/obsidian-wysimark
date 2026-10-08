@@ -30,8 +30,16 @@ export function sliceSpacesAtNodeBoundaries({
    * The content of Inline Code is literal so don't move the spaces out of it.
    */
   if (node.code) return false
-  const match = node.text.match(/^(\s*)(.*?)(\s*)$/)
+  if (node.html || node.footnote) return false
+  // A soft break must stay one leaf with its marks so it serializes as a bare newline.
+  if (node.softBreak) return false
+  const match = node.text.match(/^(\s*)([\s\S]*?)(\s*)$/)
   if (!match) return false
+  /**
+   * A whitespace-only node (e.g. a lone line break) has nothing to slice off;
+   * splitting it would recreate the same node forever.
+   */
+  if (match[2] === "") return false
   if (match[1].length === 0 && match[3].length === 0) return false
   const nextSegments: Text[] = [
     { text: match[1] },

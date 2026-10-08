@@ -1,6 +1,7 @@
 import type { Blockquote } from "mdast"
 import { Descendant } from "slate"
 
+import { InternalLinkOptions } from "../obsidian-links"
 import { Element } from "../types"
 import { parseContents } from "./parse-content"
 
@@ -37,6 +38,8 @@ function splitCalloutMarker(elements: Element[]): Element[] {
   if (!firstChild || !("text" in firstChild)) return elements
   if (!/^\[![A-Za-z0-9_-]+\][+-]?/.test(firstChild.text)) return elements
 
+  // The title can span several leaves (e.g. a bold title). Looking only at
+  // the first leaf used to discard the rest of the title and the body.
   const split = splitFirstLine(first.children)
   if (!split) return elements
 
@@ -47,9 +50,14 @@ function splitCalloutMarker(elements: Element[]): Element[] {
   ]
 }
 
-export function parseBlockquote(content: Blockquote): Element[] {
-  return [{
-    type: "block-quote",
-    children: splitCalloutMarker(parseContents(content.children)),
-  }]
+export function parseBlockquote(
+  content: Blockquote,
+  options: InternalLinkOptions = {}
+): Element[] {
+  return [
+    {
+      type: "block-quote",
+      children: splitCalloutMarker(parseContents(content.children, options)),
+    },
+  ]
 }

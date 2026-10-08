@@ -100,7 +100,7 @@ export function Toolbar() {
     }
   }, [])
   return (
-    <$ToolbarContainer ref={ref}>
+    <$ToolbarContainer ref={ref} data-wysimark-toolbar>
       <$Toolbar>
         {items.map((item, index) => (
           <ToolbarItem

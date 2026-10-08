@@ -1,4 +1,5 @@
 import { ImageBlockElement } from "../../../image-plugin/types"
+import { InternalLinkOptions } from "../../obsidian-links"
 
 import { serializeImageShared } from "../serialize-image-shared"
 
@@ -14,7 +15,10 @@ import { serializeImageShared } from "../serialize-image-shared"
  *   Correct:   ![alt](url)\n\n# Heading
  *   Incorrect: ![alt](url)# Heading  <- heading becomes plain text
  */
-export function serializeImageBlock(element: ImageBlockElement): string {
-  const imageMarkdown = serializeImageShared(element)
+export function serializeImageBlock(
+  element: ImageBlockElement,
+  options: InternalLinkOptions = {}
+): string {
+  const imageMarkdown = serializeImageShared(element, options)
   return imageMarkdown ? `${imageMarkdown}\n\n` : ""
 }

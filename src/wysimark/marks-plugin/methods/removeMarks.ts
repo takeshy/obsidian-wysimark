@@ -1,5 +1,7 @@
 import { Editor, Location, Text, Transforms } from "slate"
 
+import { isNonMarkTextKey } from "../non-mark-keys"
+
 /**
  * Toggles a mark.
  *
@@ -24,7 +26,7 @@ export function removeMarks(
   const setter: Record<string, null> = {}
   for (const [node] of nodeEntries) {
     for (const key of Object.keys(node)) {
-      if (key === "text") continue
+      if (key === "text" || isNonMarkTextKey(key)) continue
       setter[key] = null
     }
   }

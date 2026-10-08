@@ -19,6 +19,7 @@ export type AnchorElement = {
   href: string
   target?: string
   title?: string
+  markdownSyntax?: "literal" | "autolink"
   children: Descendant[]
 }
 

@@ -71,6 +71,9 @@ export function ToolbarButton({
   return (
     <$ToolbarButton
       data-item-type="button"
+      role="button"
+      aria-label={item.title}
+      aria-pressed={item.active ? !!isActive : undefined}
       ref={ref}
       onMouseEnter={onMouseEnter}
       onMouseLeave={tooltip.onMouseLeave}

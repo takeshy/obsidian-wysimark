@@ -3,7 +3,7 @@ import { isHotkey } from "is-hotkey"
 import { isMac } from "../core-utils/is-mac"
 
 export function isBetterHotkey(hotkey: string) {
-  const modifiedHotkey = hotkey.replace(
+  const modifiedHotkey = hotkey.replace(/\bmod\b/g, isMac() ? "meta" : "ctrl").replace(
     /\bsuper\b/g,
     isMac() ? "cmd+alt" : "ctrl+shift"
   )

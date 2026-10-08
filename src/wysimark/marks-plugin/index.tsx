@@ -1,5 +1,5 @@
 import { clsx } from "clsx"
-import { Editor, Location, Range, Text } from "slate"
+import { Editor, Path, Range, Text, Transforms } from "slate"
 
 import {
   createHotkeyHandler,
@@ -8,20 +8,8 @@ import {
 } from "../sink"
 
 import { createMarksMethods } from "./methods"
+import { NON_MARK_TEXT_KEYS, withoutNonMarkTextKeys } from "./non-mark-keys"
 import { $MarksSpan } from "./styles"
-
-type MarksMethods = {
-  removeMarks: (options?: { at?: Location | null }) => void
-  toggleMark: (
-    markKey: keyof Text,
-    unsetKey?: keyof Text,
-    options?: { at?: Location | null }
-  ) => void
-  toggleBold: () => void
-  toggleItalic: () => void
-  toggleUnderline: () => void
-  toggleStrike: () => void
-}
 
 export type MarksEditor = {
   /**
@@ -30,7 +18,7 @@ export type MarksEditor = {
    * This cannot be named `marks` because it conflicts with the `editor.marks`
    * built into the BaseEditor.j
    */
-  marksPlugin: MarksMethods
+  marksPlugin: ReturnType<typeof createMarksMethods>
   activeMarks?: {
     bold?: boolean
     italic?: boolean
@@ -42,6 +30,14 @@ export type MarksEditor = {
 
 export type MarksText = {
   text: string
+  /** A source Markdown soft break, rather than an explicit line break. */
+  softBreak?: true
+  html?: true
+  /** The identifier of a footnote reference; the text is only its label. */
+  footnote?: string
+  kbd?: true
+  sup?: true
+  sub?: true
   bold?: true
   italic?: true
   underline?: true
@@ -55,16 +51,48 @@ export type MarksPluginCustomTypes = {
   Text: MarksText
 }
 
+/**
+ * Footnote references, soft breaks and raw inline HTML are stored as leaves
+ * whose whole text is serialized specially. Text typed at their edge must go
+ * into a new sibling leaf; otherwise it would become part of the footnote
+ * identifier, the soft break, or the unescaped HTML source.
+ *
+ * Typing inside raw HTML (not at an edge) still edits the HTML source.
+ */
+function insertTextBesideStructuralLeaf(editor: Editor, text: string): boolean {
+  const { selection } = editor
+  if (!selection || !Range.isCollapsed(selection)) return false
+  const { path, offset } = selection.anchor
+  const [leaf] = Editor.leaf(editor, path)
+  if (!NON_MARK_TEXT_KEYS.some((key) => leaf[key])) return false
+  const atStart = offset === 0
+  const atEnd = offset === leaf.text.length
+  if (leaf.html && !atStart && !atEnd) return false
+  const marks = withoutNonMarkTextKeys(
+    editor.marks ?? Editor.marks(editor) ?? {}
+  ) as Omit<Text, "text">
+  Transforms.insertNodes(
+    editor,
+    { ...marks, text },
+    { at: atStart && !atEnd ? path : Path.next(path), select: true }
+  )
+  editor.marks = null
+  return true
+}
+
 export const MarksPlugin = createPlugin<MarksPluginCustomTypes>((editor) => {
   editor.marksPlugin = createMarksMethods(editor)
   editor.activeMarks = {}
-  const hotkeyHandler = createHotkeyHandler({
+  const hotkeys = {
     "mod+b": editor.marksPlugin.toggleBold,
     "mod+i": editor.marksPlugin.toggleItalic,
     "mod+u": editor.marksPlugin.toggleUnderline,
-    "super+0": editor.marksPlugin.removeMarks,
     "super+k": editor.marksPlugin.toggleStrike,
-  })
+    ...(!editor.wysimark.disableHighlight && {
+      "mod+h": editor.marksPlugin.toggleHighlight,
+    }),
+  }
+  const hotkeyHandler = createHotkeyHandler(hotkeys)
   // Override insertText to apply active marks
   const { insertText: defaultInsertText } = editor
   editor.insertText = (text) => {
@@ -77,6 +105,8 @@ export const MarksPlugin = createPlugin<MarksPluginCustomTypes>((editor) => {
         }
       })
     }
+    if (editor.marks) editor.marks = withoutNonMarkTextKeys(editor.marks)
+    if (insertTextBesideStructuralLeaf(editor, text)) return
     defaultInsertText(text)
   }
 
@@ -98,6 +128,10 @@ export const MarksPlugin = createPlugin<MarksPluginCustomTypes>((editor) => {
     name: "marks",
     editableProps: {
       renderLeaf: ({ leaf, children }) => {
+        if (leaf.footnote) children = <sup>{children}</sup>
+        if (leaf.kbd) children = <kbd>{children}</kbd>
+        if (leaf.sup) children = <sup>{children}</sup>
+        if (leaf.sub) children = <sub>{children}</sub>
         return (
           <$MarksSpan
             className={clsx({

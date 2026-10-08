@@ -1,4 +1,4 @@
-import { Descendant } from "slate"
+import { Descendant, Element, Transforms } from "slate"
 
 import {
   createHotkeyHandler,
@@ -32,6 +32,15 @@ export const CollapsibleParagraphPlugin =
   createPlugin<CollapsibleParagraphPluginCustomTypes>((editor) => {
     const { insertBreak } = editor
     editor.insertBreak = () => {
+      /**
+       * Pressing Enter in an editor-only spacer paragraph means the user wants
+       * real blank lines there. Without this, both halves of the split inherit
+       * `__collapsible`, so they are merged away and never serialized.
+       */
+      Transforms.unsetNodes(editor, "__collapsible", {
+        match: (node) =>
+          Element.isElement(node) && node.type === "paragraph" && !!node.__collapsible,
+      })
       // Enter = new paragraph, Shift+Enter = soft break (handled in onKeyDown)
       insertBreak()
     }
@@ -47,6 +56,8 @@ export const CollapsibleParagraphPlugin =
     editor.convertElement.addConvertElementType("paragraph")
     editor.collapsibleParagraph = {
       convertParagraph: () => {
+        editor.marksPlugin?.removeMarks()
+        if (editor.codeBlock?.convertCodeBlockToParagraph()) return
         editor.convertElement.convertElements<ParagraphElement>(
           () => false,
           {

@@ -1,13 +1,22 @@
 const WIKI_LINK_PREFIX = "wysimark:wiki-link:"
 const WIKI_EMBED_PREFIX = "wysimark:wiki-embed:"
 const ESCAPED_WIKI_OPEN = "\uE000WYSIMARK_ESCAPED_WIKI_OPEN\uE000"
+const ESCAPED_WIKI_CLOSE = "\uE000WYSIMARK_ESCAPED_WIKI_CLOSE\uE000"
 
-export function protectEscapedWikiLinks(markdown: string): string {
-  return markdown.replace(/\\\[\[/g, ESCAPED_WIKI_OPEN)
+export type InternalLinkOptions = {
+  enableInternalLinks?: boolean
 }
 
-export function restoreEscapedWikiLinks(text: string): string {
-  return text.replace(new RegExp(ESCAPED_WIKI_OPEN, "g"), "[[")
+export function protectEscapedWikiLinks(markdown: string): string {
+  return markdown
+    .replace(/\\\[\[/g, ESCAPED_WIKI_OPEN)
+    .replace(/\\\]/g, ESCAPED_WIKI_CLOSE)
+}
+
+export function restoreEscapedWikiLinks(text: string, literal = false): string {
+  return text
+    .replace(new RegExp(ESCAPED_WIKI_OPEN, "g"), literal ? "\\[[" : "[[")
+    .replace(new RegExp(ESCAPED_WIKI_CLOSE, "g"), literal ? "\\]" : "]")
 }
 
 export function wikiLinkHref(rawSpec: string): string {
@@ -34,10 +43,7 @@ export function wikiEmbedSpecFromUrl(url: string): string {
   return decodeURIComponent(url.slice(WIKI_EMBED_PREFIX.length))
 }
 
-export function splitWikiSpec(rawSpec: string): {
-  target: string
-  display?: string
-} {
+export function splitWikiSpec(rawSpec: string): { target: string; display?: string } {
   const pipeIndex = rawSpec.lastIndexOf("|")
   if (pipeIndex < 0) return { target: rawSpec.trim() }
   return {
@@ -88,9 +94,10 @@ export function wikiLinkDisplayText(rawSpec: string): string {
 export function serializeWikiLinkHref(href: string, label: string): string {
   const rawSpec = wikiLinkSpecFromHref(href)
   const { target, display } = splitWikiSpec(rawSpec)
-  if (display) return `[[${target}|${display}]]`
 
   const trimmedLabel = label.trim()
+  if (display && trimmedLabel === display) return `[[${target}|${display}]]`
+
   const defaultLabel = wikiLinkDisplayText(target)
   if (trimmedLabel && trimmedLabel !== defaultLabel) {
     return `[[${target}|${trimmedLabel}]]`

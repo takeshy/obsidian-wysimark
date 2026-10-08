@@ -4,6 +4,7 @@ import { BetterAt, findElementUp } from "../../sink"
 import { wikiLinkDisplayText, wikiLinkHref } from "../../convert/obsidian-links"
 import { AnchorElement } from ".."
 import { ImageBlockElement, ImageInlineElement } from "../../image-plugin/types"
+import type { ParagraphElement } from "../../collapsible-paragraph-plugin"
 
 /**
  * Replace the internal embed with an internal link anchor (`[[spec]]`), then
@@ -29,16 +30,13 @@ export function convertToLink(
   }
 
   if (element.type === "image-block") {
+    const paragraph: ParagraphElement = {
+      type: "paragraph",
+      children: [{ text: "" }, anchor, { text: "" }],
+    }
     Editor.withoutNormalizing(editor, () => {
       Transforms.removeNodes(editor, { at: path })
-      Transforms.insertNodes(
-        editor,
-        {
-          type: "paragraph",
-          children: [{ text: "" }, anchor, { text: "" }],
-        },
-        { at: path }
-      )
+      Transforms.insertNodes(editor, paragraph, { at: path })
     })
     const anchorPath = [...path, 1]
     Transforms.select(editor, anchorPath)

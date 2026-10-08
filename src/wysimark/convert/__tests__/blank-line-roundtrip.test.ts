@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { describe, it } from "node:test"
 import assert from "node:assert"
 import { parse } from "../parse"
@@ -6,15 +5,15 @@ import { serialize } from "../serialize"
 import type { Element } from "../types"
 
 describe("blank line round-trip", () => {
-  it("preserves a single blank line between paragraphs (NBSP marker)", () => {
-    const input = "text A\n\n\u00A0\n\ntext B"
+  it("preserves a single blank line between paragraphs (ordinary newlines)", () => {
+    const input = "text A\n\n\ntext B"
     const parsed = parse(input)
     const serialized = serialize(parsed)
     assert.strictEqual(serialized, input)
   })
 
-  it("preserves multiple blank lines between paragraphs (NBSP markers)", () => {
-    const input = "text A\n\n\u00A0\n\n\u00A0\n\ntext B"
+  it("preserves multiple blank lines between paragraphs (ordinary newlines)", () => {
+    const input = "text A\n\n\n\ntext B"
     const parsed = parse(input)
     const serialized = serialize(parsed)
     assert.strictEqual(serialized, input)
@@ -28,7 +27,7 @@ describe("blank line round-trip", () => {
     const parsed = parse(input)
     assert.strictEqual(parsed.length, 4) // textA + 2 empty + textB
     const serialized = serialize(parsed)
-    assert.strictEqual(serialized, "text A\n\n\u00A0\n\n\u00A0\n\ntext B")
+    assert.strictEqual(serialized, "text A\n\n\n\ntext B")
   })
 
   it("preserves a single extra blank line via MDAST position gap", () => {
@@ -38,24 +37,24 @@ describe("blank line round-trip", () => {
     const parsed = parse(input)
     assert.strictEqual(parsed.length, 3) // textA + 1 empty + textB
     const serialized = serialize(parsed)
-    assert.strictEqual(serialized, "text A\n\n\u00A0\n\ntext B")
+    assert.strictEqual(serialized, "text A\n\n\ntext B")
   })
 
-  it("preserves blank line at start of document (NBSP marker)", () => {
-    const input = "\u00A0\n\ntext A"
+  it("preserves blank line at start of document (ordinary newlines)", () => {
+    const input = "\ntext A"
     const parsed = parse(input)
     const serialized = serialize(parsed)
     assert.strictEqual(serialized, input)
   })
 
-  it("preserves blank line at end of document (NBSP marker)", () => {
-    const input = "text A\n\n\u00A0"
+  it("preserves blank line at end of document (ordinary newlines)", () => {
+    const input = "text A\n"
     const parsed = parse(input)
     const serialized = serialize(parsed)
     assert.strictEqual(serialized, input)
   })
 
-  it("round-trip: empty paragraph in Slate tree serializes to NBSP and parses back", () => {
+  it("round-trip: empty paragraph in Slate tree serializes to newlines and parses back", () => {
     // Simulate what happens when user enters a blank line in WYSIWYG
     const slateTree: Element[] = [
       { type: "paragraph", children: [{ text: "text A" }] },
@@ -63,7 +62,7 @@ describe("blank line round-trip", () => {
       { type: "paragraph", children: [{ text: "text B" }] },
     ] as Element[]
     const serialized = serialize(slateTree)
-    assert.strictEqual(serialized, "text A\n\n\u00A0\n\ntext B")
+    assert.strictEqual(serialized, "text A\n\n\ntext B")
     const parsed = parse(serialized)
     assert.strictEqual(parsed.length, 3)
     assert.deepStrictEqual(parsed[0], { type: "paragraph", children: [{ text: "text A" }] })

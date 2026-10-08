@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { describe, it } from "node:test"
 import assert from "node:assert"
 import { parse } from "../parse"
@@ -11,7 +10,7 @@ import type { Element } from "../types"
  * same markdown.
  */
 describe("escape round-trip", () => {
-  describe("parse -> serialize leaves plain text untouched", () => {
+  describe("parse → serialize leaves plain text untouched", () => {
     const inputs = [
       "a | b",
       "foo|bar",
@@ -33,7 +32,7 @@ describe("escape round-trip", () => {
     }
   })
 
-  describe("serialize -> parse keeps literal text literal", () => {
+  describe("serialize → parse keeps literal text literal", () => {
     const texts = [
       "[a](b)",
       "![a](b)",
@@ -52,7 +51,7 @@ describe("escape round-trip", () => {
         const markdown = serialize(tree)
         const reparsed = parse(markdown)
         assert.strictEqual(reparsed.length, 1)
-        const paragraph = reparsed[0]
+        const paragraph = reparsed[0] as Element
         assert.strictEqual(paragraph.type, "paragraph")
         assert.deepStrictEqual(paragraph.children, [{ text }])
       })
@@ -105,7 +104,7 @@ describe("escape round-trip", () => {
       ]
       const markdown = serialize(tree)
       assert.match(markdown, /a\\\|b/)
-      const reparsed = parse(markdown)
+      const reparsed = parse(markdown) as Element[]
       assert.strictEqual(reparsed[0].type, "table")
     })
 
@@ -140,7 +139,7 @@ describe("escape round-trip", () => {
   describe("highlight", () => {
     it("round-trips inline mark tags as highlight text", () => {
       const input = "<mark>highlight</mark>"
-      const parsed = parse(input)
+      const parsed = parse(input) as Element[]
 
       assert.deepStrictEqual(parsed, [
         {

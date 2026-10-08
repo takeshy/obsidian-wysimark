@@ -63,8 +63,10 @@ export const CodeBlockPlugin = createPlugin<CodeBlockPluginCustomTypes>(
       editableProps: {
         decorate,
         onKeyDown: createHotkeyHandler({
-          "super+`": () =>
-            editor.codeBlock.createCodeBlock({ language: "text" }),
+          ...(!editor.wysimark.disableCodeBlock && {
+            "super+`": () => editor.codeBlock.toggleCodeBlock(),
+            "mod+shift+n": () => editor.codeBlock.toggleCodeBlock(),
+          }),
           "mod+a": () => {
             /**
              * When selection is in code-block and the user pressed mod+a,

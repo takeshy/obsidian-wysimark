@@ -10,33 +10,39 @@ A modern WYSIWYG Markdown editor plugin for Obsidian. Edit your notes with a ric
 
 Edit your Markdown files visually with a familiar word processor-like interface. The editor automatically converts between Markdown and rich text format.
 
+### Markdown Saving
+
+The vendored editor includes the Markdown preservation fixes from `wysimark-lite 1.0.0`. Repeated saves preserve code URLs, table cell content, line breaks, footnotes, internal links, and paragraphs or code within list items. Editor-only spacer paragraphs are omitted, and blank lines use ordinary newlines rather than non-breaking spaces. Table layout and list indentation may be normalized.
+
 ### Text Formatting
 
 - **Bold** (`Ctrl/Cmd + B`)
 - *Italic* (`Ctrl/Cmd + I`)
-- ~~Strikethrough~~ (`Ctrl/Cmd + K`)
+- ~~Strikethrough~~ (`Cmd + Option + K` / `Ctrl + Shift + K`)
 - `Inline Code` (`Ctrl/Cmd + J`)
 - <u>Underline</u> (`Ctrl/Cmd + U`)
 
+Formatting buttons stay visible in narrow sidebars and highlight the formatting at the current cursor or selection. While the editor is focused, its formatting shortcuts take priority over Obsidian's global commands.
+
 ### Headings
 
-- Heading 1 (`Ctrl/Cmd + Alt + 1`)
-- Heading 2 (`Ctrl/Cmd + Alt + 2`)
-- Heading 3 (`Ctrl/Cmd + Alt + 3`)
-- Normal paragraph (`Ctrl/Cmd + Alt + 0`)
+- Heading 1 (`Cmd + Option + 1` / `Ctrl + Shift + 1`)
+- Heading 2 (`Cmd + Option + 2` / `Ctrl + Shift + 2`)
+- Heading 3 (`Cmd + Option + 3` / `Ctrl + Shift + 3`)
+- Normal paragraph (`Cmd + Option + 0` / `Ctrl + Shift + 0`)
 
 ### Lists
 
-- Bullet lists (`Ctrl/Cmd + Alt + 8`)
-- Numbered lists (`Ctrl/Cmd + Alt + 7`)
-- Task/Check lists (`Ctrl/Cmd + Alt + 9`)
+- Bullet lists (`Cmd + Option + 8` / `Ctrl + Shift + 8`)
+- Numbered lists (`Cmd + Option + 7` / `Ctrl + Shift + 7`)
+- Task/Check lists (`Cmd + Option + 9` / `Ctrl + Shift + 9`)
 - Increase indent (`Tab`)
 - Decrease indent (`Shift + Tab`)
 
 ### Block Elements
 
-- Block quotes (`Ctrl/Cmd + Alt + .`)
-- Code blocks with syntax highlighting
+- Block quotes (`Cmd + Option + .` / `Ctrl + Shift + .`)
+- Code blocks with syntax highlighting (`Cmd/Ctrl + Shift + N`; press again to turn the block off)
 - HTML blocks (iframe, video embeds, etc.) - displayed as read-only blocks and preserved as raw HTML
 - Callouts (`> [!note]`, `> [!warning]`, etc.) rendered with their icon and color
 - Mermaid code blocks rendered as live diagram previews
@@ -53,7 +59,7 @@ Edit your Markdown files visually with a familiar word processor-like interface.
 
 ### Links and Images
 
-- Insert links (`Ctrl/Cmd + K`) with text and tooltip
+- Insert links (`Cmd + Option + K` / `Ctrl + Shift + K`) with text and tooltip
 - Edit existing links (URL, text, and tooltip)
 - Selected text becomes link text automatically
 - Insert images from URL
@@ -87,10 +93,12 @@ Plugin page: https://community.obsidian.md/plugins/wysimark-editor
 
 ## Usage
 
-1. After enabling the plugin, a Wysimark panel will appear in the right sidebar
-2. Click on any Markdown file in your vault to open it in the Wysimark editor
+1. Enable Wysimark Editor in Settings > Community plugins (installing alone does not enable it)
+2. Open a Markdown file and click the pencil icon labeled "Wysimark editor" in the left ribbon to open the editor in the right sidebar. You can also run "Wysimark Editor: Toggle sidebar" from the command palette
 3. Edit your content using the toolbar or keyboard shortcuts
 4. Changes are saved automatically
+
+If the icon is missing, check that the ribbon is visible and that "Wysimark editor" is enabled in the ribbon's right-click menu.
 
 ## Development
 

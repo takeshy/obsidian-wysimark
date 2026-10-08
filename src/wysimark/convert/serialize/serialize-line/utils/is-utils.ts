@@ -41,6 +41,6 @@ export function isElement(
  */
 export function isPlainSpace(segment: Segment): boolean {
   return (
-    Slate.Text.isText(segment) && !!segment.text.match(/^\s+$/) && !segment.code
+    Slate.Text.isText(segment) && !!segment.text.match(/^[ \t]+$/) && !segment.code
   )
 }

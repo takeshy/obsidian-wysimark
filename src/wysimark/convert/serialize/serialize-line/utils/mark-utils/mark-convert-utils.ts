@@ -3,6 +3,10 @@ import { MarkKey } from "../../../../types"
 export const MARK_KEY_TO_OPEN_TOKEN = {
   bold: "**",
   italic: "_",
+  underline: "<u>",
+  kbd: "<kbd>",
+  sup: "<sup>",
+  sub: "<sub>",
   // ins: "++",
   strike: "~~",
   highlight: "<mark>",
@@ -23,6 +27,10 @@ export const MARK_KEY_TO_OPEN_TOKEN = {
 export const MARK_KEY_TO_CLOSE_TOKEN = {
   bold: "**",
   italic: "_",
+  underline: "</u>",
+  kbd: "</kbd>",
+  sup: "</sup>",
+  sub: "</sub>",
   // ins: "++",
   strike: "~~",
   highlight: "</mark>",

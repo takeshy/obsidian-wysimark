@@ -56,6 +56,10 @@ export const ListPlugin = createPlugin<ListPluginCustomTypes>(
             )
             return true
           }
+          if (element.blockChildren) {
+            Transforms.unwrapNodes(editor, { at: path })
+            return true
+          }
           editor.collapsibleParagraph.convertParagraph()
           return true
         },

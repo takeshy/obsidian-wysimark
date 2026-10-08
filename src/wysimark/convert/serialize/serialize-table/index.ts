@@ -6,16 +6,20 @@ import {
   TableRowElement,
 } from "../../../table-plugin"
 
+import { InternalLinkOptions } from "../../obsidian-links"
 import { Segment } from "../../types"
 import { assert, assertElementType } from "../../utils"
 import { serializeLine } from "../serialize-line"
 
-export function serializeTable(element: TableElement): string {
+export function serializeTable(
+  element: TableElement,
+  options: InternalLinkOptions = {}
+): string {
   const lines: string[] = []
-  lines.push(serializeTableRow(element.children[0]))
+  lines.push(serializeTableRow(element.children[0], options))
   lines.push(serializeColumns(element.columns))
   element.children.slice(1).forEach((row) => {
-    lines.push(serializeTableRow(row))
+    lines.push(serializeTableRow(row, options))
   })
   return `${lines.join("\n")}\n\n`
 }
@@ -49,12 +53,18 @@ function serializeAlign(align: TableColumnAlign) {
   }
 }
 
-function serializeTableRow(element: TableRowElement): string {
+function serializeTableRow(
+  element: TableRowElement,
+  options: InternalLinkOptions
+): string {
   assertElementType(element, "table-row")
-  return `|${element.children.map(serializeTableCell).join("|")}|`
+  return `|${element.children.map((cell) => serializeTableCell(cell, options)).join("|")}|`
 }
 
-function serializeTableCell(element: TableCellElement): string {
+function serializeTableCell(
+  element: TableCellElement,
+  options: InternalLinkOptions
+): string {
   assertElementType(element, "table-cell")
   assert(
     element.children.length === 1,
@@ -62,12 +72,15 @@ function serializeTableCell(element: TableCellElement): string {
       element.children
     )}`
   )
-  return element.children.map(serializeTableContent).join("")
+  return element.children.map((child) => serializeTableContent(child, options)).join("")
 }
 
-function serializeTableContent(element: TableContentElement): string {
+function serializeTableContent(
+  element: TableContentElement,
+  options: InternalLinkOptions
+): string {
   assertElementType(element, "table-content")
-  const line = serializeLine(element.children as Segment[])
+  const line = serializeLine(element.children as Segment[], [], [], { ...options, inTable: true })
   // GFM splits a row into cells on unescaped pipes before any inline parsing,
   // so every pipe in a cell (even inside code spans or URLs) must be escaped.
   // Pipes outside of tables are literal and `escapeText` leaves them alone.

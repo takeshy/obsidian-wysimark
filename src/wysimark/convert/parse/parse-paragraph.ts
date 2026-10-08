@@ -1,7 +1,9 @@
 import type { Paragraph } from "mdast"
+import { Descendant } from "slate"
 
 import { ImageBlockElement, ImageInlineElement } from "../../image-plugin/types"
 
+import { InternalLinkOptions } from "../obsidian-links"
 import { Element, Segment } from "../types"
 import { parsePhrasingContents } from "./parse-phrasing-content/parse-phrasing-content"
 
@@ -14,22 +16,17 @@ function isImageBlock(segments: Segment[]): boolean {
   return true
 }
 
-const NBSP = "\u00A0"
-
-function isSingleNBSP(segments: Segment[]): boolean {
-  if (segments.length !== 1) return false
-  if (!("text" in segments[0]) || segments[0].text !== NBSP) return false
-  return true
-}
-
 /**
  * Parses to a Paragraph or an ImageBlock element.
  *
  * We need to do it this way because an ImageBlock is a Paragraph that happens
  * to have exactly one ImageInline child.
  */
-export function parseParagraph(content: Paragraph): Element[] {
-  const segments = parsePhrasingContents(content.children)
+export function parseParagraph(
+  content: Paragraph,
+  options: InternalLinkOptions = {}
+): Element[] {
+  const segments = parsePhrasingContents(content.children, {}, options)
   if (isImageBlock(segments)) {
     const imageSegment = segments[1] as ImageInlineElement
     const imageBlockElement: ImageBlockElement = {
@@ -38,19 +35,10 @@ export function parseParagraph(content: Paragraph): Element[] {
     }
     return [imageBlockElement]
   }
-  if (isSingleNBSP(segments)) {
-    return [
-      {
-        type: "paragraph",
-        children: [{ text: "" }],
-      },
-    ]
-  }
-
   return [
     {
       type: "paragraph",
-      children: segments,
+      children: segments as Descendant[],
     },
   ]
 }

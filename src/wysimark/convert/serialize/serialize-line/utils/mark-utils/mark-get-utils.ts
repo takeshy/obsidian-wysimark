@@ -1,15 +1,16 @@
 import { Text as SlateText } from "slate"
 
 import { MarkKey, Segment, Text } from "../../../../types"
+import { isNonMarkTextKey } from "../../../../../marks-plugin/non-mark-keys"
 import { isPlainSpace, isText } from "../is-utils"
 
 /**
  * Gets all the marks in current `Text`
  */
 export function getMarksFromText(text: Text): MarkKey[] {
-  const { text: _textContent, ...marks } = text
-  void _textContent
-  return Object.keys(marks) as (keyof typeof marks)[]
+  return Object.keys(text).filter(
+    (key) => key !== "text" && !isNonMarkTextKey(key)
+  ) as MarkKey[]
 }
 
 /**

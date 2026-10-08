@@ -34,6 +34,13 @@ function BlockQuote({
     ReactEditor.focus(editor)
   }
 
+  if (element.footnoteIdentifier) {
+    return <div {...attributes} id={`footnote-${element.footnoteIdentifier}`}>
+      <sup contentEditable={false}>{element.footnoteIdentifier}</sup>
+      {children}
+    </div>
+  }
+
   if (callout && !isEditing) {
     return (
       <$Callout
@@ -73,6 +80,7 @@ export type BlockQuoteEditor = {
 
 export type BlockQuoteElement = {
   type: "block-quote"
+  footnoteIdentifier?: string
   children: Descendant[]
 }
 

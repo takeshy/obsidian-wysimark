@@ -2,11 +2,12 @@ import { useCallback, useRef } from "react"
 import { Descendant, Editor, Element } from "slate"
 import { RenderLeafProps, Slate } from "slate-react"
 
-import { parse, serialize, escapeUrlSlashes } from "../convert"
+import { parse, serialize } from "../convert"
 import { throttle } from "../utils/throttle"
 import { SinkEditable } from "./SinkEditable"
 import { replaceDocument } from "./replace-document"
 import { useEditor } from "./useEditor"
+import { MarkdownChangeTracker } from "./markdown-change-tracker"
 import type { GetVaultFilePathsHandler, GetVaultImagePathsHandler } from "./types"
 
 export type { Element, Text } from "./plugins"
@@ -51,7 +52,7 @@ export function Editable({
   getVaultImagePaths,
   getVaultFilePaths,
 }: EditableProps) {
-  const ignoreNextChangeRef = useRef<boolean>(false)
+  const changeTrackerRef = useRef<MarkdownChangeTracker | undefined>(undefined)
 
   /**
    * This is a temporary ref that is only used once to store the initial value
@@ -77,9 +78,8 @@ export function Editable({
    * Throttled version of `onChange` for the `Slate` component. This method gets
    * called on every change to the editor except for:
    *
-   * - The first call to `onChange` when the component is mounted which would
-   *   be in response to the initial normalization pass that is always run to
-   *   make sure the content is in a good state.
+   * - Changes that serialize to the normalized document loaded initially.
+   *   Initialization and cursor movement must not rewrite the source file.
    * - When the incoming value (markdown) to the editor is changed and we force
    *   the editor to update its value after doing a `parse` on the markdown.
    *   We don't want the `onChange` callback to be called for this because if
@@ -98,12 +98,14 @@ export function Editable({
     throttle(
       () => {
         const markdown = serialize(editor.children as Element[])
+        const changed = changeTrackerRef.current?.next(markdown)
+        if (changed === undefined) return
         editor.wysimark.prevValue = {
-          markdown,
+          markdown: changed,
           children: editor.children,
         }
-        lastEmittedValueRef.current = markdown
-        onChangeRef.current(markdown)
+        lastEmittedValueRef.current = changed
+        onChangeRef.current(changed)
       },
       throttleInMs,
       { leading: false, trailing: true }
@@ -121,11 +123,6 @@ export function Editable({
    */
   const onSlateChange = useCallback(
     (nextValue: Descendant[]) => {
-      if (ignoreNextChangeRef.current) {
-        ignoreNextChangeRef.current = false
-        prevValueRef.current = nextValue
-        return
-      }
       if (prevValueRef.current === nextValue) {
         return
       }
@@ -146,17 +143,18 @@ export function Editable({
    * ref can be lost on a hot reload. This then reinitializes the editor with
    * the initial value.
    *
-   * NOTE: This value hasn't been normalized yet.
+   * Normalize before recording the baseline so initialization cannot count
+   * as a user edit, even when Slate emits multiple mount notifications.
    */
   if (editor.wysimark.prevValue == null || initialValueRef.current == null) {
-    ignoreNextChangeRef.current = true
-    const valueToProcess = escapeUrlSlashes(value);
-    const children = parse(valueToProcess)
+    const children = parse(value)
     editor.children = children
-    prevValueRef.current = initialValueRef.current = children
+    Editor.normalize(editor, { force: true })
+    prevValueRef.current = initialValueRef.current = editor.children
+    changeTrackerRef.current = new MarkdownChangeTracker(value, serialize(editor.children as Element[]))
     editor.wysimark.prevValue = {
       markdown: value, // Store the original unescaped value
-      children,
+      children: editor.children,
     }
     lastEmittedValueRef.current = value
   } else {
@@ -179,12 +177,11 @@ export function Editable({
     const diffFromPrevValue = value !== editor.wysimark.prevValue.markdown
     const diffFromLastEmitted = value !== lastEmittedValueRef.current
     if (diffFromPrevValue && diffFromLastEmitted) {
-      ignoreNextChangeRef.current = true
       onThrottledSlateChange.cancel()
-      const valueToProcess = escapeUrlSlashes(value);
-      const documentValue = parse(valueToProcess)
+      const documentValue = parse(value)
       replaceDocument(editor, documentValue)
       prevValueRef.current = editor.children
+      changeTrackerRef.current = new MarkdownChangeTracker(value, serialize(editor.children as Element[]))
       editor.wysimark.prevValue = {
         markdown: value,
         children: editor.children,

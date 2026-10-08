@@ -6,5 +6,6 @@ import { Editor, Element } from "slate"
  * `editor.convertElement.addConvertElementType` method.
  */
 export function isConvertElement(editor: Editor, element: Element): boolean {
+  if ("blockChildren" in element && element.blockChildren) return false
   return editor.convertElement.convertElementTypes.includes(element.type)
 }

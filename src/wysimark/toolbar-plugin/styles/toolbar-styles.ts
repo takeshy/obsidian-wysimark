@@ -38,10 +38,12 @@ export const $ToolbarContainer = styled("div")`
   height: calc(
     3em + 1px
   ); // $ToolbarDivider height + border-bottom of 1px above
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 `
 
 export const $Toolbar = styled("div")`
+  white-space: nowrap;
   display: inline-block;
   height: calc(
     3em + 1px
@@ -83,8 +85,9 @@ export const $ToolbarButton = styled("div")`
     pointer-events: none;
   }
   &.--active {
-    color: var(--shade-700);
-    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-on-accent, var(--blue-700));
+    background: var(--interactive-accent, var(--blue-100));
+    border-color: var(--interactive-accent, var(--blue-300));
     svg {
       /* stroke-width: 2px; */
     }
@@ -99,6 +102,10 @@ export const $ToolbarButton = styled("div")`
       svg {
         /* stroke-width: 2px; */
       }
+    }
+    &.--active:hover {
+      color: var(--text-on-accent, var(--blue-700));
+      background: var(--interactive-accent-hover, var(--blue-200));
     }
   }
 

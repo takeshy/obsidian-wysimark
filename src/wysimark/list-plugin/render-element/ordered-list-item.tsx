@@ -21,6 +21,7 @@ export function OrderedListItem({
   const style = {
     marginLeft: `${2 + element.depth * 2}em`,
     "--list-item-var": `list-item-depth-${element.depth}`,
+    counterReset: element.start != null ? `list-item-depth-${element.depth} ${element.start - 1}` : undefined,
   } as React.CSSProperties
   const className = clsx({ "--first-at-depth": element.__firstAtDepth })
   return (

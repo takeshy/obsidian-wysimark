@@ -1,7 +1,12 @@
 import { ImageSharedElement } from "../../../image-plugin/types"
-import { isWikiEmbedUrl, serializeWikiEmbedUrl } from "../../obsidian-links"
+import {
+  InternalLinkOptions,
+  isWikiEmbedUrl,
+  serializeWikiEmbedUrl,
+} from "../../obsidian-links"
 
 import { serializeGenericImageUrl } from "./serialize-generic-image-url"
+import { serializeLinkDestination, serializeLinkTitle } from "../serialize-link-destination"
 import { serializePortiveImageUrl } from "./serialize-portive-image-url"
 import { serializeUncommonmarkImageUrl } from "./serialize-uncommonmark-image-url"
 
@@ -11,8 +16,13 @@ const urlSerializers = [
   serializeGenericImageUrl,
 ]
 
-export function serializeImageShared(image: ImageSharedElement): string {
-  if (isWikiEmbedUrl(image.url)) return serializeWikiEmbedUrl(image.url)
+export function serializeImageShared(
+  image: ImageSharedElement,
+  options: InternalLinkOptions = {}
+): string {
+  if (options.enableInternalLinks && isWikiEmbedUrl(image.url)) {
+    return serializeWikiEmbedUrl(image.url)
+  }
 
   for (const urlSerializer of urlSerializers) {
     const url = urlSerializer(image)
@@ -24,8 +34,8 @@ export function serializeImageShared(image: ImageSharedElement): string {
        * invalid. This happens when the image is uploading.
        */
       if (url === "") return ""
-      return `![${image.alt}](${url}${
-        typeof image.title === "string" ? ` "${image.title}"` : ""
+      return `![${(image.alt || "").replace(/[\\[\]]/g, "\\$&")}](${serializeLinkDestination(url)}${
+        typeof image.title === "string" ? ` "${serializeLinkTitle(image.title)}"` : ""
       })`
     }
   }

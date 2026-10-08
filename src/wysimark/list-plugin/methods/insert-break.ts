@@ -9,6 +9,9 @@ export function insertBreak(editor: Editor): boolean {
   const entry = findElementUp<ListItemElement>(editor, isListItem)
   if (!entry) return false
   const [element, path] = entry
+  // Rich list items contain independently editable blocks. Let Slate split
+  // the current paragraph rather than splitting the surrounding list item.
+  if (element.blockChildren) return false
 
   /**
    * If we're in an empty list
@@ -37,6 +40,9 @@ export function insertBreak(editor: Editor): boolean {
    */
   const nextEntry = findElementUp<ListItemElement>(editor, isListItem)
   if (!nextEntry) return true
+  if (nextEntry[0].type === "ordered-list-item" && nextEntry[0].start != null) {
+    Transforms.unsetNodes(editor, "start", { at: nextEntry[1] })
+  }
   /**
    * And if it's a checked task list that is checked, we want to uncheck it.
    * New list items are by default always unchecked.

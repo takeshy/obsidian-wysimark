@@ -13,12 +13,14 @@ export function serializeSegment(
   options?: EscapeTextOptions
 ): string {
   if (SlateText.isText(segment)) {
+    if (segment.html) return segment.text
+    if (segment.footnote) return `[^${segment.footnote}]`
     /**
      * If the segment is a `code` segment, we need to use a different strategy
      * for escaping the `code` segment. This is why it needs a separate
      * serializing function.
      */
-    if (segment.code) return serializeCodeText(segment)
+    if (segment.code) return serializeCodeText(segment, options)
     /**
      * Otherwise, we use the standard text escaping code.
      */
@@ -29,7 +31,7 @@ export function serializeSegment(
       return serializeAnchor(segment, options)
     }
     case "image-inline":
-      return serializeImageShared(segment)
+      return serializeImageShared(segment, options)
     default:
       assertUnreachable(segment)
   }

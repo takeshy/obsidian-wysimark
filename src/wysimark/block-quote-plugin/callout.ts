@@ -55,3 +55,7 @@ export function getCalloutInfo(element: BlockQuoteElement): CalloutInfo | null {
     icon: icons[type] || icons.note,
   }
 }
+
+export function isCalloutBlockQuote(node: Node): node is BlockQuoteElement {
+  return Element.isElement(node) && node.type === "block-quote" && getCalloutInfo(node) !== null
+}

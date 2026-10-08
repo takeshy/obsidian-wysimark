@@ -3,7 +3,7 @@ import { createEditor, Editor } from "slate"
 import { withHistory } from "slate-history"
 import { ReactEditor, withReact } from "slate-react"
 
-import { parse, serialize, escapeUrlSlashes } from "../convert"
+import { parse, serialize } from "../convert"
 import { Element } from "./plugins"
 import { withSink } from "./SinkEditable"
 import { replaceDocument } from "./replace-document"
@@ -55,9 +55,7 @@ export function useEditor({
       return serialize(editor.children as Element[])
     }
     editor.setMarkdown = (markdown: string) => {
-      // Escape forward slashes in URLs before parsing
-      const escapedMarkdown = escapeUrlSlashes(markdown);
-      const documentValue = parse(escapedMarkdown)
+      const documentValue = parse(markdown)
       replaceDocument(editor, documentValue)
     }
     return nextEditor

@@ -30,6 +30,11 @@ export type WysimarkEditor = {
    * Private state for the wysimark editor.
    */
   wysimark: {
+    enableInternalLinks?: boolean
+    disableCodeBlock?: boolean
+    disableHighlight?: boolean
+    disableTaskList?: boolean
+
     prevValue?: {
       markdown: string
       children: Descendant[]

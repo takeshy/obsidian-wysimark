@@ -2,12 +2,15 @@ import { Editor, Transforms } from "slate"
 
 import { curryOne } from "../../sink"
 
-import { parse, escapeUrlSlashes } from "../../convert"
+import { parse } from "../../convert"
 
 function pasteMarkdown(editor: Editor, markdown: string) {
-  // Escape forward slashes in URLs before parsing
-  const escapedMarkdown = escapeUrlSlashes(markdown);
-  const fragment = parse(escapedMarkdown)
+
+  const fragment = parse(markdown)
+  for (const element of fragment) {
+    delete element.__markdownLeadingNewlines
+    delete element.__markdownTrailingNewlines
+  }
   Transforms.insertNodes(editor, fragment)
 }
 

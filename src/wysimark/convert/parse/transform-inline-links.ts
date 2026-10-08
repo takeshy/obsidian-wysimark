@@ -24,15 +24,6 @@ export function transformInlineLinks(tree: Root): void {
   visit(tree as unknown as Node, (n: Node, index: number | undefined, p: Parent | undefined) => {
     const node = n as unknown as Content
     const parent = p ?? null
-    if (
-      node.type === "definition" &&
-      parent !== null &&
-      typeof index === "number"
-    ) {
-      parent.children.splice(index, 1)
-      return [SKIP, index]
-    }
-
     if (node.type === "imageReference" || node.type === "linkReference") {
       const identifier =
         "identifier" in node && typeof node.identifier === "string"

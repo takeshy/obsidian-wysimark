@@ -15,6 +15,8 @@ import { serializeCodeLine } from "./serialize-code-line"
  */
 export function serializeCodeBlock(codeBlock: CodeBlockElement): string {
   const lines: string[] = []
+  const info = `${codeBlock.language}${codeBlock.meta ? ` ${codeBlock.meta}` : ""}`
+  const fence = info.includes("`") ? "~" : "`"
   /**
    * Start with the default number of backticks
    */
@@ -28,7 +30,7 @@ export function serializeCodeBlock(codeBlock: CodeBlockElement): string {
      * Check if it starts with any backticks and if it does, make our backticks
      * one larger than the largest one.
      */
-    const match = lineOfCode.match(/^([`]+)/)
+    const match = lineOfCode.match(fence === "`" ? /^ {0,3}([`]+)/ : /^ {0,3}([~]+)/)
     if (match) backticks = Math.max(backticks, match[1].length + 1)
     /**
      * Add it to our lines
@@ -39,7 +41,7 @@ export function serializeCodeBlock(codeBlock: CodeBlockElement): string {
    * At the very end, when we know how many backticks we need, add our backticks
    * and language at the start and the closing backticks at the end.
    */
-  lines.unshift(`${"`".repeat(backticks)}${codeBlock.language}`)
-  lines.push(`${"`".repeat(backticks)}`)
+  lines.unshift(`${fence.repeat(backticks)}${info}`)
+  lines.push(fence.repeat(backticks))
   return `${lines.join("\n")}\n\n`
 }

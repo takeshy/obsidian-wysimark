@@ -9,7 +9,7 @@ export default class WysimarkEditorPlugin extends Plugin {
     this.registerView(VIEW_TYPE_WYSIMARK, (leaf) => new WysimarkView(leaf, this));
 
     // Add ribbon icon to show/toggle the view
-    this.addRibbonIcon('edit-3', 'Wysimark editor', () => {
+    this.addRibbonIcon('pencil', 'Wysimark editor', () => {
       void this.activateWysimarkView();
     });
 
