@@ -39,7 +39,7 @@ export function parseContents(
           elements.push({
             type: "paragraph",
             children: [{ text: "" }],
-          } as Element)
+          })
         }
       }
     }

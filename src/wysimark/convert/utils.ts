@@ -6,7 +6,7 @@ import { Element } from "./types"
  * and replaces with just the character itself.
  */
 export function unescapeMarkdown(text: string): string {
-  return text.replace(/\\([\\`*_\[\]~|<])/g, '$1');
+  return text.replace(/\\([\\`*_[\]~|<])/g, '$1');
 }
 
 export function assert(pass: boolean, message: string) {

@@ -1,5 +1,4 @@
 import type { Heading } from "mdast"
-import { Descendant } from "slate"
 
 import { InternalLinkOptions } from "../obsidian-links"
 import { Element } from "../types"
@@ -13,7 +12,7 @@ export function parseHeading(
     {
       type: "heading",
       level: content.depth,
-      children: parsePhrasingContents(content.children, {}, options) as Descendant[],
+      children: parsePhrasingContents(content.children, {}, options),
     },
   ]
 }

@@ -4,7 +4,6 @@ import { MarkProps, Segment } from "../../types"
 import { assertUnreachable } from "../../utils"
 import { normalizeSegments } from "./normalize-segments"
 import { parseInlineImage } from "./parse-inline-image"
-import { Descendant } from "slate"
 import {
   InternalLinkOptions,
   restoreEscapedWikiLinks,
@@ -109,7 +108,7 @@ function findPairedInlineTags(phrasingContents: PhrasingContent[]): Set<number> 
     if (!tag.closing) {
       stack.push(index)
     } else if (stack.length) {
-      paired.add(stack.pop()!)
+      paired.add(stack.pop())
       paired.add(index)
     }
   })
@@ -189,7 +188,7 @@ function parsePhrasingContent(
             phrasingContent.children,
             marks,
             options
-          ) as Descendant[],
+          ),
         },
       ]
     case "strong":

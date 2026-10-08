@@ -2,7 +2,7 @@
 // These are the only characters `\` can escape, so a `\` not followed by one
 // of them is a literal backslash (e.g. Windows paths like `C:\Users`).
 function isAsciiPunct(ch: string): boolean {
-  return /[!-/:-@\[-`{-~]/.test(ch)
+  return /[!-/:-@[-`{-~]/.test(ch)
 }
 
 function isWhitespace(ch: string): boolean {
@@ -47,7 +47,7 @@ function getDelimitersThatCanPair(
       rightFlanking && (intraword || !leftFlanking || isPunctOrSymbol(next))
 
     if (canClose && openers.length > 0) {
-      escaped.add(openers.pop() as number)
+      escaped.add(openers.pop())
       escaped.add(i)
     }
     if (canOpen) openers.push(i)
@@ -69,7 +69,7 @@ function getTildesThatCanPair(chars: string[]): Set<number> {
     const canClose = !isWhitespace(prev)
 
     if (canClose && openers.length > 0) {
-      escaped.add(openers.pop() as number)
+      escaped.add(openers.pop())
       escaped.add(i)
     }
     if (canOpen) openers.push(i)

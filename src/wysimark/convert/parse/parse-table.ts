@@ -1,5 +1,4 @@
 import type { Table, TableCell, TableRow } from "mdast"
-import { Descendant } from "slate"
 
 import { InternalLinkOptions } from "../obsidian-links"
 import {
@@ -48,7 +47,7 @@ function parseTableCell(
     children: [
       {
         type: "table-content",
-        children: parsePhrasingContents(cell.children, {}, options) as Descendant[],
+        children: parsePhrasingContents(cell.children, {}, options),
       },
     ],
   }

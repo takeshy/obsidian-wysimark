@@ -7,7 +7,7 @@ export function serializeCodeText(text: Text, options?: EscapeTextOptions): stri
   // changing either the code text or the number of cells.
   if (options?.inTable && /\\\|/.test(text.text)) {
     return `<code>${text.text.replace(/[&<>\\|*_~[\]`]/g,
-      (char) => `&#${char.codePointAt(0)};`)}<\/code>`
+      (char) => `&#${char.codePointAt(0)};`)}</code>`
   }
   let max = 0
   for (const match of text.text.matchAll(/[`]+/g)) {

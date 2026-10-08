@@ -1,5 +1,4 @@
 import type { ListItem } from "mdast"
-import { Descendant } from "slate"
 
 import { InternalLinkOptions } from "../../obsidian-links"
 import { Element } from "../../types"
@@ -24,7 +23,7 @@ export function parseListItemChild(
             type: "task-list-item",
             depth,
             checked,
-            children: parsePhrasingContents(child.children, {}, options) as Descendant[],
+            children: parsePhrasingContents(child.children, {}, options),
           },
         ]
       } else if (ordered) {
@@ -32,7 +31,7 @@ export function parseListItemChild(
           {
             type: "ordered-list-item",
             depth,
-            children: parsePhrasingContents(child.children, {}, options) as Descendant[],
+            children: parsePhrasingContents(child.children, {}, options),
           },
         ]
       } else {
@@ -40,7 +39,7 @@ export function parseListItemChild(
           {
             type: "unordered-list-item",
             depth,
-            children: parsePhrasingContents(child.children, {}, options) as Descendant[],
+            children: parsePhrasingContents(child.children, {}, options),
           },
         ]
       }
